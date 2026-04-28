@@ -1,25 +1,28 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import useAuth from '../../hooks/useAuth';
+import authService from '../../services/authService';
+import Spinner from '../../components/ui/Spinner';
+import ROUTES from '../../constants/routes';
 
-export default function SignUp() {
+export default function SignUpPage() {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [form, setForm] = useState({ name: '', email: '', password: '' });
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setTimeout(() => {
-      localStorage.setItem('medsutra_user', JSON.stringify({
-        name: form.name,
-        email: form.email,
-        role: 'Patient',
-        joined: new Date().toLocaleDateString('en-IN', { month: 'long', year: 'numeric' }),
-        avatar: form.name.charAt(0).toUpperCase(),
-      }));
-      window.dispatchEvent(new Event('storage'));
-      navigate('/Dashboard');
-    }, 900);
+    try {
+      const userData = await authService.register(form.name, form.email, form.password);
+      login(userData);
+      navigate(ROUTES.DASHBOARD);
+    } catch (err) {
+      console.error('Registration failed:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -27,7 +30,7 @@ export default function SignUp() {
 
       {/* Left panel */}
       <div className="hidden lg:flex flex-col justify-between bg-gray-900 p-14">
-        <Link to="/" className="flex items-center gap-2 no-underline">
+        <Link to={ROUTES.HOME} className="flex items-center gap-2 no-underline">
           <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center flex-shrink-0">
             <span className="text-gray-900 font-black text-xs">MS</span>
           </div>
@@ -69,7 +72,7 @@ export default function SignUp() {
         <div className="w-full max-w-sm">
 
           {/* Mobile logo */}
-          <Link to="/" className="lg:hidden flex items-center gap-2 no-underline mb-10">
+          <Link to={ROUTES.HOME} className="lg:hidden flex items-center gap-2 no-underline mb-10">
             <div className="w-7 h-7 rounded-md bg-gray-900 flex items-center justify-center">
               <span className="text-white font-black text-xs">MS</span>
             </div>
@@ -123,7 +126,7 @@ export default function SignUp() {
             >
               {loading
                 ? <span className="flex items-center justify-center gap-2">
-                    <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    <Spinner />
                     Creating account...
                   </span>
                 : 'Create Account'
@@ -139,7 +142,7 @@ export default function SignUp() {
 
           <p className="text-sm text-gray-500 text-center mt-6">
             Already have an account?{' '}
-            <Link to="/Login" className="text-gray-900 font-semibold hover:underline no-underline">
+            <Link to={ROUTES.LOGIN} className="text-gray-900 font-semibold hover:underline no-underline">
               Sign in
             </Link>
           </p>

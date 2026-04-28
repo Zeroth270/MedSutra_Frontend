@@ -1,26 +1,28 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import useAuth from '../../hooks/useAuth';
+import authService from '../../services/authService';
+import Spinner from '../../components/ui/Spinner';
+import ROUTES from '../../constants/routes';
 
-export default function Login() {
+export default function LoginPage() {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [form, setForm] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setTimeout(() => {
-      const username = form.email.split('@')[0];
-      localStorage.setItem('medsutra_user', JSON.stringify({
-        name: username.charAt(0).toUpperCase() + username.slice(1),
-        email: form.email,
-        role: 'Patient',
-        joined: new Date().toLocaleDateString('en-IN', { month: 'long', year: 'numeric' }),
-        avatar: username.charAt(0).toUpperCase(),
-      }));
-      window.dispatchEvent(new Event('storage'));
-      navigate('/Dashboard');
-    }, 900);
+    try {
+      const userData = await authService.login(form.email, form.password);
+      login(userData);
+      navigate(ROUTES.DASHBOARD);
+    } catch (err) {
+      console.error('Login failed:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -28,7 +30,7 @@ export default function Login() {
 
       {/* Left panel */}
       <div className="hidden lg:flex flex-col justify-between bg-gray-900 p-14">
-        <Link to="/" className="flex items-center gap-2 no-underline">
+        <Link to={ROUTES.HOME} className="flex items-center gap-2 no-underline">
           <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center flex-shrink-0">
             <span className="text-gray-900 font-black text-xs">MS</span>
           </div>
@@ -69,7 +71,7 @@ export default function Login() {
         <div className="w-full max-w-sm">
 
           {/* Mobile logo */}
-          <Link to="/" className="lg:hidden flex items-center gap-2 no-underline mb-10">
+          <Link to={ROUTES.HOME} className="lg:hidden flex items-center gap-2 no-underline mb-10">
             <div className="w-7 h-7 rounded-md bg-gray-900 flex items-center justify-center">
               <span className="text-white font-black text-xs">MS</span>
             </div>
@@ -116,7 +118,7 @@ export default function Login() {
             >
               {loading
                 ? <span className="flex items-center justify-center gap-2">
-                    <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    <Spinner />
                     Signing in...
                   </span>
                 : 'Sign in'
@@ -126,7 +128,7 @@ export default function Login() {
 
           <p className="text-sm text-gray-500 text-center mt-7">
             Don't have an account?{' '}
-            <Link to="/SignUp" className="text-gray-900 font-semibold hover:underline no-underline">
+            <Link to={ROUTES.SIGN_UP} className="text-gray-900 font-semibold hover:underline no-underline">
               Sign up for free
             </Link>
           </p>

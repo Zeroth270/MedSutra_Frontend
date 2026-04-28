@@ -1,4 +1,5 @@
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router-dom';
+import ROUTES from '../../constants/routes';
 
 const FEATURES = [
   {
@@ -17,23 +18,16 @@ const FEATURES = [
     title: 'Caregiver Access',
     desc: 'Share your real-time adherence data with family members or physicians. Critical alerts notify caregivers when doses are repeatedly missed.',
   },
-]
+];
 
 const STEPS = [
   { number: '01', title: 'Create your profile', desc: 'Sign up and enter your medications, dosages, and daily schedule in minutes.' },
   { number: '02', title: 'Set your reminders', desc: 'Configure smart alerts. Our AI personalizes timing based on your daily routine.' },
   { number: '03', title: 'Verify each dose', desc: 'Use AI Vision to scan and confirm every medication matches your prescription.' },
   { number: '04', title: 'Track your progress', desc: 'View weekly adherence reports and AI-generated insights for better outcomes.' },
-]
+];
 
-const STATS = [
-  { value: '94%', label: 'Average adherence rate among users' },
-  { value: '50,000+', label: 'Active patients on the platform' },
-  { value: '2 Million+', label: 'Doses tracked and verified' },
-  { value: '99.9%', label: 'Platform uptime guaranteed' },
-]
-
-export default function Home() {
+export default function HomePage() {
   return (
     <main className="bg-white">
 
@@ -51,7 +45,7 @@ export default function Home() {
           </p>
           <div className="flex flex-wrap items-center justify-center gap-4">
             <Link
-              to="/SignUp"
+              to={ROUTES.SIGN_UP}
               className="btn-primary px-8 py-3.5 text-sm rounded-xl no-underline"
             >
               Start for Free
@@ -68,18 +62,6 @@ export default function Home() {
           </p>
         </div>
       </section>
-
-      {/* Stats */}
-      {/* <section className="border-y border-gray-100 bg-gray-50 py-14 px-6">
-        <div className="max-w-6xl mx-auto grid grid-cols-2 lg:grid-cols-4 gap-10">
-          {STATS.map((s, i) => (
-            <div key={i} className="text-center">
-              <p className="text-3xl font-black text-gray-900 mb-2">{s.value}</p>
-              <p className="text-sm text-gray-500 leading-snug">{s.label}</p>
-            </div>
-          ))}
-        </div>
-      </section> */}
 
       {/* Features */}
       <section id="features" className="py-24 px-6">
@@ -143,7 +125,7 @@ export default function Home() {
             Join thousands of patients who trust MedSutra AI to keep them safe, informed, and adherent.
           </p>
           <Link
-            to="/SignUp"
+            to={ROUTES.SIGN_UP}
             className="inline-block bg-white text-gray-900 font-bold px-10 py-4 rounded-xl text-sm hover:bg-gray-100 transition-all no-underline"
           >
             Create a Free Account
@@ -152,5 +134,5 @@ export default function Home() {
         </div>
       </section>
     </main>
-  )
+  );
 }
