@@ -31,10 +31,10 @@ export default function SignUpPage() {
       {/* Left panel */}
       <div className="hidden lg:flex flex-col justify-between bg-gray-900 p-14">
         <Link to={ROUTES.HOME} className="flex items-center gap-2 no-underline">
-          <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center flex-shrink-0">
+          {/* <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center flex-shrink-0">
             <span className="text-gray-900 font-black text-xs">MS</span>
           </div>
-          <span className="text-white font-bold text-base">MedSutra AI</span>
+          <span className="text-white font-bold text-base">MedSutra AI</span> */}
         </Link>
 
         <div>
@@ -91,11 +91,10 @@ export default function SignUpPage() {
                     key={role}
                     type="button"
                     onClick={() => setForm({ ...form, role })}
-                    className={`py-2 rounded-lg text-xs font-bold transition-all border ${
-                      form.role === role 
-                        ? 'bg-gray-900 border-gray-900 text-white shadow-md' 
+                    className={`py-2 rounded-lg text-xs font-bold transition-all border ${form.role === role
+                        ? 'bg-gray-900 border-gray-900 text-white shadow-md'
                         : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300'
-                    }`}
+                      }`}
                   >
                     {role}
                   </button>
@@ -146,9 +145,9 @@ export default function SignUpPage() {
             >
               {loading
                 ? <span className="flex items-center justify-center gap-2">
-                    <Spinner />
-                    Creating account...
-                  </span>
+                  <Spinner />
+                  Creating account...
+                </span>
                 : 'Create Account'
               }
             </button>
