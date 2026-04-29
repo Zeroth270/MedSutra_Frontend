@@ -24,10 +24,10 @@ export default function SettingsPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-8">
           {/* Identity Box */}
-          <div className="theme-surface border theme-border rounded-[3rem] p-10 shadow-sm hover:shadow-xl transition-all">
+          <div className="rounded-[3rem] p-10 transition-all">
             <h2 className="font-black theme-text text-[10px] uppercase tracking-[0.2em] mb-10 px-1">Identity & Authentication</h2>
 
-            <div className="flex items-center gap-6 mb-12 p-8 theme-bg rounded-[2.5rem] border theme-border shadow-sm">
+            <div className="flex items-center gap-6 mb-12 p-8 rounded-[2.5rem] shadow-sm border theme-border hover:border-teal-500/30 transition-colors">
               <div className="w-20 h-20 rounded-2xl bg-gray-900 dark:bg-teal-600 flex items-center justify-center font-black text-white text-3xl flex-shrink-0 shadow-2xl border-4 border-white dark:border-gray-800">{user.avatar}</div>
               <div>
                 <p className="font-black theme-text text-2xl uppercase tracking-tight">{user.name}</p>
@@ -38,19 +38,19 @@ export default function SettingsPage() {
             <div className="space-y-8">
               <div className="group">
                 <label className="block text-[10px] font-black theme-text-sub uppercase tracking-[0.2em] mb-3 px-2 group-focus-within:text-teal-600 transition-colors">Legal Full Name</label>
-                <input value={name} onChange={e => setName(e.target.value)} className="w-full px-6 py-4 theme-bg border theme-border rounded-2xl text-sm theme-text focus:outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-500/5 transition-all font-black uppercase tracking-tight" />
+                <input value={name} onChange={e => setName(e.target.value)} className="w-full px-6 py-4 rounded-2xl text-sm theme-text border border-transparent focus:outline-none focus:border-teal-500 hover:border-teal-500/30 focus:ring-4 focus:ring-teal-500/5 transition-all font-black uppercase tracking-tight" />
               </div>
               <div className="group">
                 <label className="block text-[10px] font-black theme-text-sub uppercase tracking-[0.2em] mb-3 px-2 group-focus-within:text-teal-600 transition-colors">Primary Email Node</label>
-                <input value={email} onChange={e => setEmail(e.target.value)} type="email" className="w-full px-6 py-4 theme-bg border theme-border rounded-2xl text-sm theme-text focus:outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-500/5 transition-all font-black uppercase tracking-tight" />
+                <input value={email} onChange={e => setEmail(e.target.value)} type="email" className="w-full px-6 py-4 rounded-2xl text-sm theme-text border border-transparent focus:outline-none focus:border-teal-500 hover:border-teal-500/30 focus:ring-4 focus:ring-teal-500/5 transition-all font-black uppercase tracking-tight" />
               </div>
               <div className="group">
                 <label className="block text-[10px] font-black theme-text-sub uppercase tracking-[0.2em] mb-3 px-2 group-focus-within:text-teal-600 transition-colors">Emergency Contact Phone</label>
-                <input value={phone} onChange={e => setPhone(e.target.value)} type="tel" className="w-full px-6 py-4 theme-bg border theme-border rounded-2xl text-sm theme-text focus:outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-500/5 transition-all font-black uppercase tracking-tight" />
+                <input value={phone} onChange={e => setPhone(e.target.value)} type="tel" className="w-full px-6 py-4 rounded-2xl text-sm theme-text border border-transparent focus:outline-none focus:border-teal-500 hover:border-teal-500/30 focus:ring-4 focus:ring-teal-500/5 transition-all font-black uppercase tracking-tight" />
               </div>
               <div className="group opacity-60">
                 <label className="block text-[10px] font-black theme-text-sub uppercase tracking-[0.2em] mb-3 px-2">Assigned Clinical Role</label>
-                <input value={user.role} readOnly className="w-full px-6 py-4 theme-bg border theme-border rounded-2xl text-[10px] theme-text-sub cursor-not-allowed font-black uppercase tracking-[0.2em]" />
+                <input value={user.role} readOnly className="w-full px-6 py-4 rounded-2xl text-[10px] theme-text-sub cursor-not-allowed font-black uppercase tracking-[0.2em]" />
               </div>
 
               <div className="pt-4">
@@ -65,8 +65,8 @@ export default function SettingsPage() {
           </div>
 
           {/* Security Box */}
-          <div className="theme-surface border border-red-100 dark:border-red-900/30 rounded-[3rem] p-10 hover:shadow-2xl hover:shadow-red-500/5 transition-all group">
-            <h2 className="font-black text-red-500 dark:text-red-400 text-[10px] uppercase tracking-[0.2em] mb-8 px-1">Restrictive Actions</h2>
+          <div className="border border-red-100 dark:border-red-900/30 hover:border-red-500 rounded-[3rem] p-10 hover:shadow-2xl hover:shadow-red-500/5 transition-all group">
+            {/* <h2 className="font-black text-red-500 dark:text-red-400 text-[10px] uppercase tracking-[0.2em] mb-8 px-1">Restrictive Actions</h2> */}
             <div className="flex flex-col md:flex-row md:items-center justify-between p-8 bg-red-50 dark:bg-red-900/10 rounded-[2rem] border border-red-100 dark:border-red-900/20 gap-6">
               <div>
                 <p className="text-lg font-black text-red-600 dark:text-red-400 uppercase tracking-tight">Delete User Account</p>
@@ -78,7 +78,7 @@ export default function SettingsPage() {
 
         {/* Sidebar Settings Column */}
         <div className="space-y-8">
-          <div className="theme-surface border theme-border rounded-[3rem] p-10 shadow-lg hover:shadow-xl transition-all">
+          <div className="rounded-[3rem] p-10 transition-all">
             <h2 className="font-black theme-text text-[10px] uppercase tracking-[0.2em] mb-3">Alert Logic</h2>
             <p className="text-[10px] theme-text-sub font-bold uppercase tracking-widest mb-10 opacity-70">Personalize real-time triggers</p>
 

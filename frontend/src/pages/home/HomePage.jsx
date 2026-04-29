@@ -34,7 +34,7 @@ export default function HomePage() {
       {/* Hero */}
       <section id="home" className="pt-32 pb-24 px-6">
         <div className="max-w-3xl mx-auto text-center">
-          <div className="inline-block px-4 py-1.5 theme-bg rounded-full text-[10px] font-black theme-text-sub uppercase tracking-widest border theme-border mb-10 shadow-sm">
+          <div className="inline-block px-4 py-1.5 rounded-full text-[10px] font-black theme-text-sub uppercase tracking-widest mb-10">
             AI-Powered Medication Management
           </div>
           <h1 className="text-4xl md:text-6xl font-black theme-text leading-tight tracking-tight mb-8">
@@ -52,7 +52,7 @@ export default function HomePage() {
             </Link>
             <a
               href="#features"
-              className="text-xs font-black uppercase tracking-widest theme-text-sub hover:theme-text px-10 py-4 border theme-border rounded-xl hover:border-gray-300 dark:hover:border-teal-900 transition-all no-underline theme-surface shadow-sm"
+              className="text-xs font-black uppercase tracking-widest theme-text-sub hover:theme-text px-10 py-4 transition-all no-underline"
             >
               How it works
             </a>
@@ -72,7 +72,7 @@ export default function HomePage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {STEPS.map((step, i) => (
-              <div key={i} className="theme-surface border theme-border rounded-3xl p-8 shadow-sm hover:shadow-lg transition-all duration-300 group">
+              <div key={i} className="rounded-3xl p-8 transition-all duration-300 group">
                 <p className="text-4xl font-black text-gray-100 dark:text-gray-800 mb-6 group-hover:text-teal-500/20 transition-colors">{step.number}</p>
                 <h3 className="font-black theme-text mb-4 text-base uppercase tracking-tight">{step.title}</h3>
                 <p className="text-sm theme-text-sub leading-relaxed font-medium">{step.desc}</p>
@@ -99,7 +99,7 @@ export default function HomePage() {
             {FEATURES.map((f, i) => (
               <div
                 key={i}
-                className="card-hover theme-surface border theme-border rounded-3xl p-10 shadow-sm hover:shadow-xl transition-all duration-300 group"
+                className="card-hover rounded-3xl p-10 transition-all duration-300 group"
               >
                 <div className="w-10 h-10 rounded-xl bg-gray-900 dark:bg-teal-600 flex items-center justify-center mb-8 flex-shrink-0 shadow-lg">
                   <span className="text-white text-xs font-black">{String(i + 1).padStart(2, '0')}</span>

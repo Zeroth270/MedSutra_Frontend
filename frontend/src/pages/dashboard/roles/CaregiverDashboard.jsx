@@ -74,14 +74,14 @@ export default function CaregiverDashboard() {
       <section className="space-y-8">
         <div className="flex items-center justify-between px-2">
           <h2 className="text-[10px] font-black theme-text-sub uppercase tracking-[0.2em]">Active Monitored Nodes</h2>
-          <span className="text-[10px] font-black text-teal-600 bg-teal-50 dark:bg-teal-900/20 px-4 py-2 rounded-xl border border-teal-100 dark:border-teal-800/50 uppercase tracking-widest shadow-sm">{monitored.length} Accounts</span>
+          <span className="text-[10px] font-black text-teal-600 border border-teal-200 dark:border-teal-900/30 px-4 py-2 rounded-xl uppercase tracking-widest shadow-sm">{monitored.length} Accounts</span>
         </div>
         <div className="grid grid-cols-1 gap-6">
           {monitored.map((p) => (
             <div key={p.id} className="theme-surface border theme-border rounded-[2.5rem] p-8 shadow-sm hover:shadow-2xl hover:border-teal-100 dark:hover:border-teal-900 transition-all duration-300 group card-hover relative overflow-hidden">
               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 relative z-10">
                 <div className="flex items-center gap-6">
-                  <div className={`w-16 h-16 rounded-2xl flex items-center justify-center font-black text-2xl transition-transform group-hover:scale-110 shadow-lg border-2 ${p.urgency === 'high' ? 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-100 dark:border-red-900/50' : 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border-green-100 dark:border-green-800/50'}`}>
+                  <div className={`w-16 h-16 rounded-2xl flex items-center justify-center font-black text-2xl transition-transform group-hover:scale-110 shadow-lg border-2 ${p.urgency === 'high' ? 'border-red-200 dark:border-red-900/30 text-red-600 dark:text-red-400' : 'border-green-200 dark:border-green-900/30 text-green-700 dark:text-green-400'}`}>
                     {p.name.charAt(0)}
                   </div>
                   <div>
@@ -127,7 +127,7 @@ export default function CaregiverDashboard() {
         <section className="space-y-8 pt-4">
           <div className="flex items-center justify-between px-2">
             <h2 className="text-[10px] font-black theme-text-sub uppercase tracking-[0.2em]">Active Care Network</h2>
-            <span className="text-[10px] font-black text-teal-600 bg-teal-50 dark:bg-teal-900/20 px-4 py-2 rounded-xl border border-teal-100 dark:border-teal-800/50 uppercase tracking-widest shadow-sm">{activeNetwork.length} Specialists</span>
+            <span className="text-[10px] font-black text-teal-600 border border-teal-200 dark:border-teal-900/30 px-4 py-2 rounded-xl uppercase tracking-widest shadow-sm">{activeNetwork.length} Specialists</span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {activeNetwork.map((doc) => (
@@ -162,7 +162,7 @@ export default function CaregiverDashboard() {
             <input
               type="text"
               placeholder="Filter specialists..."
-              className="pl-12 pr-8 py-4 theme-surface border theme-border rounded-2xl text-xs theme-text focus:ring-4 focus:ring-teal-500/10 focus:border-teal-500 outline-none w-full md:w-96 transition-all shadow-sm font-medium"
+              className="pl-12 pr-8 py-4 border theme-border rounded-2xl text-xs theme-text focus:ring-4 focus:ring-teal-500/10 focus:border-teal-500 outline-none w-full md:w-96 transition-all shadow-sm font-medium"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />

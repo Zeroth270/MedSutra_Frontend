@@ -85,13 +85,13 @@ export default function CaregiverLinkPage() {
           <section>
             <div className="flex items-center justify-between mb-8 px-2">
               <h2 className="font-black theme-text text-xl uppercase tracking-tight">Active Care Network</h2>
-              <span className="text-[10px] font-black text-teal-600 bg-teal-50 dark:bg-teal-900/20 px-4 py-2 rounded-xl border border-teal-100 dark:border-teal-800/50 uppercase tracking-[0.2em] shadow-sm">{caregivers.length} Verified</span>
+              <span className="text-[10px] font-black text-teal-600 border border-teal-200 dark:border-teal-900/30 px-4 py-2 rounded-xl uppercase tracking-[0.2em] shadow-sm">{caregivers.length} Verified</span>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {caregivers.map((c) => (
-                <div key={c.id} className="theme-surface border theme-border rounded-[2.5rem] p-8 flex flex-col gap-6 hover:shadow-2xl hover:border-teal-100 dark:hover:border-teal-900 transition-all duration-300 group card-hover relative overflow-hidden">
+                <div key={c.id} className="border theme-border hover:border-teal-500 rounded-[2.5rem] p-8 flex flex-col gap-6 transition-all duration-300 group card-hover relative overflow-hidden shadow-sm hover:shadow-2xl">
                   <div className="flex items-center gap-6 relative z-10">
-                    <div className="w-16 h-16 rounded-2xl bg-gray-900 dark:bg-teal-600 flex items-center justify-center font-black text-white text-2xl flex-shrink-0 group-hover:rotate-6 transition-transform shadow-xl border-2 border-white dark:border-gray-800">{c.initial}</div>
+                    <div className="w-16 h-16 rounded-2xl bg-gray-900 dark:bg-teal-600 flex items-center justify-center font-black text-white text-2xl flex-shrink-0 transition-transform shadow-xl border-2 border-white dark:border-gray-800">{c.initial}</div>
                     <div className="flex-1 min-w-0">
                       <p className="font-black theme-text text-lg uppercase tracking-tight group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors truncate">{c.name}</p>
                       <p className="text-[10px] theme-text-sub font-black mt-1.5 uppercase tracking-[0.2em] opacity-70">{c.role}</p>
@@ -99,7 +99,7 @@ export default function CaregiverLinkPage() {
                   </div>
 
                   <div className="flex items-center justify-between pt-6 border-t theme-border relative z-10">
-                    <span className="text-[10px] font-black bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 px-4 py-2 rounded-xl border border-green-100 dark:border-green-800/50 uppercase tracking-widest shadow-sm">{c.status}</span>
+                    <span className="text-[10px] font-black border border-green-200 dark:border-green-900/30 text-green-700 dark:text-green-400 px-4 py-2 rounded-xl uppercase tracking-widest shadow-sm">{c.status}</span>
                     <div className="flex gap-2">
                       <button onClick={() => alert(`Configuring access for ${c.name}...`)} className="text-[10px] theme-text-sub hover:text-teal-600 dark:hover:text-teal-400 font-black uppercase tracking-[0.2em] transition-all">Configure</button>
                       <button onClick={() => handleRemove(c.id)} className="text-[10px] text-red-500 font-black uppercase tracking-[0.2em] transition-all ml-2">Disconnect</button>
@@ -131,7 +131,7 @@ export default function CaregiverLinkPage() {
                 <input
                   type="text"
                   placeholder="Filter by specialty..."
-                  className="pl-12 pr-8 py-4 theme-surface border theme-border rounded-2xl text-xs theme-text focus:ring-4 focus:ring-teal-500/10 focus:border-teal-500 outline-none w-full md:w-96 transition-all shadow-sm font-medium"
+                  className="pl-12 pr-8 py-4 border theme-border hover:border-teal-500 rounded-2xl text-xs theme-text focus:ring-4 focus:ring-teal-500/10 focus:border-teal-500 outline-none w-full md:w-96 transition-all shadow-sm font-medium"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -160,7 +160,7 @@ export default function CaregiverLinkPage() {
 
         {/* Global Permissions Column */}
         <div className="space-y-8">
-          <div className="theme-surface border theme-border rounded-[3rem] p-10 sticky top-24 shadow-2xl hover:shadow-xl transition-all">
+          <div className="border theme-border hover:border-teal-500 rounded-[3rem] p-10 sticky top-24 transition-all shadow-sm hover:shadow-xl">
             <div className="flex items-center gap-3 mb-10 px-1">
               <div className="w-2 h-7 bg-teal-500 rounded-full"></div>
               <h2 className="font-black theme-text text-lg uppercase tracking-tight">Global Logic</h2>

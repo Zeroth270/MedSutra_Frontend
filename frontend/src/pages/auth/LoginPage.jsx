@@ -45,12 +45,12 @@ export default function LoginPage() {
             <span className="text-teal-500">is ready.</span>
           </h2>
           <p className="text-gray-400 text-base leading-relaxed max-w-sm font-medium">
-            MedSutra AI clinical systems are actively monitoring 50,000+ patient nodes for optimal adherence performance.
+            MedSutra AI clinical systems are actively monitoring patient nodes for optimal adherence performance.
           </p>
         </div>
 
         <p className="text-gray-600 text-[10px] font-black uppercase tracking-widest relative z-10">
-          © {new Date().getFullYear()} MedSutra Clinical Systems
+          {/* © {new Date().getFullYear()} MedSutra Clinical Systems */}
         </p>
       </div>
 

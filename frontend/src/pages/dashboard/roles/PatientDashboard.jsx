@@ -68,8 +68,8 @@ export default function PatientDashboard({ selectedPatient, isDoctorView }) {
             {/* Stats */}
             <div className="grid grid-cols-2 xl:grid-cols-4 gap-6 mb-12">
                 {stats.map(s => (
-                    <div key={s.label} className="theme-surface border theme-border rounded-3xl p-8 shadow-sm hover:shadow-xl hover:border-teal-100 dark:hover:border-teal-900 transition-all group card-hover">
-                        <p className="text-[10px] font-black theme-text-sub uppercase tracking-[0.2em] mb-6">{s.label}</p>
+                    <div key={s.label} className="border theme-border hover:border-teal-500 rounded-3xl p-8 transition-all group card-hover shadow-sm hover:shadow-xl">
+                        <p className="text-[10px] font-black theme-text uppercase tracking-[0.2em] mb-6">{s.label}</p>
                         <p className="text-4xl font-black theme-text mb-2 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">{s.value}</p>
                         <p className="text-[10px] theme-text-sub font-black uppercase tracking-widest">{s.sub}</p>
                     </div>
@@ -93,19 +93,19 @@ export default function PatientDashboard({ selectedPatient, isDoctorView }) {
                         </div>
                         <div className="space-y-4">
                             {meds.map((med) => (
-                                <div key={med.id} className="theme-surface border theme-border rounded-[2rem] px-8 py-8 flex items-center justify-between hover:shadow-2xl hover:border-teal-200 dark:hover:border-teal-800 transition-all group card-hover relative overflow-hidden">
+                                <div key={med.id} className="border theme-border hover:border-teal-500 rounded-[2rem] px-8 py-8 flex items-center justify-between transition-all group card-hover relative overflow-hidden shadow-sm hover:shadow-2xl">
                                     <div className="flex items-center gap-6 relative z-10">
-                                        <div className="w-16 h-16 rounded-2xl theme-bg border theme-border flex items-center justify-center text-3xl group-hover:scale-110 transition-transform shadow-lg group-hover:rotate-6">💊</div>
+                                        <div className="w-16 h-16 rounded-2xl theme-bg flex items-center justify-center text-3xl group-hover:scale-110 transition-transform shadow-lg">💊</div>
                                         <div>
                                             <p className="text-xl font-black theme-text group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors uppercase tracking-tight">{med.name}</p>
-                                            <p className="text-[10px] theme-text-sub font-black mt-1.5 uppercase tracking-widest opacity-70">{med.frequency} · SCHED: {med.time}</p>
+                                            <p className="text-[10px] text-teal-600 dark:text-teal-400 font-black mt-1.5 uppercase tracking-widest">{med.frequency} · SCHED: {med.time}</p>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-5 relative z-10">
-                                        <span className={`text-[10px] font-black px-4 py-2 rounded-xl uppercase tracking-widest border shadow-sm ${
+                                        <span className={`text-[10px] font-black px-4 py-2 rounded-xl uppercase tracking-widest border transition-all ${
                                             med.status === 'Active' 
-                                            ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border-green-100 dark:border-green-800/50'
-                                            : 'bg-gray-50 dark:bg-gray-800 text-gray-500 border-gray-100 dark:border-gray-700'
+                                            ? 'border-green-200 dark:border-green-900/30 text-green-700 dark:text-green-400'
+                                            : 'border-gray-200 dark:border-gray-700 text-gray-500'
                                         }`}>
                                             {med.status}
                                         </span>
@@ -121,7 +121,7 @@ export default function PatientDashboard({ selectedPatient, isDoctorView }) {
                                     </div>
                                     {!isDoctorView && (
                                         <div className="absolute right-6 top-6 opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <span className="text-[8px] font-black theme-text-sub uppercase tracking-widest border theme-border px-2 py-1 rounded bg-theme-bg/50 backdrop-blur-sm">Verified</span>
+                                            <span className="text-[8px] font-black theme-text-sub uppercase tracking-widest border theme-border px-2 py-1 rounded">Verified</span>
                                         </div>
                                     )}
                                     <div className="absolute -right-8 -bottom-8 w-24 h-24 bg-teal-500/5 rounded-full blur-3xl" />
@@ -143,18 +143,18 @@ export default function PatientDashboard({ selectedPatient, isDoctorView }) {
                         </div>
                         <div className="space-y-4">
                             {log.map((item, i) => (
-                                <div key={i} className="theme-surface border theme-border rounded-3xl px-8 py-6 flex flex-col sm:flex-row sm:items-center justify-between hover:shadow-xl transition-all group gap-4 relative overflow-hidden">
+                                <div key={i} className="border theme-border hover:border-teal-500 rounded-3xl px-8 py-6 flex flex-col sm:flex-row sm:items-center justify-between transition-all group gap-4 relative overflow-hidden shadow-sm hover:shadow-xl">
                                     <div className="flex items-center gap-6 relative z-10">
                                         <div className={`w-3 h-3 rounded-full ${item.dot} shadow-[0_0_12px_rgba(0,0,0,0.15)] animate-pulse`} />
                                         <span className="text-[10px] theme-text-sub font-black w-24 uppercase tracking-[0.2em]">{item.time}</span>
                                         <span className="text-sm font-black theme-text uppercase tracking-tight group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">{item.med}</span>
                                     </div>
-                                    <span className={`text-[10px] font-black px-4 py-2 rounded-xl uppercase tracking-widest border shadow-sm self-start sm:self-auto relative z-10 ${
+                                    <span className={`text-[10px] font-black px-4 py-2 rounded-xl uppercase tracking-widest border transition-all self-start sm:self-auto relative z-10 ${
                                         item.status === 'Taken' 
-                                            ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border-green-100 dark:border-green-800/50' 
+                                            ? 'border-green-200 dark:border-green-900/30 text-green-700 dark:text-green-400' 
                                             : item.status === 'Missed'
-                                                ? 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-100 dark:border-red-900/50'
-                                                : 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400 border-yellow-100 dark:border-yellow-800/50'
+                                                ? 'border-red-200 dark:border-red-900/30 text-red-600 dark:text-red-400'
+                                                : 'border-yellow-200 dark:border-yellow-900/30 text-yellow-700 dark:text-yellow-500'
                                     }`}>
                                         {item.status}
                                     </span>
@@ -183,7 +183,7 @@ export default function PatientDashboard({ selectedPatient, isDoctorView }) {
                     </div>
 
                     {isDoctorView && (
-                        <div className="theme-surface border theme-border rounded-[3rem] p-10 shadow-2xl hover:shadow-xl transition-all">
+                        <div className="border theme-border hover:border-teal-500 rounded-[3rem] p-10 transition-all shadow-sm hover:shadow-xl">
                             <h3 className="font-black theme-text text-[10px] uppercase tracking-[0.3em] mb-10 px-2">Clinical Logic</h3>
                             <div className="space-y-3">
                                 <button className="w-full text-left px-6 py-5 rounded-2xl border theme-border text-[10px] font-black theme-text-sub hover:theme-bg hover:text-teal-600 dark:hover:text-teal-400 transition-all uppercase tracking-[0.2em] flex items-center gap-4 group">

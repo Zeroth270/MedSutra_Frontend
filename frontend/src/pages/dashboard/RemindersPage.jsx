@@ -58,7 +58,7 @@ export default function RemindersPage() {
           { label: 'Snoozed', value: reminders.filter(r => r.status === 'Snoozed').length, color: 'text-yellow-500' },
           { label: 'Total Set', value: reminders.length, color: 'theme-text' },
         ].map(s => (
-          <div key={s.label} className="theme-surface border theme-border rounded-[2rem] p-8 shadow-sm hover:shadow-xl transition-all card-hover group">
+          <div key={s.label} className="border theme-border hover:border-teal-500 rounded-[2rem] p-8 transition-all card-hover group shadow-sm hover:shadow-xl">
             <p className="text-[10px] font-black theme-text-sub uppercase tracking-[0.2em] mb-4">{s.label}</p>
             <p className={`text-4xl font-black ${s.color} group-hover:scale-110 transition-transform origin-left`}>{s.value}</p>
           </div>
@@ -70,13 +70,13 @@ export default function RemindersPage() {
         {reminders.map((r) => {
           const isActive = r.status === 'Active';
           return (
-            <div key={r.id} className="theme-surface border theme-border rounded-[2.5rem] p-8 shadow-sm hover:shadow-2xl transition-all group card-hover relative overflow-hidden">
+            <div key={r.id} className="border theme-border hover:border-teal-500 rounded-[2.5rem] p-8 transition-all group card-hover relative overflow-hidden shadow-sm hover:shadow-2xl">
               {/* Decorative Glow */}
               <div className={`absolute top-0 right-0 w-32 h-32 blur-[60px] opacity-10 -mr-16 -mt-16 transition-all group-hover:opacity-20 ${isActive ? 'bg-teal-500' : 'bg-yellow-500'}`} />
 
               <div className="flex items-start justify-between mb-8 relative z-10">
                 <div className="flex items-center gap-5">
-                  <div className="w-16 h-16 rounded-2xl theme-bg border theme-border flex items-center justify-center text-3xl group-hover:scale-110 group-hover:rotate-6 transition-all shadow-lg">
+                  <div className="w-16 h-16 rounded-2xl theme-bg flex items-center justify-center text-3xl group-hover:scale-110 transition-all shadow-lg">
                     {r.icon}
                   </div>
                   <div>
@@ -86,9 +86,9 @@ export default function RemindersPage() {
                 </div>
                 <button
                   onClick={() => handleToggle(r.id)}
-                  className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border shadow-sm transition-all active:scale-95 ${isActive
-                    ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border-green-100 dark:border-green-800/50'
-                    : 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400 border-yellow-100 dark:border-yellow-800/50'}`}
+                  className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all active:scale-95 ${isActive
+                    ? 'border-green-200 dark:border-green-900/30 text-green-700 dark:text-green-400'
+                    : 'border-yellow-200 dark:border-yellow-900/30 text-yellow-700 dark:text-yellow-500'}`}
                 >
                   {r.status}
                 </button>

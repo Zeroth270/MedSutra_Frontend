@@ -91,7 +91,7 @@ export default function AIVerificationPage() {
             </div>
           ) : (
             <>
-                <div className={`w-28 h-28 rounded-[2.5rem] flex items-center justify-center text-5xl transition-all duration-500 shadow-xl group-hover:scale-110 group-hover:rotate-6 ${dragging || scanning ? 'bg-teal-100 dark:bg-teal-900 text-teal-600 scale-110' : 'theme-bg border theme-border'}`}>
+                <div className={`w-28 h-28 rounded-[2.5rem] flex items-center justify-center text-5xl transition-all duration-500 shadow-xl group-hover:scale-110 ${dragging || scanning ? 'bg-teal-100 dark:bg-teal-900 text-teal-600 scale-110' : 'theme-bg border theme-border'}`}>
                     {scanning ? '🧬' : '🔬'}
                 </div>
                 
@@ -133,7 +133,7 @@ export default function AIVerificationPage() {
         <div className="theme-surface border theme-border rounded-[3rem] p-10 shadow-lg hover:shadow-xl transition-all">
           <div className="flex items-center justify-between mb-10 px-2">
             <h2 className="font-black theme-text text-lg uppercase tracking-tight">Workflow Logic</h2>
-            <div className="px-3 py-1 bg-teal-100 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400 rounded-lg text-[9px] font-black uppercase tracking-widest border border-teal-200 dark:border-teal-800/50">Neural Net v2.4</div>
+            <div className="px-3 py-1 text-teal-600 dark:text-teal-400 rounded-lg text-[9px] font-black uppercase tracking-widest border border-teal-200 dark:border-teal-800/50">Neural Net v2.4</div>
           </div>
           
           <div className="space-y-8">
@@ -172,13 +172,13 @@ export default function AIVerificationPage() {
           {history.map((h) => (
             <div key={h.id} className="flex flex-col sm:flex-row sm:items-center justify-between px-10 py-7 hover:theme-bg transition-all group gap-4">
               <div className="flex items-center gap-6">
-                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0 shadow-lg group-hover:scale-110 transition-transform ${h.ok ? 'bg-green-50 dark:bg-green-900/20 border border-green-100 dark:border-green-800/50' : 'bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/50'}`}>{h.ok ? '✅' : '⚠️'}</div>
+                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-2xl flex-shrink-0 shadow-lg group-hover:scale-110 transition-transform ${h.ok ? 'border border-green-200 dark:border-green-900/30' : 'border border-red-200 dark:border-red-900/30'}`}>{h.ok ? '✅' : '⚠️'}</div>
                 <div>
                   <p className="text-lg font-black theme-text group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors uppercase tracking-tight">{h.med}</p>
                   <p className="text-[10px] theme-text-sub font-black mt-1 uppercase tracking-widest opacity-60">{h.date}</p>
                 </div>
               </div>
-              <span className={`text-[10px] font-black px-5 py-2.5 rounded-xl uppercase tracking-widest border shadow-sm self-start sm:self-auto ${h.ok ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border-green-100 dark:border-green-800/50' : 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-100 dark:border-red-900/50'}`}>{h.result}</span>
+              <span className={`text-[10px] font-black px-5 py-2.5 rounded-xl uppercase tracking-widest border shadow-sm self-start sm:self-auto transition-all ${h.ok ? 'border-green-200 dark:border-green-900/30 text-green-700 dark:text-green-400' : 'border-red-200 dark:border-red-900/30 text-red-600 dark:text-red-400'}`}>{h.result}</span>
             </div>
           ))}
           {history.length === 0 && (

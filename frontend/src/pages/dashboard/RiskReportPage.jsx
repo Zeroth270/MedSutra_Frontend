@@ -1,10 +1,10 @@
 import PageHeader from '../../components/ui/PageHeader';
 
 const factors = [
-  { label: 'Missed Doses (Last 30 Days)', value: 9, max: 30, risk: 'Medium', barColor: 'bg-yellow-400', badgeClass: 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400 border-yellow-100 dark:border-yellow-800/50' },
-  { label: 'Adherence Rate', value: 94, max: 100, risk: 'Low', barColor: 'bg-teal-500', badgeClass: 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border-green-100 dark:border-green-800/50' },
-  { label: 'Refill Delay Risk', value: 30, max: 100, risk: 'Low', barColor: 'bg-teal-500', badgeClass: 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border-green-100 dark:border-green-800/50' },
-  { label: 'Non-Adherence Prediction', value: 15, max: 100, risk: 'Low', barColor: 'bg-teal-500', badgeClass: 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border-green-100 dark:border-green-800/50' },
+  { label: 'Missed Doses (Last 30 Days)', value: 9, max: 30, risk: 'Medium', barColor: 'bg-yellow-400', badgeClass: 'border-yellow-200 dark:border-yellow-900/30 text-yellow-700 dark:text-yellow-500' },
+  { label: 'Adherence Rate', value: 94, max: 100, risk: 'Low', barColor: 'bg-teal-500', badgeClass: 'border-green-200 dark:border-green-900/30 text-green-700 dark:text-green-400' },
+  { label: 'Refill Delay Risk', value: 30, max: 100, risk: 'Low', barColor: 'bg-teal-500', badgeClass: 'border-green-200 dark:border-green-900/30 text-green-700 dark:text-green-400' },
+  { label: 'Non-Adherence Prediction', value: 15, max: 100, risk: 'Low', barColor: 'bg-teal-500', badgeClass: 'border-green-200 dark:border-green-900/30 text-green-700 dark:text-green-400' },
 ];
 
 const tips = [

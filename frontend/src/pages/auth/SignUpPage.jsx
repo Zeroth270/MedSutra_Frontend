@@ -66,7 +66,7 @@ export default function SignUpPage() {
         </div>
 
         <p className="text-gray-600 text-[10px] font-black uppercase tracking-widest relative z-10">
-          © {new Date().getFullYear()} MedSutra Clinical Systems
+          {/* © {new Date().getFullYear()} MedSutra Clinical Systems */}
         </p>
       </div>
 

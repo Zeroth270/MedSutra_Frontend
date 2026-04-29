@@ -4,7 +4,7 @@ const DoctorCard = ({ doctor, onBook }) => {
   const { name, specialty, rating, experience, image, diseases, availability } = doctor;
 
   return (
-    <div className="theme-surface border theme-border rounded-2xl p-5 hover:shadow-lg hover:border-teal-100 dark:hover:border-teal-900 transition-all duration-300 group card-hover">
+    <div className="border theme-border hover:border-teal-500 rounded-2xl p-5 transition-all duration-300 group card-hover shadow-sm hover:shadow-lg">
       <div className="flex items-start gap-4">
         <div className="relative">
           <img
@@ -18,7 +18,7 @@ const DoctorCard = ({ doctor, onBook }) => {
         <div className="flex-1">
           <div className="flex items-center justify-between">
             <h3 className="font-black theme-text text-base group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">{name}</h3>
-            <div className="flex items-center gap-1 bg-yellow-50 dark:bg-yellow-900/20 px-2 py-0.5 rounded-lg border border-yellow-100 dark:border-yellow-900/30">
+            <div className="flex items-center gap-1 px-2 py-0.5 rounded-lg border border-yellow-200 dark:border-yellow-900/30">
               <span className="text-yellow-500 text-xs">★</span>
               <span className="text-yellow-700 dark:text-yellow-500 text-xs font-bold">{rating}</span>
             </div>
@@ -36,7 +36,7 @@ const DoctorCard = ({ doctor, onBook }) => {
         <p className="text-[10px] uppercase tracking-widest theme-text-sub font-black mb-2.5 px-0.5">Specializes in</p>
         <div className="flex flex-wrap gap-1.5">
           {diseases.map((disease, idx) => (
-            <span key={idx} className="px-2.5 py-1 theme-bg theme-text rounded-lg text-[10px] font-black uppercase tracking-tighter border theme-border">
+            <span key={idx} className="px-2.5 py-1 theme-text rounded-lg text-[10px] font-black uppercase tracking-tighter border theme-border">
               {disease}
             </span>
           ))}

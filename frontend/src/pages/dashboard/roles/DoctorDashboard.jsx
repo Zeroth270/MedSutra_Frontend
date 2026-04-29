@@ -67,7 +67,7 @@ export default function DoctorDashboard() {
             {/* Performance Stats */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {quickStats.map(s => (
-                    <div key={s.label} className="theme-surface border theme-border rounded-3xl p-8 shadow-sm hover:shadow-xl transition-all group card-hover">
+                    <div key={s.label} className="border theme-border hover:border-teal-500 rounded-3xl p-8 transition-all group card-hover shadow-sm hover:shadow-xl">
                         <div className="flex items-center justify-between mb-6">
                             <p className="text-[10px] font-black theme-text-sub uppercase tracking-[0.2em]">{s.label}</p>
                             <span className="text-2xl group-hover:scale-125 transition-transform drop-shadow-sm">{s.icon}</span>
@@ -90,11 +90,11 @@ export default function DoctorDashboard() {
                             <div
                                 key={p.id}
                                 onClick={() => setSelectedPatient(p)}
-                                className="theme-surface border theme-border rounded-[2.5rem] p-8 shadow-sm hover:shadow-2xl hover:border-teal-300 dark:hover:border-teal-700 transition-all cursor-pointer group card-hover relative overflow-hidden"
+                                className="border theme-border hover:border-teal-500 rounded-[2.5rem] p-8 transition-all cursor-pointer group card-hover relative overflow-hidden shadow-sm hover:shadow-2xl"
                             >
                                 <div className="flex items-start justify-between mb-8 relative z-10">
                                     <div className="flex items-center gap-6">
-                                        <div className="w-16 h-16 rounded-2xl bg-gray-900 dark:bg-teal-600 flex items-center justify-center font-black text-white text-xl group-hover:rotate-6 transition-transform shadow-xl border-2 border-white dark:border-gray-800">
+                                        <div className="w-16 h-16 rounded-2xl bg-gray-900 dark:bg-teal-600 flex items-center justify-center font-black text-white text-xl transition-transform shadow-xl border-2 border-white dark:border-gray-800">
                                             {p.avatar}
                                         </div>
                                         <div className="min-w-0">
@@ -116,9 +116,9 @@ export default function DoctorDashboard() {
                                         <p className="text-[9px] font-black theme-text-sub uppercase tracking-[0.2em] mb-1.5">Compliance Rate</p>
                                         <p className="text-xl font-black theme-text">{p.adherence}</p>
                                     </div>
-                                    <span className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border shadow-sm ${p.status === 'At Risk'
-                                        ? 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-100 dark:border-red-900/50'
-                                        : 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border-green-100 dark:border-green-800/50'
+                                    <span className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all ${p.status === 'At Risk'
+                                        ? 'border-red-200 dark:border-red-900/30 text-red-600 dark:text-red-400'
+                                        : 'border-green-200 dark:border-green-900/30 text-green-700 dark:text-green-400'
                                         }`}>
                                         {p.status}
                                     </span>
@@ -145,7 +145,7 @@ export default function DoctorDashboard() {
                         <h2 className="font-black theme-text text-xl uppercase tracking-tight">Feedback Hub</h2>
                     </div>
 
-                    <div className="theme-surface border theme-border rounded-[3rem] overflow-hidden shadow-lg hover:shadow-2xl transition-all">
+                    <div className="border theme-border hover:border-teal-500 rounded-[3rem] overflow-hidden transition-all shadow-sm hover:shadow-2xl">
                         <div className="p-10 border-b theme-border theme-bg/50">
                             <div className="flex items-baseline gap-2">
                                 <span className="text-6xl font-black theme-text">4.9</span>
@@ -168,7 +168,7 @@ export default function DoctorDashboard() {
                                     <div className="flex items-center justify-between mb-3">
                                         <div className="flex items-center gap-3">
                                             <span className="text-xs font-black theme-text group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">{review.author}</span>
-                                            <span className="text-[8px] font-black theme-text-sub uppercase px-2 py-0.5 theme-bg rounded-md tracking-widest border theme-border">{review.role}</span>
+                                            <span className="text-[8px] font-black theme-text-sub uppercase px-2 py-0.5 rounded-md tracking-widest border theme-border">{review.role}</span>
                                         </div>
                                         <span className="text-[9px] theme-text-sub font-bold opacity-50">{review.date}</span>
                                     </div>

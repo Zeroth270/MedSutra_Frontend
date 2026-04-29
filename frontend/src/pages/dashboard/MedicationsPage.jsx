@@ -66,9 +66,9 @@ export default function MedicationsPage() {
           { label: 'Critical Refill', value: meds.filter(m => m.status === 'Low Stock').length, icon: '⚠️' },
           { label: 'Next Refill', value: '3 days', icon: '📦' },
         ].map(s => (
-          <div key={s.label} className="theme-surface border theme-border rounded-[2rem] p-8 shadow-sm hover:shadow-xl transition-all group card-hover">
+          <div key={s.label} className="border theme-border hover:border-teal-500 rounded-[2rem] p-8 transition-all group card-hover shadow-sm hover:shadow-xl">
             <div className="flex items-center justify-between mb-4">
-              <p className="text-[10px] font-black theme-text-sub uppercase tracking-[0.2em]">{s.label}</p>
+              <p className="text-[10px] font-black theme-text uppercase tracking-[0.2em]">{s.label}</p>
               <span className="text-xl group-hover:scale-110 transition-transform">{s.icon}</span>
             </div>
             <p className="text-4xl font-black theme-text mb-1 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">{s.value}</p>
@@ -81,29 +81,29 @@ export default function MedicationsPage() {
         {meds.map((med) => {
           const isLow = med.status === 'Low Stock';
           return (
-            <div key={med.id} className="theme-surface border theme-border rounded-[2.5rem] p-8 shadow-sm hover:shadow-2xl transition-all group card-hover relative overflow-hidden">
+            <div key={med.id} className="border theme-border hover:border-teal-500 rounded-[2.5rem] p-8 transition-all group card-hover relative overflow-hidden shadow-sm hover:shadow-2xl">
               <div className="flex items-start justify-between mb-8 relative z-10">
                 <div className="flex items-center gap-5">
-                  <div className="w-14 h-14 rounded-2xl theme-bg border theme-border flex items-center justify-center text-3xl group-hover:scale-110 group-hover:rotate-6 transition-all shadow-sm">💊</div>
+                  <div className="w-14 h-14 rounded-2xl theme-bg flex items-center justify-center text-3xl group-hover:scale-110 transition-all shadow-sm">💊</div>
                   <div>
-                    <h3 className="text-xl font-black theme-text group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors uppercase tracking-tight">{med.name}</h3>
-                    <p className="text-[10px] theme-text-sub font-black mt-1.5 uppercase tracking-widest opacity-70">{med.type} · {med.frequency}</p>
+                    <h3 className="text-xl font-black theme-text  transition-colors uppercase tracking-tight">{med.name}</h3>
+                    <p className="text-[10px] text-teal-600 dark:text-teal-400 font-black mt-1.5 uppercase tracking-widest">{med.type} · {med.frequency}</p>
                   </div>
                 </div>
-                <span className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border shadow-sm ${isLow
-                  ? 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-100 dark:border-red-900/50'
-                  : 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400 border-green-100 dark:border-green-800/50'}`}>
+                <span className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all ${isLow
+                  ? 'border-red-200 dark:border-red-900/30 text-red-600 dark:text-red-400'
+                  : 'border-green-200 dark:border-green-900/30 text-green-700 dark:text-green-400'}`}>
                   {med.status}
                 </span>
               </div>
 
-              <div className="grid grid-cols-2 gap-6 mb-8 p-6 theme-bg rounded-[1.5rem] border theme-border relative z-10">
+              <div className="grid grid-cols-2 gap-6 mb-8 p-6 rounded-[1.5rem] relative z-10 shadow-sm border theme-border hover:border-teal-500/30 transition-colors">
                 <div>
-                  <p className="text-[9px] font-black theme-text-sub uppercase tracking-widest mb-1.5">Timing</p>
+                  <p className="text-[9px] font-black text-teal-600 dark:text-teal-400 uppercase tracking-widest mb-1.5">Timing</p>
                   <p className="text-sm font-black theme-text">{med.time}</p>
                 </div>
                 <div>
-                  <p className="text-[9px] font-black theme-text-sub uppercase tracking-widest mb-1.5">Current Stock</p>
+                  <p className="text-[9px] font-black text-teal-600 dark:text-teal-400 uppercase tracking-widest mb-1.5">Current Stock</p>
                   <p className={`text-sm font-black ${isLow ? 'text-red-500' : 'theme-text'}`}>{med.stock} Units Left</p>
                 </div>
               </div>

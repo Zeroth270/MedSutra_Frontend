@@ -30,7 +30,7 @@ export default function DashboardLayout() {
 
   return (
     <div className="flex min-h-screen theme-bg" style={{ fontFamily: "'Inter', sans-serif" }}>
-      <aside style={{ width: sidebarW, minWidth: sidebarW, transition: 'width 0.22s ease, min-width 0.22s ease' }} className="fixed left-0 top-0 h-screen z-50 theme-surface border-r theme-border flex flex-col overflow-hidden">
+      <aside style={{ width: sidebarW, minWidth: sidebarW, transition: 'width 0.22s ease, min-width 0.22s ease' }} className="fixed left-0 top-0 h-screen z-50 border-r theme-border flex flex-col overflow-hidden">
         <div className="flex items-center border-b theme-border flex-shrink-0" style={{ height: 64, padding: '0 16px', justifyContent: sidebarOpen ? 'space-between' : 'center' }}>
           {sidebarOpen && (
             <Link to={ROUTES.HOME} className="flex items-center gap-2 no-underline min-w-0">
@@ -47,7 +47,7 @@ export default function DashboardLayout() {
 
         {sidebarOpen ? (
           <div className="px-4 py-4 border-b theme-border flex-shrink-0">
-            <div className="flex items-center gap-3 p-3 theme-bg rounded-xl border theme-border">
+            <div className="flex items-center gap-3 p-3 rounded-xl border theme-border">
               <div className="w-9 h-9 rounded-lg bg-gray-900 dark:bg-teal-600 flex items-center justify-center font-bold text-white text-sm flex-shrink-0 shadow-md">{user.avatar}</div>
               <div className="min-w-0">
                 <p className="font-black theme-text text-sm truncate">{user.name}</p>
@@ -110,7 +110,7 @@ export default function DashboardLayout() {
       </aside>
 
       <main style={{ marginLeft: sidebarW, transition: 'margin-left 0.22s ease', flex: 1 }} className="min-h-screen flex flex-col theme-bg">
-        <div className="sticky top-0 z-40 theme-surface border-b theme-border px-8 h-16 flex items-center justify-between flex-shrink-0 shadow-sm">
+        <div className="sticky top-0 z-40 px-8 h-16 flex items-center justify-between flex-shrink-0 shadow-sm border-b theme-border bg-theme-bg/80 backdrop-blur-md">
           <div>
             <p className="text-sm font-black theme-text tracking-tight uppercase">{activePage?.label ?? 'Dashboard'}</p>
             <p className="text-[10px] theme-text-sub mt-0.5 font-bold uppercase tracking-widest opacity-80">MedSutra Platform</p>
