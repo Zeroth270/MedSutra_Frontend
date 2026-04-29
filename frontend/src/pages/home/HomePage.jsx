@@ -57,12 +57,33 @@ export default function HomePage() {
               See how it works
             </a>
           </div>
-          <p className="text-xs text-gray-400 mt-6">
+          {/* <p className="text-xs text-gray-400 mt-6">
             No credit card required &nbsp;·&nbsp; HIPAA compliant &nbsp;·&nbsp; Free forever plan
-          </p>
+          </p> */}
         </div>
       </section>
 
+      {/* How it works */}
+      <section id="about" className="py-24 px-6 bg-gray-50">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-16">
+            <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-4">How It Works</p>
+            <h2 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tight">
+              Up and running in minutes
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {STEPS.map((step, i) => (
+              <div key={i} className="bg-white border border-gray-100 rounded-2xl p-7">
+                <p className="text-3xl font-black text-gray-200 mb-4">{step.number}</p>
+                <h3 className="font-bold text-gray-900 mb-3 text-base">{step.title}</h3>
+                <p className="text-sm text-gray-500 leading-relaxed">{step.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
       {/* Features */}
       <section id="features" className="py-24 px-6">
         <div className="max-w-6xl mx-auto">
@@ -92,31 +113,8 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
-      {/* How it works */}
-      <section id="about" className="py-24 px-6 bg-gray-50">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-4">How It Works</p>
-            <h2 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tight">
-              Up and running in minutes
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {STEPS.map((step, i) => (
-              <div key={i} className="bg-white border border-gray-100 rounded-2xl p-7">
-                <p className="text-3xl font-black text-gray-200 mb-4">{step.number}</p>
-                <h3 className="font-bold text-gray-900 mb-3 text-base">{step.title}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed">{step.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* CTA */}
-      <section className="py-24 px-6 bg-gray-900">
+      {/*<section className="py-24 px-6 bg-gray-900">
         <div className="max-w-2xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-black text-white mb-5 tracking-tight">
             Start managing your medications the smart way
@@ -132,7 +130,7 @@ export default function HomePage() {
           </Link>
           <p className="text-gray-600 text-xs mt-5">No credit card required · Cancel anytime</p>
         </div>
-      </section>
+      </section>*/}
     </main>
   );
 }

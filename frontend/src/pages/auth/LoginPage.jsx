@@ -28,13 +28,12 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2">
 
-      {/* Left panel */}
       <div className="hidden lg:flex flex-col justify-between bg-gray-900 p-14">
         <Link to={ROUTES.HOME} className="flex items-center gap-2 no-underline">
-          <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center flex-shrink-0">
+          {/* <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center flex-shrink-0">
             <span className="text-gray-900 font-black text-xs">MS</span>
           </div>
-          <span className="text-white font-bold text-base">MedSutra AI</span>
+          <span className="text-white font-bold text-base">MedSutra AI</span> */}
         </Link>
 
         <div>
@@ -47,7 +46,7 @@ export default function LoginPage() {
             MedSutra AI helps 50,000+ patients manage medications safely with smart reminders and AI verification.
           </p>
 
-          <div className="mt-10 grid grid-cols-3 gap-4">
+          {/* <div className="mt-10 grid grid-cols-3 gap-4">
             {[
               { val: '94%', label: 'Adherence' },
               { val: '50K+', label: 'Patients' },
@@ -58,7 +57,7 @@ export default function LoginPage() {
                 <p className="text-gray-500 text-xs">{s.label}</p>
               </div>
             ))}
-          </div>
+          </div> */}
         </div>
 
         <p className="text-gray-700 text-xs">
@@ -90,11 +89,10 @@ export default function LoginPage() {
                     key={role}
                     type="button"
                     onClick={() => setForm({ ...form, role })}
-                    className={`py-2 rounded-lg text-xs font-bold transition-all border ${
-                      form.role === role 
-                        ? 'bg-gray-900 border-gray-900 text-white shadow-md' 
-                        : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300'
-                    }`}
+                    className={`py-2 rounded-lg text-xs font-bold transition-all border ${form.role === role
+                      ? 'bg-gray-900 border-gray-900 text-white shadow-md'
+                      : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300'
+                      }`}
                   >
                     {role}
                   </button>
@@ -138,9 +136,9 @@ export default function LoginPage() {
             >
               {loading
                 ? <span className="flex items-center justify-center gap-2">
-                    <Spinner />
-                    Signing in...
-                  </span>
+                  <Spinner />
+                  Signing in...
+                </span>
                 : 'Sign in'
               }
             </button>

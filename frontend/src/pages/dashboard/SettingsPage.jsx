@@ -80,12 +80,12 @@ export default function SettingsPage() {
               ))}
             </div>
           </div>
-          <div className="bg-gray-900 rounded-xl p-6">
+          {/* <div className="bg-gray-900 rounded-xl p-6">
             <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Security</p>
             <p className="text-white font-bold text-sm mb-1">Two-Factor Authentication</p>
             <p className="text-gray-500 text-xs mb-4 leading-relaxed">Add an extra layer of security to your account.</p>
             <button className="w-full bg-white text-gray-900 font-semibold py-2.5 rounded-lg text-sm hover:bg-gray-100 transition-all">Enable 2FA</button>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>
