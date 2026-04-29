@@ -71,8 +71,19 @@ export default function DashboardLayout() {
               .map(item => {
               const isActive = item.path === ROUTES.DASHBOARD ? location.pathname === ROUTES.DASHBOARD : location.pathname.startsWith(item.path);
               return (
-                <Link key={item.label} to={item.path} title={!sidebarOpen ? item.label : undefined} className={`nav-item no-underline ${isActive ? 'active' : ''}`} style={{ justifyContent: sidebarOpen ? 'flex-start' : 'center' }}>
-                  <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${isActive ? 'bg-white' : 'bg-gray-300'}`} />
+                <Link 
+                  key={item.label} 
+                  to={item.path} 
+                  title={!sidebarOpen ? item.label : undefined} 
+                  className={`nav-item no-underline flex items-center ${isActive ? 'active' : ''}`} 
+                  style={{ 
+                    justifyContent: sidebarOpen ? 'flex-start' : 'center',
+                    padding: sidebarOpen ? '10px 14px' : '10px 0'
+                  }}
+                >
+                  <span className={`text-lg flex-shrink-0 ${sidebarOpen ? 'mr-3' : 'm-0'} ${isActive ? 'grayscale-0' : 'grayscale'}`}>
+                    {item.icon}
+                  </span>
                   {sidebarOpen && <span className="truncate">{item.label}</span>}
                 </Link>
               );
@@ -81,8 +92,16 @@ export default function DashboardLayout() {
         </nav>
 
         <div className="px-3 pb-4 border-t border-gray-100 pt-3 flex-shrink-0">
-          <button onClick={handleLogout} title={!sidebarOpen ? 'Logout' : undefined} className="nav-item hover:bg-red-50 hover:text-red-500 w-full" style={{ justifyContent: sidebarOpen ? 'flex-start' : 'center' }}>
-            <div className="w-1.5 h-1.5 rounded-full bg-gray-300 flex-shrink-0" />
+          <button 
+            onClick={handleLogout} 
+            title={!sidebarOpen ? 'Logout' : undefined} 
+            className="nav-item hover:bg-red-50 hover:text-red-500 w-full flex items-center" 
+            style={{ 
+              justifyContent: sidebarOpen ? 'flex-start' : 'center',
+              padding: sidebarOpen ? '10px 14px' : '10px 0'
+            }}
+          >
+            <span className={`text-lg flex-shrink-0 ${sidebarOpen ? 'mr-3' : 'm-0'}`}>🚪</span>
             {sidebarOpen && <span>Logout</span>}
           </button>
         </div>

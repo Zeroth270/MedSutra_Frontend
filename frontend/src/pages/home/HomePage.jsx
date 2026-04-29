@@ -57,9 +57,9 @@ export default function HomePage() {
               See how it works
             </a>
           </div>
-          <p className="text-xs text-gray-400 mt-6">
+          {/* <p className="text-xs text-gray-400 mt-6">
             No credit card required &nbsp;·&nbsp; HIPAA compliant &nbsp;·&nbsp; Free forever plan
-          </p>
+          </p> */}
         </div>
       </section>
 
