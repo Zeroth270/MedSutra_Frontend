@@ -26,74 +26,79 @@ export default function SignUpPage() {
   };
 
   return (
-    <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2">
+    <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2 theme-bg animate-fade-in">
 
       {/* Left panel */}
-      <div className="hidden lg:flex flex-col justify-between bg-gray-900 p-14">
-        <Link to={ROUTES.HOME} className="flex items-center gap-2 no-underline">
-          {/* <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center flex-shrink-0">
-            <span className="text-gray-900 font-black text-xs">MS</span>
+      <div className="hidden lg:flex flex-col justify-between bg-gray-950 p-16 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-teal-500/10 rounded-full blur-[100px] -mr-32 -mt-32" />
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-teal-500/5 rounded-full blur-[80px] -ml-20 -mb-20" />
+
+        <Link to={ROUTES.HOME} className="flex items-center gap-2.5 no-underline relative z-10">
+          {/* <div className="w-10 h-10 rounded-xl bg-teal-600 flex items-center justify-center flex-shrink-0 shadow-lg">
+            <span className="text-white font-black text-sm tracking-tight">MS</span>
           </div>
-          <span className="text-white font-bold text-base">MedSutra AI</span> */}
+          <span className="text-white font-black text-xl tracking-tight uppercase">MedSutra AI</span> */}
         </Link>
 
-        <div>
-          <h2 className="text-3xl font-black text-white leading-snug mb-5">
-            Your medication<br />
-            management starts<br />
-            <span className="text-gray-400">right here.</span>
+        <div className="relative z-10">
+          <h2 className="text-4xl lg:text-5xl font-black text-white leading-[1.1] mb-8 uppercase tracking-tighter">
+            Your clinical<br />
+            journey starts<br />
+            <span className="text-teal-500">right here.</span>
           </h2>
-          <p className="text-gray-400 text-sm leading-relaxed max-w-xs">
-            Set up your full medication schedule in minutes. Let AI handle the reminders, verification, and insights.
+          <p className="text-gray-400 text-base leading-relaxed max-w-sm font-medium">
+            Join the elite network of health-conscious individuals using AI to optimize their clinical outcomes.
           </p>
 
-          <div className="mt-10 space-y-3">
+          <div className="mt-12 space-y-5">
             {[
-              'AI-powered medication verification',
-              'Smart adaptive reminders',
-              'Real-time caregiver alerts',
-              'HIPAA-compliant and secure',
+              'Neural Medication Verification',
+              'Adaptive Adherence Logic',
+              'Secure Caregiver Handshakes',
+              'HIPAA-Compliant Neural Engine',
             ].map((item, i) => (
-              <div key={i} className="flex items-center gap-3">
-                <div className="w-1.5 h-1.5 rounded-full bg-white flex-shrink-0" />
-                <span className="text-gray-400 text-sm">{item}</span>
+              <div key={i} className="flex items-center gap-4 group">
+                <div className="w-2 h-2 rounded-full bg-teal-500 group-hover:scale-150 transition-transform shadow-[0_0_8px_rgba(20,184,166,0.5)]" />
+                <span className="text-gray-400 text-sm font-black uppercase tracking-widest group-hover:text-white transition-colors">{item}</span>
               </div>
             ))}
           </div>
         </div>
 
-        <p className="text-gray-700 text-xs">
-          © {new Date().getFullYear()} MedSutra AI. All rights reserved.
+        <p className="text-gray-600 text-[10px] font-black uppercase tracking-widest relative z-10">
+          © {new Date().getFullYear()} MedSutra Clinical Systems
         </p>
       </div>
 
       {/* Right — Form */}
-      <div className="flex items-center justify-center px-6 py-16 bg-gray-50">
-        <div className="w-full max-w-sm">
+      <div className="flex items-center justify-center px-10 py-20 theme-bg">
+        <div className="w-full max-w-md">
 
           {/* Mobile logo */}
-          <Link to={ROUTES.HOME} className="lg:hidden flex items-center gap-2 no-underline mb-10">
-            <div className="w-7 h-7 rounded-md bg-gray-900 flex items-center justify-center">
+          <Link to={ROUTES.HOME} className="lg:hidden flex items-center gap-3 no-underline mb-12">
+            <div className="w-9 h-9 rounded-xl bg-gray-900 dark:bg-teal-600 flex items-center justify-center shadow-lg">
               <span className="text-white font-black text-xs">MS</span>
             </div>
-            <span className="font-bold text-gray-900">MedSutra AI</span>
+            <span className="font-black theme-text text-lg uppercase tracking-tight">MedSutra AI</span>
           </Link>
 
-          <h1 className="text-2xl font-black text-gray-900 mb-2">Create account</h1>
-          <p className="text-gray-500 text-sm mb-8">Start your intelligent medication journey today</p>
+          <div className="mb-10">
+            <h1 className="text-3xl font-black theme-text mb-2 uppercase tracking-tight">Create Entity</h1>
+            <p className="theme-text-sub text-sm font-medium">Initialize your intelligent medication profile.</p>
+          </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-3">I am registering as a</label>
-              <div className="grid grid-cols-3 gap-2">
+              <label className="block text-[10px] font-black theme-text-sub uppercase tracking-[0.2em] mb-4 px-1">Select Clinical Role</label>
+              <div className="grid grid-cols-3 gap-3">
                 {['Patient', 'Caregiver', 'Doctor'].map(role => (
                   <button
                     key={role}
                     type="button"
                     onClick={() => setForm({ ...form, role })}
-                    className={`py-2 rounded-lg text-xs font-bold transition-all border ${form.role === role
-                        ? 'bg-gray-900 border-gray-900 text-white shadow-md'
-                        : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300'
+                    className={`py-3.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border shadow-sm active:scale-95 ${form.role === role
+                      ? 'bg-gray-900 dark:bg-teal-600 border-gray-900 dark:border-teal-500 text-white shadow-xl'
+                      : 'theme-surface border theme-border theme-text-sub hover:theme-text hover:border-gray-400 dark:hover:border-gray-600'
                       }`}
                   >
                     {role}
@@ -102,69 +107,70 @@ export default function SignUpPage() {
               </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Full Name</label>
-              <input
-                type="text"
-                placeholder="John Doe"
-                required
-                value={form.name}
-                onChange={e => setForm({ ...form, name: e.target.value })}
-                className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-400 focus:ring-2 focus:ring-gray-200 transition-all"
-              />
-            </div>
+            <div className="space-y-6">
+              <div className="group">
+                <label className="block text-[10px] font-black theme-text-sub uppercase tracking-[0.2em] mb-2 px-1 group-focus-within:text-teal-600 transition-colors">Legal Full Name</label>
+                <input
+                  type="text"
+                  placeholder="e.g. John Doe"
+                  required
+                  value={form.name}
+                  onChange={e => setForm({ ...form, name: e.target.value })}
+                  className="w-full px-5 py-4 theme-surface border theme-border rounded-xl text-sm theme-text placeholder-gray-500 focus:outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-500/5 transition-all font-medium"
+                />
+              </div>
 
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Email address</label>
-              <input
-                type="email"
-                placeholder="you@example.com"
-                required
-                value={form.email}
-                onChange={e => setForm({ ...form, email: e.target.value })}
-                className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-400 focus:ring-2 focus:ring-gray-200 transition-all"
-              />
-            </div>
+              <div className="group">
+                <label className="block text-[10px] font-black theme-text-sub uppercase tracking-[0.2em] mb-2 px-1 group-focus-within:text-teal-600 transition-colors">Digital Identity (Email)</label>
+                <input
+                  type="email"
+                  placeholder="you@domain.com"
+                  required
+                  value={form.email}
+                  onChange={e => setForm({ ...form, email: e.target.value })}
+                  className="w-full px-5 py-4 theme-surface border theme-border rounded-xl text-sm theme-text placeholder-gray-500 focus:outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-500/5 transition-all font-medium"
+                />
+              </div>
 
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Password</label>
-              <input
-                type="password"
-                placeholder="Create a strong password"
-                required
-                value={form.password}
-                onChange={e => setForm({ ...form, password: e.target.value })}
-                className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-400 focus:ring-2 focus:ring-gray-200 transition-all"
-              />
+              <div className="group">
+                <label className="block text-[10px] font-black theme-text-sub uppercase tracking-[0.2em] mb-2 px-1 group-focus-within:text-teal-600 transition-colors">Access Credentials (Password)</label>
+                <input
+                  type="password"
+                  placeholder="••••••••••••"
+                  required
+                  value={form.password}
+                  onChange={e => setForm({ ...form, password: e.target.value })}
+                  className="w-full px-5 py-4 theme-surface border theme-border rounded-xl text-sm theme-text placeholder-gray-500 focus:outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-500/5 transition-all font-medium"
+                />
+              </div>
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="btn-primary w-full py-3 rounded-xl text-sm"
+              className="btn-primary w-full py-4.5 rounded-xl text-xs font-black uppercase tracking-[0.2em] shadow-2xl shadow-teal-500/20 active:scale-[0.98] transition-all flex items-center justify-center gap-3 mt-4"
             >
               {loading
-                ? <span className="flex items-center justify-center gap-2">
-                  <Spinner />
-                  Creating account...
-                </span>
-                : 'Create Account'
+                ? <><Spinner /> Initializing...</>
+                : 'Commit & Initialize'
               }
             </button>
           </form>
 
-          <p className="text-xs text-gray-400 text-center mt-5 leading-relaxed">
-            By creating an account you agree to our{' '}
-            <a href="#" className="text-gray-600 hover:underline">Terms</a> and{' '}
-            <a href="#" className="text-gray-600 hover:underline">Privacy Policy</a>.
-          </p>
+          {/* <p className="text-[10px] theme-text-sub font-black uppercase tracking-widest text-center mt-8 leading-relaxed opacity-60">
+            By initializing you agree to the{' '}
+            <a href="#" className="text-teal-600 dark:text-teal-400 hover:underline">Neural Protocol</a> and{' '}
+            <a href="#" className="text-teal-600 dark:text-teal-400 hover:underline">Privacy Logic</a>.
+          </p> */}
 
-          <p className="text-sm text-gray-500 text-center mt-6">
-            Already have an account?{' '}
-            <Link to={ROUTES.LOGIN} className="text-gray-900 font-semibold hover:underline no-underline">
-              Sign in
-            </Link>
-          </p>
+          <div className="mt-10 pt-8 border-t theme-border text-center">
+            <p className="text-sm theme-text-sub font-medium">
+              Existing entity?{' '}
+              <Link to={ROUTES.LOGIN} className="text-teal-600 dark:text-teal-400 font-black hover:underline no-underline uppercase tracking-widest ml-1 text-xs">
+                Sign in Access
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
     </div>

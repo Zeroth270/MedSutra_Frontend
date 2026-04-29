@@ -4,13 +4,13 @@
  */
 export default function PageHeader({ title, subtitle, actionLabel, onAction }) {
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-10">
       <div>
-        <h1 className="text-2xl font-black text-gray-900 tracking-tight">{title}</h1>
-        {subtitle && <p className="text-gray-500 text-sm mt-1">{subtitle}</p>}
+        <h1 className="text-3xl font-black theme-text tracking-tight uppercase">{title}</h1>
+        {subtitle && <p className="theme-text-sub text-sm mt-1.5 font-medium">{subtitle}</p>}
       </div>
       {actionLabel && (
-        <button onClick={onAction} className="btn-primary px-5 py-2.5 rounded-lg text-sm">
+        <button onClick={onAction} className="btn-primary px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest shadow-lg shadow-teal-500/20 active:scale-95 transition-all">
           {actionLabel}
         </button>
       )}

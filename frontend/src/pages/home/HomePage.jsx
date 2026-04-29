@@ -29,90 +29,89 @@ const STEPS = [
 
 export default function HomePage() {
   return (
-    <main className="bg-white">
+    <main className="theme-bg transition-colors duration-300">
 
       {/* Hero */}
       <section id="home" className="pt-32 pb-24 px-6">
         <div className="max-w-3xl mx-auto text-center">
-          <div className="inline-block px-3 py-1 bg-gray-100 rounded-full text-xs font-semibold text-gray-600 tracking-wide mb-8">
+          <div className="inline-block px-4 py-1.5 theme-bg rounded-full text-[10px] font-black theme-text-sub uppercase tracking-widest border theme-border mb-10 shadow-sm">
             AI-Powered Medication Management
           </div>
-          <h1 className="text-4xl md:text-5xl font-black text-gray-900 leading-tight tracking-tight mb-6">
-            Manage your medications<br />with confidence and clarity
+          <h1 className="text-4xl md:text-6xl font-black theme-text leading-tight tracking-tight mb-8">
+            Manage medications with<br />confidence and clarity
           </h1>
-          <p className="text-lg text-gray-500 leading-relaxed mb-10 max-w-xl mx-auto">
+          <p className="text-lg theme-text-sub leading-relaxed mb-12 max-w-xl mx-auto font-medium">
             MedSutra AI helps patients stay on track with smart reminders, AI verification, and real-time caregiver alerts — all in one place.
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-4">
+          <div className="flex flex-wrap items-center justify-center gap-5">
             <Link
               to={ROUTES.SIGN_UP}
-              className="btn-primary px-8 py-3.5 text-sm rounded-xl no-underline"
+              className="btn-primary px-10 py-4 text-xs font-black uppercase tracking-widest rounded-xl no-underline shadow-xl shadow-teal-500/20 active:scale-95 transition-all"
             >
               Start for Free
             </Link>
             <a
               href="#features"
-              className="text-sm font-medium text-gray-600 hover:text-gray-900 px-8 py-3.5 border border-gray-200 rounded-xl hover:border-gray-300 transition-all no-underline bg-white"
+              className="text-xs font-black uppercase tracking-widest theme-text-sub hover:theme-text px-10 py-4 border theme-border rounded-xl hover:border-gray-300 dark:hover:border-teal-900 transition-all no-underline theme-surface shadow-sm"
             >
-              See how it works
+              How it works
             </a>
           </div>
-          {/* <p className="text-xs text-gray-400 mt-6">
-            No credit card required &nbsp;·&nbsp; HIPAA compliant &nbsp;·&nbsp; Free forever plan
-          </p> */}
         </div>
       </section>
 
       {/* How it works */}
-      <section id="about" className="py-24 px-6 bg-gray-50">
+      <section id="about" className="py-24 px-6 theme-bg border-y theme-border">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-4">How It Works</p>
-            <h2 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tight">
+          <div className="text-center mb-20">
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] theme-text-sub mb-5">Workflow</p>
+            <h2 className="text-3xl md:text-5xl font-black theme-text tracking-tight">
               Up and running in minutes
             </h2>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {STEPS.map((step, i) => (
-              <div key={i} className="bg-white border border-gray-100 rounded-2xl p-7">
-                <p className="text-3xl font-black text-gray-200 mb-4">{step.number}</p>
-                <h3 className="font-bold text-gray-900 mb-3 text-base">{step.title}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed">{step.desc}</p>
+              <div key={i} className="theme-surface border theme-border rounded-3xl p-8 shadow-sm hover:shadow-lg transition-all duration-300 group">
+                <p className="text-4xl font-black text-gray-100 dark:text-gray-800 mb-6 group-hover:text-teal-500/20 transition-colors">{step.number}</p>
+                <h3 className="font-black theme-text mb-4 text-base uppercase tracking-tight">{step.title}</h3>
+                <p className="text-sm theme-text-sub leading-relaxed font-medium">{step.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
+
       {/* Features */}
       <section id="features" className="py-24 px-6">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
-            <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-4">Features</p>
-            <h2 className="text-3xl md:text-4xl font-black text-gray-900 tracking-tight mb-4">
-              Everything you need to stay on track
+          <div className="text-center mb-20">
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] theme-text-sub mb-5">Features</p>
+            <h2 className="text-3xl md:text-5xl font-black theme-text tracking-tight mb-6">
+              Stay on track effortlessly
             </h2>
-            <p className="text-gray-500 max-w-xl mx-auto leading-relaxed">
+            <p className="theme-text-sub max-w-2xl mx-auto leading-relaxed font-medium text-lg">
               A complete platform designed to eliminate medication errors and bring peace of mind to patients and caregivers alike.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {FEATURES.map((f, i) => (
               <div
                 key={i}
-                className="card-hover bg-white border border-gray-100 rounded-2xl p-8"
+                className="card-hover theme-surface border theme-border rounded-3xl p-10 shadow-sm hover:shadow-xl transition-all duration-300 group"
               >
-                <div className="w-8 h-8 rounded-lg bg-gray-900 flex items-center justify-center mb-5 flex-shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-gray-900 dark:bg-teal-600 flex items-center justify-center mb-8 flex-shrink-0 shadow-lg">
                   <span className="text-white text-xs font-black">{String(i + 1).padStart(2, '0')}</span>
                 </div>
-                <h3 className="text-lg font-bold text-gray-900 mb-3">{f.title}</h3>
-                <p className="text-gray-500 leading-relaxed text-sm">{f.desc}</p>
+                <h3 className="text-xl font-black theme-text mb-4 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors uppercase tracking-tight">{f.title}</h3>
+                <p className="theme-text-sub leading-relaxed text-base font-medium">{f.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
+
       {/* CTA */}
       {/*<section className="py-24 px-6 bg-gray-900">
         <div className="max-w-2xl mx-auto text-center">

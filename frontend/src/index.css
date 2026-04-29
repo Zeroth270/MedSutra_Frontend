@@ -1,5 +1,33 @@
 @import "tailwindcss";
 
+@theme {
+  --dark-mode: selector(.dark);
+}
+
+/* ───────────────────── Design Tokens ───────────────────── */
+:root {
+  color-scheme: light;
+  --teal-primary: #00796b;
+  --teal-hover: #006055;
+  --bg: #ffffff;
+  --surface: #ffffff;
+  --border: #e5e7eb;
+  --text-primary: #000000;
+  --text-secondary: #4b5563;
+}
+
+html.dark,
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --teal-primary: #14b8a6;
+  --teal-hover: #0d9488;
+  --bg: #030712;
+  --surface: #0f172a;
+  --border: #1e293b;
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+}
+
 /* ───────────────────── Base / Reset ───────────────────── */
 @layer base {
   *,
@@ -8,16 +36,6 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-  }
-
-  :root {
-    --teal-primary: #00796b;
-    --teal-hover: #006055;
-    --bg: #ffffff;
-    --surface: #ffffff;
-    --border: #f3f4f6;
-    --text-primary: #111827;
-    --text-secondary: #6b7280;
   }
 
   html {
@@ -34,6 +52,15 @@
   }
 }
 
+/* ───────────────────── Theme Utilities ───────────────────── */
+@layer utilities {
+  .theme-bg { background-color: var(--bg) !important; }
+  .theme-surface { background-color: var(--surface) !important; }
+  .theme-text { color: var(--text-primary) !important; }
+  .theme-text-sub { color: var(--text-secondary) !important; }
+  .theme-border { border-color: var(--border) !important; }
+}
+
 /* ───────────────────── Components ───────────────────── */
 @layer components {
   /* Sidebar nav item (Dashboard) */
@@ -45,8 +72,7 @@
     border-radius: 8px;
     font-size: 14px;
     font-weight: 500;
-    color: #6b7280;
-    transition: background 0.15s ease, color 0.15s ease;
+    color: var(--text-secondary);
     cursor: pointer;
     border: none;
     background: transparent;
@@ -57,13 +83,13 @@
   }
 
   .nav-item:hover {
-    background: #f3f4f6;
-    color: #111827;
+    background: var(--border);
+    color: var(--text-primary);
   }
 
   .nav-item.active {
-    background: #111827;
-    color: #ffffff;
+    background: var(--text-primary);
+    color: var(--bg);
     font-weight: 600;
   }
 
@@ -74,7 +100,6 @@
     font-weight: 600;
     border: none;
     cursor: pointer;
-    transition: background-color 0.2s ease, transform 0.1s ease;
     display: inline-flex;
     align-items: center;
     justify-content: center;
