@@ -29,10 +29,12 @@ export default function MedicationsPage() {
     { name: 'name', labelKey: 'auth_name_label', placeholderKey: 'med_prompt_name', required: true },
     { 
       name: 'type', 
-      labelKey: 'auth_select_role', 
+      labelKey: 'med_type_tablet', 
       type: 'select', 
       options: [
-        { value: 'med_type_tablet', labelKey: 'med_type_tablet' }
+        { value: 'med_type_tablet', labelKey: 'med_type_tablet' },
+        { value: 'med_type_capsule', labelKey: 'med_type_capsule' },
+        { value: 'med_type_syrup', labelKey: 'med_type_syrup' }
       ] 
     },
     { 
@@ -44,22 +46,27 @@ export default function MedicationsPage() {
         { value: 'med_freq_twice', labelKey: 'med_freq_twice' }
       ] 
     },
-    { name: 'time', labelKey: 'med_timing', placeholderKey: 'med_prompt_time', required: true },
+    { name: 'time', labelKey: 'med_timing', type: 'time', required: true },
     { name: 'stock', labelKey: 'med_stock', type: 'number', required: true }
   ];
 
   const handleSave = (data) => {
+    const processedData = {
+      ...data,
+      stock: parseInt(data.stock, 10) || 0
+    };
+
     if (editingMed) {
-      setMeds(meds.map(m => m.id === editingMed.id ? { ...m, ...data } : m));
-      addNotification(`${t('notif_updated')} (${data.name})`, 'success');
+      setMeds(meds.map(m => m.id === editingMed.id ? { ...m, ...processedData } : m));
+      addNotification(`${t('notif_updated')} (${processedData.name})`, 'success');
     } else {
       const newMed = {
-        ...data,
+        ...processedData,
         id: Date.now(),
-        status: data.stock < 10 ? 'dash_at_risk' : 'dash_stable'
+        status: processedData.stock < 10 ? 'dash_at_risk' : 'dash_stable'
       };
       setMeds([...meds, newMed]);
-      addNotification(`${t('notif_added')} (${data.name})`, 'success');
+      addNotification(`${t('notif_added')} (${processedData.name})`, 'success');
     }
   };
 

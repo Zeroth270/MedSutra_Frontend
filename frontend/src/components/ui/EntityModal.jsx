@@ -9,7 +9,8 @@ const EntityModal = ({ isOpen, onClose, onSave, title, initialData = {}, fields 
     if (isOpen) {
       setFormData(initialData || {});
     }
-  }, [isOpen, initialData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -58,7 +59,7 @@ const EntityModal = ({ isOpen, onClose, onSave, title, initialData = {}, fields 
                     name={field.name}
                     value={formData[field.name] || ''}
                     onChange={handleChange}
-                    className="w-full px-6 py-4 theme-bg border theme-border rounded-xl text-sm theme-text focus:outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-500/5 transition-all font-medium appearance-none"
+                    className="w-full px-6 py-4 theme-bg border theme-border rounded-xl text-sm theme-text focus:outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-500/5 transition-all font-medium"
                     required={field.required}
                   >
                     {field.options.map(opt => (
