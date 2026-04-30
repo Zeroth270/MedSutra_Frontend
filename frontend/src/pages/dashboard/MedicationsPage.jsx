@@ -157,10 +157,10 @@ export default function MedicationsPage() {
                 <div className="flex-1">
                   <div className="flex justify-between items-center mb-2.5">
                     <span className="text-[9px] font-black theme-text-sub uppercase tracking-widest">{t('med_inventory_level')}</span>
-                    <span className="text-[9px] font-black theme-text-sub">{Math.round((med.stock / 30) * 100)}%</span>
+                    <span className="text-[9px] font-black theme-text-sub">{Math.round(((30 - med.stock) / 30) * 100)}%</span>
                   </div>
                   <div className="theme-bg rounded-full h-2 border theme-border overflow-hidden shadow-inner">
-                    <div className={`h-full rounded-full transition-all duration-700 ${isLow ? 'bg-red-500 shadow-[0_0_12px_rgba(239,68,68,0.3)]' : 'bg-teal-500 shadow-[0_0_12px_rgba(20,184,166,0.3)]'}`} style={{ width: `${(med.stock / 30) * 100}%` }} />
+                    <div className={`h-full rounded-full transition-all duration-700 ${isLow ? 'bg-red-500 shadow-[0_0_12px_rgba(239,68,68,0.3)]' : 'bg-teal-500 shadow-[0_0_12px_rgba(20,184,166,0.3)]'}`} style={{ width: `${((30 - med.stock) / 30) * 100}%` }} />
                   </div>
                 </div>
                 {!isPatient && (
