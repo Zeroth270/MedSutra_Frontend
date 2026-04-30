@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useNotification } from '../../../context/NotificationContext';
 import DoctorCard from '../../../components/dashboard/DoctorCard';
+import EntityModal from '../../../components/ui/EntityModal';
+import ConfirmModal from '../../../components/ui/ConfirmModal';
 import { MOCK_DOCTORS } from '../../../constants/doctors';
 
 const INITIAL_MONITORED = [
@@ -12,9 +15,51 @@ const INITIAL_MONITORED = [
 export default function CaregiverDashboard() {
   const { t } = useTranslation();
   const { user } = useOutletContext();
+  const { addNotification } = useNotification();
   const [searchQuery, setSearchQuery] = useState('');
   const [monitored, setMonitored] = useState(INITIAL_MONITORED);
   const [activeNetwork, setActiveNetwork] = useState([]);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
+
+  const fields = [
+    { name: 'name', labelKey: 'auth_name_label', placeholder: 'e.g. Sarah Miller', required: true },
+    { name: 'med', labelKey: 'med_prompt_name', placeholder: 'e.g. Heart Rate Monitoring', required: true },
+    { name: 'time', labelKey: 'med_prompt_time', placeholder: 'e.g. 09:00 AM', required: true },
+    { 
+      name: 'urgency', 
+      labelKey: 'settings_alert_logic', 
+      type: 'select', 
+      options: [
+        { value: 'low', labelKey: 'dash_stable' },
+        { value: 'high', labelKey: 'dash_at_risk' }
+      ] 
+    }
+  ];
+
+  const handleSave = (data) => {
+    const newPatient = {
+      ...data,
+      id: Date.now(),
+      status: 'dash_taken',
+    };
+    setMonitored([...monitored, newPatient]);
+    addNotification(`${t('notif_added')} (${data.name})`, 'success');
+  };
+
+  const handleRemove = (id) => {
+    setDeletingId(id);
+    setConfirmOpen(true);
+  };
+
+  const executeRemove = () => {
+    const patient = monitored.find(p => p.id === deletingId);
+    setMonitored(monitored.filter(p => p.id !== deletingId));
+    addNotification(`${t('notif_removed')} (${patient.nameKey ? t(patient.nameKey) : patient.name})`, 'warning');
+    setConfirmOpen(false);
+    setDeletingId(null);
+  };
 
   const filteredDoctors = MOCK_DOCTORS.filter(doc => {
     const name = doc.nameKey ? t(doc.nameKey).toLowerCase() : (doc.name || '').toLowerCase();
@@ -26,52 +71,47 @@ export default function CaregiverDashboard() {
            (doc.diseases && doc.diseases.some(d => d.toLowerCase().includes(query)));
   });
 
-  const handleAddPatient = () => {
-    const name = window.prompt(t('dash_register_patient'));
-    if (!name) return;
-    const med = window.prompt(t('med_prompt_name'), 'General Care');
-
-    const newPatient = {
-      id: Date.now(),
-      name,
-      status: 'dash_taken',
-      time: '9:00 AM',
-      med: med || 'General',
-      urgency: 'low'
-    };
-    setMonitored([...monitored, newPatient]);
-  };
-
-  const handleRemove = (id) => {
-    if (window.confirm(t('med_confirm_delete'))) {
-      setMonitored(monitored.filter(p => p.id !== id));
-    }
-  };
-
   const handleBook = (doctor) => {
     const doctorName = doctor.nameKey ? t(doctor.nameKey) : doctor.name;
     if (activeNetwork.some(d => (d.nameKey ? t(d.nameKey) : d.name) === doctorName)) {
-      alert(`${doctorName} is already in your active network.`);
+      addNotification(`${doctorName} is already in your active network.`, 'info');
       return;
     }
     setActiveNetwork([doctor, ...activeNetwork]);
-    alert(`${doctorName} has been added to your Active Care Network.`);
+    addNotification(`${doctorName} has been added to your Active Care Network.`, 'success');
   };
 
   const handleRemoveSpecialist = (doctor) => {
     const doctorName = doctor.nameKey ? t(doctor.nameKey) : doctor.name;
     setActiveNetwork(activeNetwork.filter(d => (d.nameKey ? t(d.nameKey) : d.name) !== doctorName));
+    addNotification(`${doctorName} removed from network.`, 'info');
   };
 
   return (
     <div className="animate-fade-in space-y-12">
+      <ConfirmModal
+        isOpen={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        onConfirm={executeRemove}
+        title={t('med_remove_title')}
+        message={t('med_confirm_delete')}
+      />
+
+      <EntityModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onSave={handleSave}
+        title={t('dash_register_patient')}
+        fields={fields}
+      />
+
       <div className="mb-10 px-1 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
           <h1 className="text-3xl font-black theme-text tracking-tight uppercase">{t('dash_caregiver_portal')}, {user.name}</h1>
           <p className="theme-text-sub text-sm mt-1.5 font-medium">{t('dash_caregiver_desc')}</p>
         </div>
         <button
-          onClick={handleAddPatient}
+          onClick={() => setModalOpen(true)}
           className="bg-gray-900 dark:bg-teal-600 text-white px-8 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-xl shadow-teal-500/20"
         >
           {t('dash_register_patient')}
@@ -105,11 +145,11 @@ export default function CaregiverDashboard() {
                     {t(p.status)}
                   </div>
                   <div className="flex gap-2">
-                    <button onClick={() => alert(`Initiating secure consult for ${p.nameKey ? t(p.nameKey) : p.name}...`)} className="bg-gray-900 dark:bg-teal-600 text-white px-8 py-3.5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all active:scale-95 shadow-xl shadow-gray-900/10">
+                    <button onClick={() => addNotification(`Initiating secure consult for ${p.nameKey ? t(p.nameKey) : p.name}...`, 'info')} className="bg-gray-900 dark:bg-teal-600 text-white px-8 py-3.5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all active:scale-95 shadow-xl shadow-gray-900/10">
                       {t('dash_consult')}
                     </button>
-                    <button onClick={() => handleRemove(p.id)} className="w-12 h-12 rounded-xl border theme-border flex items-center justify-center theme-text-sub hover:text-red-500 transition-all">
-                      ✕
+                    <button onClick={() => handleRemove(p.id)} className="w-12 h-12 rounded-xl border theme-border flex items-center justify-center theme-text-sub hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-200 dark:border-red-800 transition-all shadow-sm" title={t('med_remove_title')}>
+                      🗑️
                     </button>
                   </div>
                 </div>
@@ -119,7 +159,7 @@ export default function CaregiverDashboard() {
           ))}
 
           {monitored.length === 0 && (
-            <button onClick={handleAddPatient} className="border-2 border-dashed theme-border rounded-[2.5rem] p-12 flex flex-col items-center justify-center gap-5 hover:border-teal-300 dark:hover:border-teal-700 hover:theme-bg transition-all group shadow-sm">
+            <button onClick={() => setModalOpen(true)} className="border-2 border-dashed theme-border rounded-[2.5rem] p-12 flex flex-col items-center justify-center gap-5 hover:border-teal-300 dark:hover:border-teal-700 hover:theme-bg transition-all group shadow-sm">
               <div className="w-16 h-16 rounded-2xl theme-bg flex items-center justify-center theme-text-sub group-hover:bg-teal-100 dark:group-hover:bg-teal-900 group-hover:text-teal-600 transition-all border theme-border shadow-md">
                 <span className="text-3xl font-black">+</span>
               </div>
@@ -152,7 +192,7 @@ export default function CaregiverDashboard() {
                 </div>
                 <div className="mt-4 pt-4 border-t theme-border flex justify-between items-center relative z-10">
                   <span className="text-[9px] font-black text-green-600 dark:text-green-400 uppercase tracking-widest">{t('dash_clinical_sync')}</span>
-                  <button onClick={() => alert(`Initiating clinical consult with ${doc.nameKey ? t(doc.nameKey) : doc.name}...`)} className="text-[9px] font-black text-teal-600 uppercase tracking-[0.2em] hover:underline">{t('dash_consult')}</button>
+                  <button onClick={() => addNotification(`Initiating clinical consult with ${doc.nameKey ? t(doc.nameKey) : doc.name}...`, 'info')} className="text-[9px] font-black text-teal-600 uppercase tracking-[0.2em] hover:underline">{t('dash_consult')}</button>
                 </div>
                 <div className="absolute -right-8 -bottom-8 w-24 h-24 bg-teal-500/5 rounded-full blur-2xl" />
               </div>

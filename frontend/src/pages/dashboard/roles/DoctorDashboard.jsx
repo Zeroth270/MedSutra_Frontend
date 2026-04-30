@@ -1,7 +1,10 @@
 import { useOutletContext } from 'react-router-dom';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNotification } from '../../../context/NotificationContext';
 import PatientDashboard from './PatientDashboard';
+import ConfirmModal from '../../../components/ui/ConfirmModal';
+import EntityModal from '../../../components/ui/EntityModal';
 
 const INITIAL_PATIENTS = [
     { id: 1, nameKey: 'pat_john', name: 'John Doe', status: 'dash_at_risk', adherence: '65%', lastSeen: '2 hrs ago', color: 'text-red-600', bg: 'bg-red-50', avatar: 'JD' },
@@ -12,8 +15,38 @@ const INITIAL_PATIENTS = [
 export default function DoctorDashboard() {
     const { t } = useTranslation();
     const { user } = useOutletContext();
+    const { addNotification } = useNotification();
     const [selectedPatient, setSelectedPatient] = useState(null);
     const [patients, setPatients] = useState(INITIAL_PATIENTS);
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const [deletingId, setDeletingId] = useState(null);
+    const [modalOpen, setModalOpen] = useState(false);
+
+    const fields = [
+        { name: 'name', labelKey: 'auth_name_label', placeholder: 'e.g. John Doe', required: true },
+        { 
+            name: 'status', 
+            labelKey: 'settings_alert_logic', 
+            type: 'select', 
+            options: [
+                { value: 'dash_stable', labelKey: 'dash_stable' },
+                { value: 'dash_at_risk', labelKey: 'dash_at_risk' }
+            ] 
+        }
+    ];
+
+    const handleSave = (data) => {
+        const initials = data.name.split(' ').map(n => n[0]).join('').toUpperCase();
+        const newPatient = {
+            id: Date.now(),
+            ...data,
+            adherence: '100%',
+            lastSeen: 'Just now',
+            avatar: initials || 'P'
+        };
+        setPatients([...patients, newPatient]);
+        addNotification(`${t('notif_added')} (${data.name})`, 'success');
+    };
 
     const quickStats = [
         { label: 'dash_total_patients', value: patients.length, icon: '👥' },
@@ -21,27 +54,18 @@ export default function DoctorDashboard() {
         { label: 'dash_consultations', value: '12', icon: '📅' },
     ];
 
-    const handleRegister = () => {
-        const name = window.prompt('Enter new patient full name:');
-        if (!name) return;
-        const initials = name.split(' ').map(n => n[0]).join('').toUpperCase();
-
-        const newPatient = {
-            id: Date.now(),
-            name,
-            status: 'dash_stable',
-            adherence: '100%',
-            lastSeen: 'Just now',
-            avatar: initials || 'P'
-        };
-        setPatients([...patients, newPatient]);
+    const handleRemovePatient = (e, id) => {
+        e.stopPropagation();
+        setDeletingId(id);
+        setConfirmOpen(true);
     };
 
-    const handleRemovePatient = (e, id) => {
-        e.stopPropagation(); // Prevent card click
-        if (window.confirm('Are you sure you want to remove this patient from your clinical oversight?')) {
-            setPatients(patients.filter(p => p.id !== id));
-        }
+    const executeRemove = () => {
+        const patient = patients.find(p => p.id === deletingId);
+        setPatients(patients.filter(p => p.id !== deletingId));
+        addNotification(`${t('notif_removed')} (${patient.nameKey ? t(patient.nameKey) : patient.name})`, 'warning');
+        setConfirmOpen(false);
+        setDeletingId(null);
     };
 
     if (selectedPatient) {
@@ -61,6 +85,22 @@ export default function DoctorDashboard() {
 
     return (
         <div className="animate-fade-in space-y-10">
+            <ConfirmModal
+                isOpen={confirmOpen}
+                onClose={() => setConfirmOpen(false)}
+                onConfirm={executeRemove}
+                title={t('med_remove_title')}
+                message="Are you sure you want to remove this patient from your clinical oversight?"
+            />
+
+            <EntityModal
+                isOpen={modalOpen}
+                onClose={() => setModalOpen(false)}
+                onSave={handleSave}
+                title={t('dash_register_patient')}
+                fields={fields}
+            />
+
             <div className="mb-8 px-1">
                 <h1 className="text-3xl font-black theme-text tracking-tight uppercase">{t('dash_doctor_portal')}, Dr. {user.name}</h1>
                 <p className="theme-text-sub text-sm mt-1.5 font-medium">{t('dash_doctor_desc')}</p>
@@ -85,7 +125,7 @@ export default function DoctorDashboard() {
                 <div className="lg:col-span-2 space-y-8">
                     <div className="flex items-center justify-between px-2">
                         <h2 className="font-black theme-text text-xl uppercase tracking-tight">{t('dash_active_accounts')}</h2>
-                        <button onClick={handleRegister} className="text-[10px] font-black text-teal-600 dark:text-teal-400 hover:underline uppercase tracking-widest">{t('dash_register_new')}</button>
+                        <button onClick={() => setModalOpen(true)} className="text-[10px] font-black text-teal-600 dark:text-teal-400 hover:underline uppercase tracking-widest">{t('dash_register_new')}</button>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {patients.map((p) => (
@@ -108,10 +148,10 @@ export default function DoctorDashboard() {
                                     </div>
                                     <button
                                         onClick={(e) => handleRemovePatient(e, p.id)}
-                                        className="w-10 h-10 rounded-xl border theme-border flex items-center justify-center theme-text-sub hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all shadow-sm"
-                                        title="Remove Patient"
+                                        className="w-10 h-10 rounded-xl border theme-border flex items-center justify-center theme-text-sub hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-200 dark:hover:border-red-800 transition-all shadow-sm"
+                                        title={t('med_remove_title')}
                                     >
-                                        ✕
+                                        🗑️
                                     </button>
                                 </div>
 
@@ -173,7 +213,7 @@ export default function DoctorDashboard() {
                             ))}
                         </div>
 
-                        <button onClick={() => alert('Loading full clinical feedback archives...')} className="w-full py-6 text-[10px] font-black theme-text-sub hover:text-teal-600 dark:hover:text-teal-400 border-t theme-border theme-bg/30 transition-all uppercase tracking-[0.2em] hover:bg-teal-50/20 dark:hover:bg-teal-900/10">
+                        <button onClick={() => addNotification('Loading full clinical feedback archives...', 'info')} className="w-full py-6 text-[10px] font-black theme-text-sub hover:text-teal-600 dark:hover:text-teal-400 border-t theme-border theme-bg/30 transition-all uppercase tracking-[0.2em] hover:bg-teal-50/20 dark:hover:bg-teal-900/10">
                             {t('dash_read_archives')}
                         </button>
                     </div>

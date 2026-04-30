@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNotification } from '../../context/NotificationContext';
 import PageHeader from '../../components/ui/PageHeader';
 import DoctorCard from '../../components/dashboard/DoctorCard';
+import EntityModal from '../../components/ui/EntityModal';
+import ConfirmModal from '../../components/ui/ConfirmModal';
 import { MOCK_DOCTORS } from '../../constants/doctors';
 
 const INITIAL_CAREGIVERS = [
@@ -13,46 +16,63 @@ const PERMISSIONS = ['link_permissions', 'dash_adherence_log', 'nav_risk_report'
 
 export default function CaregiverLinkPage() {
   const { t } = useTranslation();
+  const { addNotification } = useNotification();
   const [perms, setPerms] = useState(PERMISSIONS.reduce((a, p) => ({ ...a, [p]: true }), {}));
   const [searchQuery, setSearchQuery] = useState('');
   const [caregivers, setCaregivers] = useState(INITIAL_CAREGIVERS);
   const [saving, setSaving] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingCaregiver, setEditingCaregiver] = useState(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
 
-  const filteredDoctors = MOCK_DOCTORS.filter(doc => {
-    const name = doc.nameKey ? t(doc.nameKey).toLowerCase() : doc.name.toLowerCase();
-    const specialty = doc.specialtyKey ? t(doc.specialtyKey).toLowerCase() : doc.specialty.toLowerCase();
-    const query = searchQuery.toLowerCase();
-    
-    return name.includes(query) || 
-           specialty.includes(query) || 
-           doc.diseases.some(d => d.toLowerCase().includes(query));
-  });
+  const fields = [
+    { name: 'name', labelKey: 'auth_name_label', placeholderKey: 'auth_name_placeholder', required: true },
+    { 
+      name: 'role', 
+      labelKey: 'auth_select_role', 
+      type: 'select', 
+      options: [
+        { value: 'Caregiver', labelKey: 'auth_role_caregiver' },
+        { value: 'Family Member', labelKey: 'spec_family' },
+        { value: 'Specialist', labelKey: 'spec_primary' }
+      ] 
+    }
+  ];
 
-  const handleInvite = () => {
-    const name = window.prompt(t('link_btn_invite'));
-    if (!name) return;
-    const role = window.prompt(t('auth_select_role'), 'Family Caregiver');
-
-    const newCaregiver = {
-      id: Date.now(),
-      name,
-      role: role || 'Caregiver',
-      status: 'dash_stable',
-      initial: name.charAt(0).toUpperCase()
-    };
-    setCaregivers([...caregivers, newCaregiver]);
+  const handleSave = (data) => {
+    if (editingCaregiver) {
+      setCaregivers(caregivers.map(c => c.id === editingCaregiver.id ? { ...c, ...data, nameKey: null, roleKey: null } : c));
+      addNotification(`${t('notif_updated')} (${data.name})`, 'success');
+    } else {
+      const newCaregiver = {
+        ...data,
+        id: Date.now(),
+        status: 'dash_stable',
+        initial: data.name.charAt(0).toUpperCase()
+      };
+      setCaregivers([...caregivers, newCaregiver]);
+      addNotification(`${t('notif_added')} (${data.name})`, 'success');
+    }
   };
 
   const handleRemove = (id) => {
-    if (window.confirm(t('med_confirm_delete'))) {
-      setCaregivers(caregivers.filter(c => c.id !== id));
-    }
+    setDeletingId(id);
+    setConfirmOpen(true);
+  };
+
+  const executeRemove = () => {
+    const caregiver = caregivers.find(c => c.id === deletingId);
+    setCaregivers(caregivers.filter(c => c.id !== deletingId));
+    addNotification(`${t('notif_removed')} (${caregiver.nameKey ? t(caregiver.nameKey) : caregiver.name})`, 'warning');
+    setConfirmOpen(false);
+    setDeletingId(null);
   };
 
   const handleBook = (doctor) => {
     const doctorName = doctor.nameKey ? t(doctor.nameKey) : doctor.name;
     if (caregivers.some(c => (c.nameKey ? t(c.nameKey) : c.name) === doctorName)) {
-        alert(`${doctorName} is already in your Active Care Network.`);
+        addNotification(`${doctorName}: ${t('notif_updated')}`, 'info');
         return;
     }
 
@@ -67,24 +87,54 @@ export default function CaregiverLinkPage() {
     };
     
     setCaregivers([newCaregiver, ...caregivers]);
-    alert(`${doctorName} has been added to your clinical care circle.`);
+    addNotification(`${doctorName}: ${t('notif_added')}`, 'success');
   };
 
   const handleCommit = () => {
     setSaving(true);
     setTimeout(() => {
       setSaving(false);
-      alert('Global access logic synchronized successfully.');
+      addNotification(t('notif_updated'), 'success');
     }, 1000);
   };
 
+  const filteredDoctors = MOCK_DOCTORS.filter(doc => {
+    const name = doc.nameKey ? t(doc.nameKey).toLowerCase() : doc.name.toLowerCase();
+    const specialty = doc.specialtyKey ? t(doc.specialtyKey).toLowerCase() : doc.specialty.toLowerCase();
+    const query = searchQuery.toLowerCase();
+    
+    return name.includes(query) || 
+           specialty.includes(query) || 
+           doc.diseases.some(d => d.toLowerCase().includes(query));
+  });
+
   return (
     <div className="animate-fade-in space-y-12">
+      <ConfirmModal
+        isOpen={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        onConfirm={executeRemove}
+        title={t('med_remove_title')}
+        message={t('med_confirm_delete')}
+      />
+
       <PageHeader
         title={t('nav_caregiver_link')}
         subtitle={t('link_subtitle')}
         actionLabel={t('link_btn_invite')}
-        onAction={handleInvite}
+        onAction={() => {
+          setEditingCaregiver(null);
+          setModalOpen(true);
+        }}
+      />
+
+      <EntityModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onSave={handleSave}
+        title={editingCaregiver ? t('risk_configure') : t('link_btn_invite')}
+        initialData={editingCaregiver || { role: 'Caregiver' }}
+        fields={fields}
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
@@ -112,7 +162,15 @@ export default function CaregiverLinkPage() {
                   <div className="flex items-center justify-between pt-6 border-t theme-border relative z-10">
                     <span className="text-[10px] font-black border border-green-200 dark:border-green-900/30 text-green-700 dark:text-green-400 px-4 py-2 rounded-xl uppercase tracking-widest shadow-sm">{t(c.status)}</span>
                     <div className="flex gap-2">
-                      <button onClick={() => alert(`Configuring access for ${c.nameKey ? t(c.nameKey) : c.name}...`)} className="text-[10px] theme-text-sub hover:text-teal-600 dark:hover:text-teal-400 font-black uppercase tracking-[0.2em] transition-all">{t('risk_configure')}</button>
+                      <button 
+                        onClick={() => {
+                          setEditingCaregiver(c);
+                          setModalOpen(true);
+                        }} 
+                        className="text-[10px] theme-text-sub hover:theme-text font-black uppercase tracking-[0.2em] transition-all"
+                      >
+                        ✏️ {t('risk_configure')}
+                      </button>
                       <button onClick={() => handleRemove(c.id)} className="text-[10px] text-red-500 font-black uppercase tracking-[0.2em] transition-all ml-2">{t('link_btn_revoke')}</button>
                     </div>
                   </div>

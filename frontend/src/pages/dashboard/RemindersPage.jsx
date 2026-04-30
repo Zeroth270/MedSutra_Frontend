@@ -1,47 +1,71 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNotification } from '../../context/NotificationContext';
 import PageHeader from '../../components/ui/PageHeader';
+import EntityModal from '../../components/ui/EntityModal';
+import ConfirmModal from '../../components/ui/ConfirmModal';
 
 const INITIAL_REMINDERS = [
-  { id: 1, med: 'Metformin 500mg', time: '8:00 AM', days: 'Every Day', status: 'Active', next: 'Tomorrow 8:00 AM', icon: '☀️' },
-  { id: 2, med: 'Lisinopril 10mg', time: '2:00 PM', days: 'Every Day', status: 'Active', next: 'Today 2:00 PM', icon: '🌤️' },
-  { id: 3, med: 'Atorvastatin 20mg', time: '6:00 PM', days: 'Every Day', status: 'Snoozed', next: 'Today 6:00 PM', icon: '🌆' },
-  { id: 4, med: 'Metformin 500mg', time: '9:00 PM', days: 'Every Day', status: 'Active', next: 'Today 9:00 PM', icon: '🌙' },
+  { id: 1, name: 'Atorvastatin', time: '09:00 AM', status: 'Active', type: 'Tablet', next: 'Tomorrow', icon: '💊' },
+  { id: 2, name: 'Lisinopril', time: '08:00 PM', status: 'Active', type: 'Tablet', next: 'In 2 hrs', icon: '💊' },
 ];
 
 export default function RemindersPage() {
   const { t } = useTranslation();
+  const { addNotification } = useNotification();
   const [reminders, setReminders] = useState(INITIAL_REMINDERS);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingReminder, setEditingReminder] = useState(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
 
-  const handleAdd = () => {
-    const med = window.prompt(t('med_prompt_name'));
-    if (!med) return;
-    const time = window.prompt(t('med_prompt_time'), '10:00 PM');
+  const fields = [
+    { name: 'name', labelKey: 'med_prompt_name', placeholder: 'e.g. Lisinopril', required: true },
+    { name: 'time', labelKey: 'med_prompt_time', placeholder: 'e.g. 09:00 AM', required: true },
+    { 
+      name: 'type', 
+      labelKey: 'auth_select_role', 
+      type: 'select', 
+      options: [
+        { value: 'Tablet', labelKey: 'med_type_tablet' },
+        { value: 'Capsule', labelKey: 'med_type_capsule' },
+        { value: 'Syrup', labelKey: 'med_type_syrup' }
+      ] 
+    }
+  ];
 
-    const newReminder = {
-      id: Date.now(),
-      med,
-      time: time || '10:00 PM',
-      days: 'Every Day',
-      status: 'Active',
-      next: 'Today ' + (time || '10:00 PM'),
-      icon: '🔔'
-    };
-    setReminders([...reminders, newReminder]);
-  };
-
-  const handleRemove = (id) => {
-    if (window.confirm(t('med_confirm_delete'))) {
-      setReminders(reminders.filter(r => r.id !== id));
+  const handleSave = (data) => {
+    if (editingReminder) {
+      setReminders(reminders.map(r => r.id === editingReminder.id ? { ...r, ...data } : r));
+      addNotification(`${t('notif_updated')} (${data.name})`, 'success');
+    } else {
+      setReminders([...reminders, { ...data, id: Date.now(), status: 'Active', next: 'Soon', icon: '💊' }]);
+      addNotification(`${t('notif_added')} (${data.name})`, 'success');
     }
   };
 
+  const handleRemove = (id) => {
+    setDeletingId(id);
+    setConfirmOpen(true);
+  };
+
+  const executeRemove = () => {
+    const reminder = reminders.find(r => r.id === deletingId);
+    setReminders(reminders.filter(r => r.id !== deletingId));
+    addNotification(`${t('notif_removed')} (${reminder.name})`, 'warning');
+    setDeletingId(null);
+    setConfirmOpen(false);
+  };
+
   const handleToggle = (id) => {
+    const reminder = reminders.find(r => r.id === id);
+    const newStatus = reminder.status === 'Active' ? 'Snoozed' : 'Active';
     setReminders(reminders.map(r =>
       r.id === id
-        ? { ...r, status: r.status === 'Active' ? 'Snoozed' : 'Active' }
+        ? { ...r, status: newStatus }
         : r
     ));
+    addNotification(`${reminder.name}: ${newStatus === 'Active' ? t('notif_activated') : t('notif_snoozed')}`, newStatus === 'Active' ? 'success' : 'info');
   };
 
   return (
@@ -49,8 +73,28 @@ export default function RemindersPage() {
       <PageHeader
         title={t('nav_reminders')}
         subtitle={t('rem_subtitle')}
-        actionLabel={t('dash_register_new')}
-        onAction={handleAdd}
+        actionLabel={t('med_btn_add')}
+        onAction={() => {
+          setEditingReminder(null);
+          setModalOpen(true);
+        }}
+      />
+
+      <ConfirmModal
+        isOpen={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        onConfirm={executeRemove}
+        title={t('med_remove_title')}
+        message={t('med_confirm_delete')}
+      />
+
+      <EntityModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onSave={handleSave}
+        title={editingReminder ? t('dash_optimization') : t('med_btn_add')}
+        initialData={editingReminder}
+        fields={fields}
       />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
@@ -79,8 +123,8 @@ export default function RemindersPage() {
                     {r.icon}
                   </div>
                   <div>
-                    <h3 className="text-xl font-black theme-text group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors uppercase tracking-tight">{r.med}</h3>
-                    <p className="text-[10px] theme-text-sub font-black mt-1.5 uppercase tracking-widest opacity-70">{r.days}</p>
+                    <h3 className="text-xl font-black theme-text group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors uppercase tracking-tight">{r.name}</h3>
+                    <p className="text-[10px] theme-text-sub font-black mt-1.5 uppercase tracking-widest opacity-70">{t('med_timing')}</p>
                   </div>
                 </div>
                 <button
@@ -103,6 +147,16 @@ export default function RemindersPage() {
                   </div>
                 </div>
                 <div className="flex gap-2">
+                  <button 
+                    onClick={() => {
+                      setEditingReminder(r);
+                      setModalOpen(true);
+                    }} 
+                    className="w-12 h-12 rounded-2xl border theme-border flex items-center justify-center theme-text-sub hover:theme-text hover:bg-gray-100 dark:hover:bg-gray-800 transition-all shadow-sm" 
+                    title="Edit"
+                  >
+                    ✏️
+                  </button>
                   <button onClick={() => handleToggle(r.id)} className="w-12 h-12 rounded-2xl border theme-border flex items-center justify-center theme-text-sub hover:theme-text hover:bg-gray-100 dark:hover:bg-gray-800 transition-all shadow-sm" title="Toggle Status">
                     {isActive ? '⏸️' : '▶️'}
                   </button>

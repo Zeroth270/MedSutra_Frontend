@@ -11,6 +11,7 @@ const resources = {
       "nav_caregiver_link": "Caregiver Link", "nav_settings": "Settings",
       "btn_join": "Join Free", "btn_signin": "Sign In", "dashboard": "Dashboard",
       "sign_out": "Sign Out", "exit": "Exit", "switch_theme": "Switch Theme",
+      "nav_confirm": "Confirm", "nav_cancel": "Cancel",
       "select_language": "Select Language", "today": "Today", "core_nav": "Core Navigation", "platform": "MedSutra Platform",
       "hero_badge": "AI-Powered Medication Management", "hero_title": "Manage medications with confidence and clarity",
       "hero_subtitle": "MedSutra AI helps patients stay on track with smart reminders, AI verification, and real-time caregiver alerts — all in one place.",
@@ -64,7 +65,7 @@ const resources = {
       "dash_at_risk": "At Risk", "dash_stable": "Stable",
       "med_subtitle_patient": "View your prescribed medications. Managed by your Clinical Care Team.", "med_subtitle_specialist": "Manage and track prescription pharmacy protocols.",
       "med_btn_add": "+ Add Medication", "med_stat_total": "Total Scripts", "med_stat_active": "Active Course", "med_stat_critical": "Critical Refill", "med_stat_refill": "Next Refill",
-      "med_type_tablet": "Tablet", "med_freq_once": "Once Daily", "med_freq_twice": "Twice Daily", "med_timing": "Timing", "med_stock": "Current Stock", "med_units_left": "Units Left", "med_inventory_level": "Inventory Level",
+      "med_type_tablet": "Tablet", "med_type_capsule": "Capsule", "med_type_syrup": "Syrup", "med_freq_once": "Once Daily", "med_freq_twice": "Twice Daily", "med_timing": "Timing", "med_stock": "Current Stock", "med_units_left": "Units Left", "med_inventory_level": "Inventory Level",
       "med_prompt_name": "Enter medication name:", "med_prompt_time": "Enter schedule (e.g. 9 AM):", "med_confirm_delete": "Delete this medication protocol?", "med_prompt_edit": "Edit medication name:",
       "rem_subtitle": "View upcoming doses and historical adherence logs.", "rem_stat_upcoming": "Upcoming Doses", "rem_stat_completed": "Completed Today", "rem_stat_accuracy": "Log Accuracy", "rem_upcoming_schedule": "Upcoming Schedule", "rem_btn_verify": "Verify Dose", "rem_adherence_logs": "Adherence Archives",
       "rem_dose_taken": "Dose Taken Successfully", "rem_neural_confirm": "Neural confirmation verified by MS-Engine.", "rem_btn_dismiss": "Dismiss",
@@ -83,7 +84,12 @@ const resources = {
       "dash_trend_msg": "Morning compliance has improved by 12% this week. Performance is optimal.",
       "dash_opt_msg": "Evening doses are occasionally delayed. Suggest adjusting 21:00 nudge to 20:45.",
       "pat_john": "John Doe", "pat_jane": "Jane Smith", "pat_robert": "Robert Fox", "pat_sarah": "Sarah Miller",
-      "pat_sarah_miller": "Sarah Miller (Mother)", "pat_james_miller": "James Miller (Father)"
+      "pat_sarah_miller": "Sarah Miller (Mother)", "pat_james_miller": "James Miller (Father)",
+      "notif_added": "Success: New entry initialized.",
+      "notif_updated": "Update: Configuration synchronized.",
+      "notif_removed": "Warning: Entry purged from system.",
+      "notif_activated": "Status: Node activated.",
+      "notif_snoozed": "Status: Node snoozed."
     }
   },
   hi: {
@@ -138,6 +144,7 @@ const resources = {
       "settings_title": "क्लिनिकल सेटिंग्स", "settings_subtitle": "अपनी पहचान और अलर्ट कॉन्फ़िगर करें।",
       "settings_identity": "पहचान और प्रमाणीकरण", "settings_name_label": "कानूनी पूरा नाम", "settings_email_label": "ईमेल",
       "settings_phone_label": "आपातकालीन फोन", "settings_role_label": "असाइन की गई भूमिका", "settings_commit": "बदलाव सहेजें", "settings_synced": "सिंक हो गया",
+      "nav_confirm": "पुष्टि करें", "nav_cancel": "रद्द करें",
       "settings_alert_logic": "अलर्ट तर्क", "settings_personalize_triggers": "ट्रिगर कस्टमाइज़ करें",
       "notif_med_reminders": "दवा रिमाइंडर", "notif_missed_dose": "छूटी खुराक अलर्ट", "notif_weekly_summary": "साप्ताहिक सारांश", "notif_caregiver_alerts": "केयरगिवर अलर्ट", "notif_ai_insights": "AI रिपोर्ट",
       "dash_doctor_portal": "डॉक्टर पोर्टल", "dash_doctor_desc": "मरीजों की निगरानी करें।",
@@ -147,7 +154,7 @@ const resources = {
       "dash_at_risk": "जोखिम में", "dash_stable": "स्थिर",
       "med_subtitle_patient": "अपनी दवाओं को देखें। टीम द्वारा प्रबंधित।", "med_subtitle_specialist": "नुस्खे प्रबंधित करें।",
       "med_btn_add": "+ दवा जोड़ें", "med_stat_total": "कुल स्क्रिप्ट", "med_stat_active": "सक्रिय कोर्स", "med_stat_critical": "रीफिल आवश्यक", "med_stat_refill": "अगला रीफिल",
-      "med_type_tablet": "टैबलेट", "med_freq_once": "दिन में एक बार", "med_freq_twice": "दिन में दो बार", "med_timing": "समय", "med_stock": "मौजूदा स्टॉक", "med_units_left": "यूनिट बची हैं", "med_inventory_level": "इन्वेंट्री स्तर",
+      "med_type_tablet": "टैबलेट", "med_type_capsule": "कैप्सूल", "med_type_syrup": "सिरप", "med_freq_once": "दिन में एक बार", "med_freq_twice": "दिन में दो बार", "med_timing": "समय", "med_stock": "मौजूदा स्टॉक", "med_units_left": "यूनिट बची हैं", "med_inventory_level": "इन्वेंट्री स्तर",
       "med_prompt_name": "दवा का नाम लिखें:", "med_prompt_time": "समय लिखें (जैसे 9 AM):", "med_confirm_delete": "हटाएं?", "med_prompt_edit": "नाम बदलें:",
       "rem_subtitle": "आगामी खुराक और इतिहास देखें।", "rem_stat_upcoming": "आगामी खुराक", "rem_stat_completed": "आज पूर्ण", "rem_stat_accuracy": "सटीकता", "rem_upcoming_schedule": "आगामी कार्यक्रम", "rem_btn_verify": "सत्यापित करें", "rem_adherence_logs": "अनुपालन लॉग",
       "rem_dose_taken": "खुराक सफलतापूर्वक ली गई", "rem_neural_confirm": "MS-इंजन द्वारा सत्यापित।", "rem_btn_dismiss": "खारिज करें",
@@ -165,7 +172,12 @@ const resources = {
       "dash_clinical_mode": "क्लिनिकल मोड", "dash_verified": "सत्यापित", "med_remove_title": "दवा हटाएं",
       "dash_trend_msg": "इस सप्ताह सुबह के अनुपालन में 12% सुधार हुआ है। प्रदर्शन इष्टतम है।",
       "pat_john": "जॉन डो", "pat_jane": "जेन स्मिथ", "pat_robert": "रॉबर्ट फॉक्स", "pat_sarah": "सारा मिलर",
-      "pat_sarah_miller": "सारा मिलर (माता)", "pat_james_miller": "जेम्स मिलर (पिता)"
+      "pat_sarah_miller": "सारा मिलर (माता)", "pat_james_miller": "जेम्स मिलर (पिता)",
+      "notif_added": "सफलता: नई प्रविष्टि शुरू की गई।",
+      "notif_updated": "अपडेट: कॉन्फ़िगरेशन सिंक हो गया।",
+      "notif_removed": "चेतावनी: प्रविष्टि सिस्टम से हटा दी गई।",
+      "notif_activated": "स्थिति: नोड सक्रिय।",
+      "notif_snoozed": "स्थिति: नोड स्नूज़ किया गया।"
     }
   },
   kn: {

@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useNotification } from '../../context/NotificationContext';
 import PageHeader from '../../components/ui/PageHeader';
+import EntityModal from '../../components/ui/EntityModal';
+import ConfirmModal from '../../components/ui/ConfirmModal';
 
 const INITIAL_MEDS = [
   { id: 1, name: 'Metformin 500mg', type: 'med_type_tablet', frequency: 'med_freq_twice', time: '8 AM & 9 PM', stock: 28, status: 'dash_stable' },
@@ -13,42 +16,64 @@ const INITIAL_MEDS = [
 export default function MedicationsPage() {
   const { t } = useTranslation();
   const { user } = useOutletContext();
+  const { addNotification } = useNotification();
   const [meds, setMeds] = useState(INITIAL_MEDS);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingMed, setEditingMed] = useState(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
 
   const isPatient = user?.role?.toLowerCase() === 'patient';
 
-  const handleAdd = () => {
-    if (isPatient) return;
-    const name = window.prompt(t('med_prompt_name'));
-    if (!name) return;
-    const time = window.prompt(t('med_prompt_time'), '9 AM');
+  const fields = [
+    { name: 'name', labelKey: 'auth_name_label', placeholderKey: 'med_prompt_name', required: true },
+    { 
+      name: 'type', 
+      labelKey: 'auth_select_role', 
+      type: 'select', 
+      options: [
+        { value: 'med_type_tablet', labelKey: 'med_type_tablet' }
+      ] 
+    },
+    { 
+      name: 'frequency', 
+      labelKey: 'settings_alert_logic', 
+      type: 'select', 
+      options: [
+        { value: 'med_freq_once', labelKey: 'med_freq_once' },
+        { value: 'med_freq_twice', labelKey: 'med_freq_twice' }
+      ] 
+    },
+    { name: 'time', labelKey: 'med_timing', placeholderKey: 'med_prompt_time', required: true },
+    { name: 'stock', labelKey: 'med_stock', type: 'number', required: true }
+  ];
 
-    const newMed = {
-      id: Date.now(),
-      name,
-      type: 'med_type_tablet',
-      frequency: 'med_freq_once',
-      time: time || '9 AM',
-      stock: 30,
-      status: 'dash_stable'
-    };
-    setMeds([...meds, newMed]);
+  const handleSave = (data) => {
+    if (editingMed) {
+      setMeds(meds.map(m => m.id === editingMed.id ? { ...m, ...data } : m));
+      addNotification(`${t('notif_updated')} (${data.name})`, 'success');
+    } else {
+      const newMed = {
+        ...data,
+        id: Date.now(),
+        status: data.stock < 10 ? 'dash_at_risk' : 'dash_stable'
+      };
+      setMeds([...meds, newMed]);
+      addNotification(`${t('notif_added')} (${data.name})`, 'success');
+    }
   };
 
   const handleRemove = (id) => {
-    if (isPatient) return;
-    if (window.confirm(t('med_confirm_delete'))) {
-      setMeds(meds.filter(m => m.id !== id));
-    }
+    setDeletingId(id);
+    setConfirmOpen(true);
   };
 
-  const handleEdit = (id) => {
-    if (isPatient) return;
-    const med = meds.find(m => m.id === id);
-    const newName = window.prompt(t('med_prompt_edit'), med.name);
-    if (newName) {
-      setMeds(meds.map(m => m.id === id ? { ...m, name: newName } : m));
-    }
+  const executeRemove = () => {
+    const med = meds.find(m => m.id === deletingId);
+    setMeds(meds.filter(m => m.id !== deletingId));
+    addNotification(`${t('notif_removed')} (${med.name})`, 'warning');
+    setDeletingId(null);
+    setConfirmOpen(false);
   };
 
   return (
@@ -57,7 +82,27 @@ export default function MedicationsPage() {
         title={t('nav_medications')}
         subtitle={isPatient ? t('med_subtitle_patient') : t('med_subtitle_specialist')}
         actionLabel={!isPatient ? t('med_btn_add') : null}
-        onAction={handleAdd}
+        onAction={() => {
+          setEditingMed(null);
+          setModalOpen(true);
+        }}
+      />
+
+      <ConfirmModal
+        isOpen={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        onConfirm={executeRemove}
+        title={t('med_remove_title')}
+        message={t('med_confirm_delete')}
+      />
+
+      <EntityModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onSave={handleSave}
+        title={editingMed ? t('dash_optimization') : t('dash_register_new')}
+        initialData={editingMed || { type: 'med_type_tablet', frequency: 'med_freq_once', stock: 30 }}
+        fields={fields}
       />
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
@@ -120,11 +165,17 @@ export default function MedicationsPage() {
                 </div>
                 {!isPatient && (
                   <div className="flex gap-2">
-                    <button onClick={() => handleEdit(med.id)} className="w-10 h-10 rounded-xl border theme-border flex items-center justify-center theme-text-sub hover:theme-text hover:bg-gray-100 dark:hover:bg-gray-800 transition-all">
+                    <button 
+                      onClick={() => {
+                        setEditingMed(med);
+                        setModalOpen(true);
+                      }} 
+                      className="w-10 h-10 rounded-xl border theme-border flex items-center justify-center theme-text-sub hover:theme-text hover:bg-gray-100 dark:hover:bg-gray-800 transition-all"
+                    >
                       ✎
                     </button>
-                    <button onClick={() => handleRemove(med.id)} className="w-10 h-10 rounded-xl border theme-border flex items-center justify-center theme-text-sub hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all">
-                      ✕
+                    <button onClick={() => handleRemove(med.id)} className="w-10 h-10 rounded-xl border theme-border flex items-center justify-center theme-text-sub hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-200 dark:hover:border-red-800 transition-all" title={t('med_remove_title')}>
+                      🗑️
                     </button>
                   </div>
                 )}

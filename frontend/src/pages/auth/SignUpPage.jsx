@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNotification } from '../../context/NotificationContext';
 import useAuth from '../../hooks/useAuth';
 import authService from '../../services/authService';
 import Spinner from '../../components/ui/Spinner';
@@ -10,6 +11,7 @@ export default function SignUpPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { login } = useAuth();
+  const { addNotification } = useNotification();
   const [form, setForm] = useState({ name: '', email: '', password: '', role: 'Patient' });
   const [loading, setLoading] = useState(false);
 
@@ -19,9 +21,11 @@ export default function SignUpPage() {
     try {
       const userData = await authService.register(form.name, form.email, form.password, form.role);
       login(userData);
+      addNotification(`Profile created successfully! Welcome, ${userData.name}`, 'success');
       navigate(ROUTES.DASHBOARD);
     } catch (err) {
       console.error('Registration failed:', err);
+      addNotification('Registration failed. Please try again.', 'error');
     } finally {
       setLoading(false);
     }

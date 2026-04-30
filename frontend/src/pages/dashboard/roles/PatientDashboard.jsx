@@ -1,15 +1,47 @@
 import { useOutletContext } from 'react-router-dom';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNotification } from '../../../context/NotificationContext';
+import ConfirmModal from '../../../components/ui/ConfirmModal';
+import EntityModal from '../../../components/ui/EntityModal';
 
 export default function PatientDashboard({ selectedPatient, isDoctorView }) {
     const { t } = useTranslation();
     const { user } = useOutletContext();
+    const { addNotification } = useNotification();
     const [meds, setMeds] = useState([
         { id: 1, name: 'Metformin 500mg', type: 'med_type_tablet', frequency: 'med_freq_twice', time: '8 AM & 9 PM', status: 'dash_stable' },
         { id: 2, name: 'Lisinopril 10mg', type: 'med_type_tablet', frequency: 'med_freq_once', time: '2 PM', status: 'dash_stable' },
         { id: 3, name: 'Atorvastatin 20mg', type: 'med_type_tablet', frequency: 'med_freq_once', time: '6 PM', status: 'dash_stable' },
     ]);
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const [deletingId, setDeletingId] = useState(null);
+    const [modalOpen, setModalOpen] = useState(false);
+
+    const fields = [
+        { name: 'name', labelKey: 'med_prompt_name', placeholder: 'e.g. Aspirin', required: true },
+        { name: 'time', labelKey: 'med_prompt_time', placeholder: 'e.g. 9:00 AM', required: true },
+        { 
+            name: 'frequency', 
+            labelKey: 'med_timing', 
+            type: 'select', 
+            options: [
+                { value: 'med_freq_once', labelKey: 'med_freq_once' },
+                { value: 'med_freq_twice', labelKey: 'med_freq_twice' }
+            ] 
+        }
+    ];
+
+    const handleSave = (data) => {
+        const newMed = {
+            id: Date.now(),
+            ...data,
+            type: 'med_type_tablet',
+            status: 'dash_stable'
+        };
+        setMeds([...meds, newMed]);
+        addNotification(`${t('notif_added')} (${data.name})`, 'success');
+    };
 
     const stats = [
         { label: 'dash_stat_doses', value: '142', sub: 'dash_month' },
@@ -25,29 +57,30 @@ export default function PatientDashboard({ selectedPatient, isDoctorView }) {
         { time: '9:00 PM', med: 'Metformin 500mg', status: 'Pending', dot: 'bg-yellow-400' },
     ];
 
-    const removeMed = (id) => {
-        if (window.confirm(t('med_confirm_delete'))) {
-            setMeds(meds.filter(m => m.id !== id));
-        }
+    const handleRemove = (id) => {
+        setDeletingId(id);
+        setConfirmOpen(true);
     };
 
-    const addMed = () => {
-        const name = window.prompt(t('med_prompt_name'));
-        if (name) {
-            const newMed = {
-                id: Date.now(),
-                name,
-                type: 'med_type_tablet',
-                frequency: 'med_freq_once',
-                time: '9 AM',
-                status: 'dash_stable'
-            };
-            setMeds([...meds, newMed]);
-        }
+    const executeRemove = () => {
+        const med = meds.find(m => m.id === deletingId);
+        setMeds(meds.filter(m => m.id !== deletingId));
+        addNotification(`${t('notif_removed')} (${med.name})`, 'warning');
+        setConfirmOpen(false);
+        setDeletingId(null);
     };
+
 
     return (
         <div className="animate-fade-in">
+            <ConfirmModal
+                isOpen={confirmOpen}
+                onClose={() => setConfirmOpen(false)}
+                onConfirm={executeRemove}
+                title={t('med_remove_title')}
+                message={t('med_confirm_delete')}
+            />
+
             <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6 px-1">
                 <div>
                     <h1 className="text-3xl font-black theme-text tracking-tight uppercase">
@@ -59,13 +92,21 @@ export default function PatientDashboard({ selectedPatient, isDoctorView }) {
                 </div>
                 {isDoctorView && (
                     <button 
-                        onClick={addMed}
+                        onClick={() => setModalOpen(true)}
                         className="btn-primary px-8 py-4 rounded-xl text-xs font-black uppercase tracking-widest shadow-xl shadow-teal-500/20 hover:scale-105 active:scale-95 transition-all"
                     >
                         {t('med_btn_add')}
                     </button>
                 )}
             </div>
+
+            <EntityModal
+                isOpen={modalOpen}
+                onClose={() => setModalOpen(false)}
+                onSave={handleSave}
+                title={t('med_btn_add')}
+                fields={fields}
+            />
 
             {/* Stats */}
             <div className="grid grid-cols-2 xl:grid-cols-4 gap-6 mb-12">
@@ -113,11 +154,11 @@ export default function PatientDashboard({ selectedPatient, isDoctorView }) {
                                         </span>
                                         {isDoctorView && (
                                             <button 
-                                                onClick={() => removeMed(med.id)}
-                                                className="w-11 h-11 rounded-2xl border theme-border flex items-center justify-center theme-text-sub hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-100 dark:hover:border-red-900 transition-all shadow-sm"
+                                                onClick={() => handleRemove(med.id)}
+                                                className="w-11 h-11 rounded-2xl border theme-border flex items-center justify-center theme-text-sub hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-200 dark:hover:border-red-800 transition-all shadow-sm"
                                                 title={t('med_remove_title')}
                                             >
-                                                ✕
+                                                🗑️
                                             </button>
                                         )}
                                     </div>

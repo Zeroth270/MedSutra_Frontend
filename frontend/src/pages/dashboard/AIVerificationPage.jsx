@@ -1,7 +1,9 @@
 import { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNotification } from '../../context/NotificationContext';
 import PageHeader from '../../components/ui/PageHeader';
 import Spinner from '../../components/ui/Spinner';
+import ConfirmModal from '../../components/ui/ConfirmModal';
 
 const STEPS = [
   { step: '01', title: 'step_1_title', desc: 'step_1_desc' },
@@ -17,10 +19,14 @@ const INITIAL_HISTORY = [
 
 export default function AIVerificationPage() {
   const { t } = useTranslation();
+  const { addNotification } = useNotification();
   const [dragging, setDragging] = useState(false);
   const [scanning, setScanning] = useState(false);
   const [history, setHistory] = useState(INITIAL_HISTORY);
   const [cameraActive, setCameraActive] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmType, setConfirmType] = useState(null); // 'clear' or 'reminder'
+  const [lastScannedMed, setLastScannedMed] = useState('');
   const fileInputRef = useRef(null);
 
   const handleScan = (source = 'Photo') => {
@@ -37,11 +43,13 @@ export default function AIVerificationPage() {
             ok: true
         };
         setHistory([newLog, ...history]);
+        setLastScannedMed(medName);
         
-        const addReminder = window.confirm(`${t('rem_dose_taken')}: ${medName} ${t('ai_scan_match')}.\n\nWould you like to set an automatic reminder for this medication?`);
-        if (addReminder) {
-            alert('Reminder schedule synchronized. You will be notified for the next dose.');
-        }
+        addNotification(`${t(newLog.result)}: ${medName}`, 'success');
+        
+        // Trigger reminder confirm modal
+        setConfirmType('reminder');
+        setConfirmOpen(true);
     }, 2500);
   };
 
@@ -55,15 +63,33 @@ export default function AIVerificationPage() {
     }
   };
 
-  const clearLogs = () => {
-    if (window.confirm(t('med_confirm_delete'))) {
+  const onConfirm = () => {
+    if (confirmType === 'clear') {
         setHistory([]);
+        addNotification(t('notif_removed'), 'warning');
+    } else if (confirmType === 'reminder') {
+        addNotification(t('notif_updated'), 'info');
     }
+    setConfirmOpen(false);
+  };
+
+  const clearLogs = () => {
+    setConfirmType('clear');
+    setConfirmOpen(true);
   };
 
   return (
     <div className="animate-fade-in space-y-10">
       <PageHeader title={t('nav_ai_verification')} subtitle={t('ai_subtitle')} />
+
+      <ConfirmModal
+        isOpen={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        onConfirm={onConfirm}
+        title={confirmType === 'clear' ? t('med_remove_title') : t('rem_upcoming_schedule')}
+        message={confirmType === 'clear' ? t('med_confirm_delete') : `${t('rem_dose_taken')}: ${lastScannedMed} ${t('ai_scan_match')}. Would you like to set an automatic reminder?`}
+        type={confirmType === 'clear' ? 'danger' : 'info'}
+      />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div
