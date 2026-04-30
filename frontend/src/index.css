@@ -1,4 +1,33 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+@theme {
+  --dark-mode: selector(.dark);
+}
+
+/* ───────────────────── Design Tokens ───────────────────── */
+:root {
+  color-scheme: light;
+  --teal-primary: #00796b;
+  --teal-hover: #006055;
+  --bg: #ffffff;
+  --surface: #ffffff;
+  --border: #e5e7eb;
+  --text-primary: #000000;
+  --text-secondary: #4b5563;
+}
+
+html.dark,
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --teal-primary: #14b8a6;
+  --teal-hover: #0d9488;
+  --bg: #030712;
+  --surface: #0f172a;
+  --border: #1e293b;
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+}
 
 /* ───────────────────── Base / Reset ───────────────────── */
 @layer base {
@@ -10,28 +39,28 @@
     padding: 0;
   }
 
-  :root {
-    --teal-primary: #00796b;
-    --teal-hover: #006055;
-    --bg: #ffffff;
-    --surface: #ffffff;
-    --border: #f3f4f6;
-    --text-primary: #111827;
-    --text-secondary: #6b7280;
-  }
-
   html {
     scroll-behavior: smooth;
+    font-size: 15px;
   }
 
   body {
-    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    font-family: "Aptos Display", "Aptos", "Outfit", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
       Helvetica, Arial, sans-serif;
     background-color: var(--bg);
     color: var(--text-primary);
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
   }
+}
+
+/* ───────────────────── Theme Utilities ───────────────────── */
+@layer utilities {
+  .theme-bg { background-color: var(--bg) !important; }
+  .theme-surface { background-color: var(--surface) !important; }
+  .theme-text { color: var(--text-primary) !important; }
+  .theme-text-sub { color: var(--text-secondary) !important; }
+  .theme-border { border-color: var(--border) !important; }
 }
 
 /* ───────────────────── Components ───────────────────── */
@@ -45,8 +74,7 @@
     border-radius: 8px;
     font-size: 14px;
     font-weight: 500;
-    color: #6b7280;
-    transition: background 0.15s ease, color 0.15s ease;
+    color: var(--text-secondary);
     cursor: pointer;
     border: none;
     background: transparent;
@@ -57,13 +85,13 @@
   }
 
   .nav-item:hover {
-    background: #f3f4f6;
-    color: #111827;
+    background: var(--border);
+    color: var(--text-primary);
   }
 
   .nav-item.active {
-    background: #111827;
-    color: #ffffff;
+    background: var(--text-primary);
+    color: var(--bg);
     font-weight: 600;
   }
 
@@ -74,7 +102,6 @@
     font-weight: 600;
     border: none;
     cursor: pointer;
-    transition: background-color 0.2s ease, transform 0.1s ease;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -115,4 +142,38 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(100%) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+.animate-slide-in {
+  animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* ───────────────────── Custom Scrollbar ───────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--teal-primary);
+  opacity: 0.5;
 }

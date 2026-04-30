@@ -1,97 +1,216 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNotification } from '../../context/NotificationContext';
 import PageHeader from '../../components/ui/PageHeader';
 import DoctorCard from '../../components/dashboard/DoctorCard';
+import EntityModal from '../../components/ui/EntityModal';
+import ConfirmModal from '../../components/ui/ConfirmModal';
 import { MOCK_DOCTORS } from '../../constants/doctors';
 
-const initialCaregivers = [
-  { name: 'Dr. Priya Sharma', role: 'Primary Physician', status: 'Connected', initial: 'P' },
-  { name: 'Anjali Kumar', role: 'Family Caregiver', status: 'Connected', initial: 'A' },
+const INITIAL_CAREGIVERS = [
+  { id: 1, nameKey: 'doc_priya', roleKey: 'spec_primary', status: 'dash_stable', initial: 'P' },
+  { id: 2, nameKey: 'doc_anjali', roleKey: 'spec_family', status: 'dash_stable', initial: 'A' },
 ];
 
-const permissions = ['Medication Log', 'Adherence Reports', 'Risk Alerts', 'Reminder Notifications'];
+const PERMISSIONS = ['link_permissions', 'dash_adherence_log', 'nav_risk_report', 'nav_reminders'];
 
 export default function CaregiverLinkPage() {
-  const [perms, setPerms] = useState(permissions.reduce((a, p) => ({ ...a, [p]: true }), {}));
+  const { t } = useTranslation();
+  const { addNotification } = useNotification();
+  const [perms, setPerms] = useState(PERMISSIONS.reduce((a, p) => ({ ...a, [p]: true }), {}));
   const [searchQuery, setSearchQuery] = useState('');
-  const [caregivers, setCaregivers] = useState(initialCaregivers);
+  const [caregivers, setCaregivers] = useState(INITIAL_CAREGIVERS);
+  const [saving, setSaving] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingCaregiver, setEditingCaregiver] = useState(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [deletingId, setDeletingId] = useState(null);
 
-  const filteredDoctors = MOCK_DOCTORS.filter(doc => 
-    doc.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    doc.specialty.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    doc.diseases.some(d => d.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
+  const fields = [
+    { name: 'name', labelKey: 'auth_name_label', placeholderKey: 'auth_name_placeholder', required: true },
+    { 
+      name: 'role', 
+      labelKey: 'auth_select_role', 
+      type: 'select', 
+      options: [
+        { value: 'Caregiver', labelKey: 'auth_role_caregiver' },
+        { value: 'Family Member', labelKey: 'spec_family' },
+        { value: 'Specialist', labelKey: 'spec_primary' }
+      ] 
+    }
+  ];
+
+  const handleSave = (data) => {
+    if (editingCaregiver) {
+      setCaregivers(caregivers.map(c => c.id === editingCaregiver.id ? { ...c, ...data, nameKey: null, roleKey: null } : c));
+      addNotification(`${t('notif_updated')} (${data.name})`, 'success');
+    } else {
+      const newCaregiver = {
+        ...data,
+        id: Date.now(),
+        status: 'dash_stable',
+        initial: data.name.charAt(0).toUpperCase()
+      };
+      setCaregivers([...caregivers, newCaregiver]);
+      addNotification(`${t('notif_added')} (${data.name})`, 'success');
+    }
+  };
+
+  const handleRemove = (id) => {
+    setDeletingId(id);
+    setConfirmOpen(true);
+  };
+
+  const executeRemove = () => {
+    const caregiver = caregivers.find(c => c.id === deletingId);
+    setCaregivers(caregivers.filter(c => c.id !== deletingId));
+    addNotification(`${t('notif_removed')} (${caregiver.nameKey ? t(caregiver.nameKey) : caregiver.name})`, 'warning');
+    setConfirmOpen(false);
+    setDeletingId(null);
+  };
+
+  const handleBook = (doctor) => {
+    const doctorName = doctor.nameKey ? t(doctor.nameKey) : doctor.name;
+    if (caregivers.some(c => (c.nameKey ? t(c.nameKey) : c.name) === doctorName)) {
+        addNotification(`${doctorName}: ${t('notif_updated')}`, 'info');
+        return;
+    }
+
+    const newCaregiver = {
+        id: Date.now(),
+        nameKey: doctor.nameKey,
+        name: doctor.name,
+        roleKey: doctor.specialtyKey,
+        role: doctor.specialty,
+        status: 'dash_stable',
+        initial: doctorName.charAt(0).toUpperCase()
+    };
+    
+    setCaregivers([newCaregiver, ...caregivers]);
+    addNotification(`${doctorName}: ${t('notif_added')}`, 'success');
+  };
+
+  const handleCommit = () => {
+    setSaving(true);
+    setTimeout(() => {
+      setSaving(false);
+      addNotification(t('notif_updated'), 'success');
+    }, 1000);
+  };
+
+  const filteredDoctors = MOCK_DOCTORS.filter(doc => {
+    const name = doc.nameKey ? t(doc.nameKey).toLowerCase() : doc.name.toLowerCase();
+    const specialty = doc.specialtyKey ? t(doc.specialtyKey).toLowerCase() : doc.specialty.toLowerCase();
+    const query = searchQuery.toLowerCase();
+    
+    return name.includes(query) || 
+           specialty.includes(query) || 
+           doc.diseases.some(d => d.toLowerCase().includes(query));
+  });
 
   return (
-    <div className="animate-fade-in">
-      <PageHeader
-        title="Caregivers & Specialists"
-        subtitle="Manage your care team and find the right specialists for your health needs."
-        actionLabel="Invite Caregiver"
+    <div className="animate-fade-in space-y-12">
+      <ConfirmModal
+        isOpen={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        onConfirm={executeRemove}
+        title={t('med_remove_title')}
+        message={t('med_confirm_delete')}
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-8">
-          {/* Connected Caregivers Section */}
+      <PageHeader
+        title={t('nav_caregiver_link')}
+        subtitle={t('link_subtitle')}
+        actionLabel={t('link_btn_invite')}
+        onAction={() => {
+          setEditingCaregiver(null);
+          setModalOpen(true);
+        }}
+      />
+
+      <EntityModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onSave={handleSave}
+        title={editingCaregiver ? t('risk_configure') : t('link_btn_invite')}
+        initialData={editingCaregiver || { role: 'Caregiver' }}
+        fields={fields}
+      />
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+        <div className="lg:col-span-2 space-y-12">
           <section>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="font-bold text-gray-900 text-lg tracking-tight">Connected Care Team</h2>
-              <span className="text-xs font-medium text-teal-600 bg-teal-50 px-2 py-1 rounded-md">{caregivers.length} Active</span>
+            <div className="flex items-center justify-between mb-8 px-2">
+              <h2 className="font-black theme-text text-xl uppercase tracking-tight">{t('link_active_handshakes')}</h2>
+              <span className="text-[10px] font-black text-teal-600 border border-teal-200 dark:border-teal-900/30 px-4 py-2 rounded-xl uppercase tracking-[0.2em] shadow-sm">{caregivers.length} {t('dash_stable')}</span>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {caregivers.map((c, i) => (
-                <div key={i} className="bg-white border border-gray-100 rounded-2xl p-5 flex items-center gap-4 hover:shadow-md transition-all group">
-                  <div className="w-12 h-12 rounded-xl bg-gray-900 flex items-center justify-center font-bold text-white text-lg flex-shrink-0 group-hover:bg-teal-600 transition-colors">{c.initial}</div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-bold text-gray-900 text-sm">{c.name}</p>
-                    <p className="text-xs text-gray-400 mt-0.5">{c.role}</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {caregivers.map((c) => (
+                <div key={c.id} className="border theme-border hover:border-teal-500 rounded-[2.5rem] p-8 flex flex-col gap-6 transition-all duration-300 group card-hover relative overflow-hidden shadow-sm hover:shadow-2xl">
+                  <div className="flex items-center gap-6 relative z-10">
+                    <div className="w-16 h-16 rounded-2xl bg-gray-900 dark:bg-teal-600 flex items-center justify-center font-black text-white text-2xl flex-shrink-0 transition-transform shadow-xl border-2 border-white dark:border-gray-800">{c.initial}</div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-black theme-text text-lg uppercase tracking-tight group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors truncate">
+                        {c.nameKey ? t(c.nameKey) : c.name}
+                      </p>
+                      <p className="text-[10px] theme-text-sub font-black mt-1.5 uppercase tracking-[0.2em] opacity-70">
+                        {c.roleKey ? t(c.roleKey) : c.role}
+                      </p>
+                    </div>
                   </div>
-                  <div className="flex flex-col items-end gap-2">
-                    <span className="text-[10px] font-bold bg-green-50 text-green-700 px-2 py-0.5 rounded-full">{c.status}</span>
-                    <button className="text-[10px] text-gray-400 hover:text-red-500 font-bold transition-colors">Manage</button>
+
+                  <div className="flex items-center justify-between pt-6 border-t theme-border relative z-10">
+                    <span className="text-[10px] font-black border border-green-200 dark:border-green-900/30 text-green-700 dark:text-green-400 px-4 py-2 rounded-xl uppercase tracking-widest shadow-sm">{t(c.status)}</span>
+                    <div className="flex gap-2">
+                      <button 
+                        onClick={() => {
+                          setEditingCaregiver(c);
+                          setModalOpen(true);
+                        }} 
+                        className="text-[10px] theme-text-sub hover:theme-text font-black uppercase tracking-[0.2em] transition-all"
+                      >
+                        ✏️ {t('risk_configure')}
+                      </button>
+                      <button onClick={() => handleRemove(c.id)} className="text-[10px] text-red-500 font-black uppercase tracking-[0.2em] transition-all ml-2">{t('link_btn_revoke')}</button>
+                    </div>
                   </div>
+
+                  <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-teal-500/5 rounded-full blur-3xl" />
                 </div>
               ))}
-              <div className="bg-white border-2 border-dashed border-gray-100 hover:border-teal-200 rounded-2xl p-5 flex items-center gap-4 cursor-pointer transition-all group">
-                <div className="w-12 h-12 rounded-xl bg-gray-50 group-hover:bg-teal-50 flex items-center justify-center text-gray-400 group-hover:text-teal-500 text-2xl flex-shrink-0 transition-all">+</div>
-                <div>
-                  <p className="font-bold text-gray-500 group-hover:text-teal-700 text-sm transition-colors">Add Caregiver</p>
-                  <p className="text-[11px] text-gray-400 mt-0.5">Invite via email or code</p>
-                </div>
-              </div>
             </div>
           </section>
 
-          {/* Find Specialists Section */}
-          <section className="space-y-6">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <section className="space-y-10 pt-10 border-t theme-border">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 px-2">
               <div>
-                <h2 className="font-bold text-gray-900 text-lg tracking-tight">Recommended Specialists</h2>
-                <p className="text-xs text-gray-500 mt-1">Based on your medical history and AI analysis.</p>
+                <h2 className="font-black theme-text text-xl uppercase tracking-tight">{t('dash_consult')}</h2>
+                <p className="text-xs theme-text-sub mt-1.5 font-medium">{t('dash_caregiver_desc')}</p>
               </div>
-              <div className="relative">
+              <div className="relative group">
                 <input
                   type="text"
-                  placeholder="Search by disease or specialty..."
-                  className="pl-10 pr-4 py-2.5 bg-white border border-gray-100 rounded-xl text-xs focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none w-full md:w-64 transition-all"
+                  placeholder={t('dash_filter_specialists')}
+                  className="pl-12 pr-8 py-4 border theme-border hover:border-teal-500 rounded-2xl text-xs theme-text focus:ring-4 focus:ring-teal-500/10 focus:border-teal-500 outline-none w-full md:w-96 transition-all shadow-sm font-medium"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
-                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+                <span className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 text-lg group-focus-within:text-teal-500 transition-colors">🔍</span>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {filteredDoctors.map((doc, i) => (
-                <DoctorCard key={i} doctor={doc} />
+                <DoctorCard key={i} doctor={doc} onBook={handleBook} />
               ))}
               {filteredDoctors.length === 0 && (
-                <div className="col-span-full py-12 text-center bg-gray-50 rounded-2xl border border-dashed border-gray-200">
-                  <p className="text-gray-500 font-medium">No doctors found matching your search.</p>
+                <div className="col-span-full py-20 text-center theme-bg rounded-[3rem] border border-dashed theme-border">
+                  <p className="theme-text-sub font-black text-[10px] uppercase tracking-[0.2em]">{t('dash_no_specialists')}</p>
                   <button
                     onClick={() => setSearchQuery('')}
-                    className="mt-2 text-teal-600 font-bold text-sm hover:underline"
+                    className="mt-4 text-teal-600 dark:text-teal-400 font-black text-xs hover:underline uppercase tracking-widest"
                   >
-                    Clear filters
+                    {t('dash_clear_filters')}
                   </button>
                 </div>
               )}
@@ -99,62 +218,40 @@ export default function CaregiverLinkPage() {
           </section>
         </div>
 
-        <div className="space-y-6">
-          <div className="bg-white border border-gray-100 rounded-2xl p-6 sticky top-24 shadow-sm">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-2 h-6 bg-teal-500 rounded-full"></div>
-              <h2 className="font-bold text-gray-900 text-base">Global Permissions</h2>
+        <div className="space-y-8">
+          <div className="border theme-border hover:border-teal-500 rounded-[3rem] p-10 sticky top-24 transition-all shadow-sm hover:shadow-xl">
+            <div className="flex items-center gap-3 mb-10 px-1">
+              <div className="w-2 h-7 bg-teal-500 rounded-full"></div>
+              <h2 className="font-black theme-text text-lg uppercase tracking-tight">{t('link_permissions')}</h2>
             </div>
-            <p className="text-xs text-gray-500 mb-6">These settings apply to all connected caregivers unless overridden individually.</p>
 
             <div className="space-y-2">
-              {permissions.map(perm => (
-                <div key={perm} className="flex items-center justify-between py-3.5 border-b border-gray-50 last:border-0">
+              {PERMISSIONS.map(perm => (
+                <div key={perm} className="flex items-center justify-between py-5 border-b theme-border last:border-0 group">
                   <div className="flex flex-col">
-                    <span className="text-sm font-semibold text-gray-700">{perm}</span>
-                    <span className="text-[10px] text-gray-400">Real-time data sync</span>
+                    <span className="text-xs font-black theme-text group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors uppercase tracking-tight">{t(perm)}</span>
+                    <span className="text-[9px] theme-text-sub font-black uppercase tracking-widest mt-1.5 opacity-60">Synchronous Sync</span>
                   </div>
                   <button
                     onClick={() => setPerms(p => ({ ...p, [perm]: !p[perm] }))}
-                    className={`relative w-11 h-6 rounded-full transition-all duration-300 flex-shrink-0 p-1 ${perms[perm] ? 'bg-teal-600' : 'bg-gray-200'}`}
+                    className={`relative w-14 h-8 rounded-full transition-all duration-500 flex-shrink-0 p-1.5 border ${perms[perm] ? 'bg-teal-600 border-teal-500 shadow-lg shadow-teal-500/30' : 'theme-bg theme-border'}`}
                   >
-                    <span className={`block w-4 h-4 bg-white rounded-full shadow-sm transform transition-transform duration-300 ${perms[perm] ? 'translate-x-5' : 'translate-x-0'}`} />
+                    <span className={`block w-4 h-4 bg-white rounded-full shadow-md transform transition-all duration-500 ${perms[perm] ? 'translate-x-6' : 'translate-x-0'}`} />
                   </button>
                 </div>
               ))}
             </div>
 
-            <button className="w-full mt-6 py-3 bg-gray-900 text-white rounded-xl text-xs font-bold hover:bg-teal-600 transition-all shadow-md active:scale-95">
-              Update Preferences
+            <button
+              onClick={handleCommit}
+              disabled={saving}
+              className="btn-primary w-full mt-12 py-5 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] shadow-2xl shadow-teal-500/20 active:scale-95 transition-all"
+            >
+              {saving ? 'Synchronizing...' : t('settings_commit')}
             </button>
           </div>
-
-          {/* <div className="bg-gradient-to-br from-teal-500 to-teal-700 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden group">
-             <div className="relative z-10">
-              <p className="text-xs font-bold uppercase tracking-widest opacity-80 mb-2">MedSutra Premium</p>
-              <h3 className="text-lg font-black leading-tight mb-3">Get 24/7 Priority <br />Doctor Access</h3>
-              <p className="text-[11px] opacity-90 leading-relaxed mb-4">Unlimited video consultations with top-rated specialists at just $29/month.</p>
-              <button className="bg-white text-teal-700 px-4 py-2 rounded-lg text-[11px] font-black hover:bg-teal-50 transition-all">
-                Upgrade Now
-              </button>
-            </div>
-            
-            <div className="absolute -right-8 -bottom-8 w-32 h-32 bg-white/10 rounded-full group-hover:scale-110 transition-transform duration-500"></div>
-            <div className="absolute -left-4 -top-4 w-20 h-20 bg-black/5 rounded-full group-hover:scale-110 transition-transform duration-500"></div>
-          </div> */}
-
-          {/* <div className="bg-gray-50 border border-gray-100 rounded-2xl p-5">
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-teal-600 text-lg">🛡️</span>
-              <p className="text-xs font-bold text-gray-900">Privacy First</p>
-            </div>
-            <p className="text-[11px] text-gray-500 leading-relaxed">
-              We use 256-bit encryption to protect your medical records. You have full control over who sees your data.
-            </p>
-          </div> */}
         </div>
       </div>
     </div>
   );
 }
-

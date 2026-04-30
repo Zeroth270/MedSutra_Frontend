@@ -1,11 +1,9 @@
 export default function Footer() {
   return (
-    <footer className="bg-gray-950 pt-16 pb-10">
-      <div className="max-w-6xl mx-auto px-6">
-        {/* <div className="pt-8 border-t border-gray-800 flex flex-col sm:flex-row justify-between items-center gap-3"> */}
-        <p className="text-xs text-gray-600" style={{ textAlign: "center" }}>© {new Date().getFullYear()} MedSutra AI. All rights reserved.</p>
-        {/* <p className="text-xs text-gray-600">Made with care for patients worldwide</p> */}
-        {/* </div> */}
+    <footer className="theme-surface border-t theme-border pt-16 pb-10">
+      <div className="max-w-6xl mx-auto px-6 text-center">
+        <p className="text-xs theme-text-sub">© {new Date().getFullYear()} MedSutra AI.</p>
+        {/* <p className="text-[10px] theme-text-sub uppercase tracking-widest font-bold mt-2">Intelligent Medication Management</p> */}
       </div>
     </footer>
   );

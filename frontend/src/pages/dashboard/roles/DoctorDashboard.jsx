@@ -1,37 +1,82 @@
 import { useOutletContext } from 'react-router-dom';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNotification } from '../../../context/NotificationContext';
 import PatientDashboard from './PatientDashboard';
+import ConfirmModal from '../../../components/ui/ConfirmModal';
+import EntityModal from '../../../components/ui/EntityModal';
+
+const INITIAL_PATIENTS = [
+    { id: 1, nameKey: 'pat_john', name: 'John Doe', status: 'dash_at_risk', adherence: '65%', lastSeen: '2 hrs ago', color: 'text-red-600', bg: 'bg-red-50', avatar: 'JD' },
+    { id: 2, nameKey: 'pat_jane', name: 'Jane Smith', status: 'dash_stable', adherence: '98%', lastSeen: '5 hrs ago', color: 'text-green-700', bg: 'bg-green-50', avatar: 'JS' },
+    { id: 3, nameKey: 'pat_robert', name: 'Robert Fox', status: 'dash_stable', adherence: '92%', lastSeen: '1 day ago', color: 'text-green-700', bg: 'bg-green-50', avatar: 'RF' },
+];
 
 export default function DoctorDashboard() {
+    const { t } = useTranslation();
     const { user } = useOutletContext();
+    const { addNotification } = useNotification();
     const [selectedPatient, setSelectedPatient] = useState(null);
+    const [patients, setPatients] = useState(INITIAL_PATIENTS);
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const [deletingId, setDeletingId] = useState(null);
+    const [modalOpen, setModalOpen] = useState(false);
 
-    const patientUpdates = [
-        { id: 1, name: 'John Doe', status: 'At Risk', adherence: '65%', lastSeen: '2 hrs ago', color: 'text-red-600', bg: 'bg-red-50', avatar: 'JD' },
-        { id: 2, name: 'Jane Smith', status: 'Stable', adherence: '98%', lastSeen: '5 hrs ago', color: 'text-green-700', bg: 'bg-green-50', avatar: 'JS' },
-        { id: 3, name: 'Robert Fox', status: 'Stable', adherence: '92%', lastSeen: '1 day ago', color: 'text-green-700', bg: 'bg-green-50', avatar: 'RF' },
+    const fields = [
+        { name: 'name', labelKey: 'auth_name_label', placeholder: 'e.g. John Doe', required: true },
+        { 
+            name: 'status', 
+            labelKey: 'settings_alert_logic', 
+            type: 'select', 
+            options: [
+                { value: 'dash_stable', labelKey: 'dash_stable' },
+                { value: 'dash_at_risk', labelKey: 'dash_at_risk' }
+            ] 
+        }
     ];
+
+    const handleSave = (data) => {
+        const initials = data.name.split(' ').map(n => n[0]).join('').toUpperCase();
+        const newPatient = {
+            id: Date.now(),
+            ...data,
+            adherence: '100%',
+            lastSeen: 'Just now',
+            avatar: initials || 'P'
+        };
+        setPatients([...patients, newPatient]);
+        addNotification(`${t('notif_added')} (${data.name})`, 'success');
+    };
 
     const quickStats = [
-        { label: 'Total Patients', value: '42', sub: '+3 this week', icon: '👥' },
-        { label: 'Professional Rating', value: '4.9', sub: 'Based on 128 reviews', icon: '⭐' },
-        { label: 'Consultations', value: '12', sub: 'Today', icon: '📅' },
+        { label: 'dash_total_patients', value: patients.length, icon: '👥' },
+        { label: 'dash_professional_rating', value: '4.9', sub: 'Based on 128 reviews', icon: '⭐' },
+        { label: 'dash_consultations', value: '12', icon: '📅' },
     ];
 
-    const recentReviews = [
-        { id: 1, author: 'Sarah Miller', role: 'Caregiver', rating: 5, comment: 'Dr. Johnson is incredibly professional. The way he handles the medication adherence reports for my mother is impressive.', date: '2 days ago' },
-        { id: 2, author: 'John Doe', role: 'Patient', rating: 4, comment: 'Very helpful and always available for consultations. The AI verification feedback has been life-changing.', date: '1 week ago' },
-        { id: 3, author: 'Emily Watson', role: 'Caregiver', rating: 5, comment: 'Expert advice and very compassionate. Highly recommend for any heart-related concerns.', date: '2 weeks ago' },
-    ];
+    const handleRemovePatient = (e, id) => {
+        e.stopPropagation();
+        setDeletingId(id);
+        setConfirmOpen(true);
+    };
+
+    const executeRemove = () => {
+        const patient = patients.find(p => p.id === deletingId);
+        setPatients(patients.filter(p => p.id !== deletingId));
+        addNotification(`${t('notif_removed')} (${patient.nameKey ? t(patient.nameKey) : patient.name})`, 'warning');
+        setConfirmOpen(false);
+        setDeletingId(null);
+    };
 
     if (selectedPatient) {
         return (
             <div className="animate-fade-in">
                 <button
                     onClick={() => setSelectedPatient(null)}
-                    className="mb-6 flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-gray-900 transition-colors"
+                    className="mb-6 flex items-center gap-2 text-sm font-black theme-text-sub hover:theme-text transition-all group"
                 >
-                    <span>← Back to Overview</span>
+                    <span className="group-hover:-translate-x-1 transition-transform">←</span>
+                    <span className="uppercase tracking-widest text-[10px]">{t('dash_back_to_overview')}</span>
                 </button>
                 <PatientDashboard selectedPatient={selectedPatient} isDoctorView={true} />
             </div>
@@ -40,125 +85,140 @@ export default function DoctorDashboard() {
 
     return (
         <div className="animate-fade-in space-y-10">
-            <div className="mb-8">
-                <h1 className="text-2xl font-black text-gray-900 tracking-tight">Doctor Portal, Dr. {user.name}</h1>
-                <p className="text-gray-500 text-sm mt-1.5">Monitor patient adherence, manage clinical care plans, and track your professional performance.</p>
+            <ConfirmModal
+                isOpen={confirmOpen}
+                onClose={() => setConfirmOpen(false)}
+                onConfirm={executeRemove}
+                title={t('med_remove_title')}
+                message="Are you sure you want to remove this patient from your clinical oversight?"
+            />
+
+            <EntityModal
+                isOpen={modalOpen}
+                onClose={() => setModalOpen(false)}
+                onSave={handleSave}
+                title={t('dash_register_patient')}
+                fields={fields}
+            />
+
+            <div className="mb-8 px-1">
+                <h1 className="text-3xl font-black theme-text tracking-tight uppercase">{t('dash_doctor_portal')}, Dr. {user.name}</h1>
+                <p className="theme-text-sub text-sm mt-1.5 font-medium">{t('dash_doctor_desc')}</p>
             </div>
 
             {/* Performance Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {quickStats.map(s => (
-                    <div key={s.label} className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all group">
-                        <div className="flex items-center justify-between mb-4">
-                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{s.label}</p>
-                            <span className="text-xl group-hover:scale-110 transition-transform">{s.icon}</span>
+                    <div key={s.label} className="border theme-border hover:border-teal-500 rounded-3xl p-8 transition-all group card-hover shadow-sm hover:shadow-xl">
+                        <div className="flex items-center justify-between mb-6">
+                            <p className="text-[10px] font-black theme-text-sub uppercase tracking-[0.2em]">{t(s.label)}</p>
+                            <span className="text-2xl group-hover:scale-125 transition-transform drop-shadow-sm">{s.icon}</span>
                         </div>
-                        <p className="text-3xl font-black text-gray-900 mb-1">{s.value}</p>
-                        <p className="text-xs text-gray-400 font-medium">{s.sub}</p>
+                        <p className="text-4xl font-black theme-text mb-2 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">{s.value}</p>
+                        <p className="text-[10px] theme-text-sub font-black uppercase tracking-widest">{s.sub || 'Real-time Sync'}</p>
                     </div>
                 ))}
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
                 {/* Patient List Column */}
-                <div className="lg:col-span-2 space-y-6">
-                    <div className="flex items-center justify-between">
-                        <h2 className="font-black text-gray-900 text-lg">Patient Accounts</h2>
-                        <button className="text-xs font-bold text-teal-600 hover:underline">View All Patients</button>
+                <div className="lg:col-span-2 space-y-8">
+                    <div className="flex items-center justify-between px-2">
+                        <h2 className="font-black theme-text text-xl uppercase tracking-tight">{t('dash_active_accounts')}</h2>
+                        <button onClick={() => setModalOpen(true)} className="text-[10px] font-black text-teal-600 dark:text-teal-400 hover:underline uppercase tracking-widest">{t('dash_register_new')}</button>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                        {patientUpdates.map((p) => (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {patients.map((p) => (
                             <div
                                 key={p.id}
                                 onClick={() => setSelectedPatient(p)}
-                                className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm hover:shadow-lg hover:border-teal-100 transition-all cursor-pointer group card-hover"
+                                className="border theme-border hover:border-teal-500 rounded-[2.5rem] p-8 transition-all cursor-pointer group card-hover relative overflow-hidden shadow-sm hover:shadow-2xl"
                             >
-                                <div className="flex items-center gap-4 mb-5">
-                                    <div className="w-12 h-12 rounded-xl bg-gray-900 flex items-center justify-center font-bold text-white text-lg group-hover:bg-teal-600 transition-colors">
-                                        {p.avatar}
+                                <div className="flex items-start justify-between mb-8 relative z-10">
+                                    <div className="flex items-center gap-6">
+                                        <div className="w-16 h-16 rounded-2xl bg-gray-900 dark:bg-teal-600 flex items-center justify-center font-black text-white text-xl transition-transform shadow-xl border-2 border-white dark:border-gray-800">
+                                            {p.avatar}
+                                        </div>
+                                        <div className="min-w-0">
+                                            <h3 className="font-black theme-text text-lg truncate group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors uppercase tracking-tight">
+                                                {p.nameKey ? t(p.nameKey) : p.name}
+                                            </h3>
+                                            <p className="text-[10px] theme-text-sub font-black uppercase tracking-widest mt-1.5 opacity-60">{t('dash_activity')}: {p.lastSeen}</p>
+                                        </div>
                                     </div>
-                                    <div className="min-w-0">
-                                        <h3 className="font-bold text-gray-900 truncate group-hover:text-teal-700 transition-colors">{p.name}</h3>
-                                        <p className="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">Last activity: {p.lastSeen}</p>
-                                    </div>
+                                    <button
+                                        onClick={(e) => handleRemovePatient(e, p.id)}
+                                        className="w-10 h-10 rounded-xl border theme-border flex items-center justify-center theme-text-sub hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-200 dark:hover:border-red-800 transition-all shadow-sm"
+                                        title={t('med_remove_title')}
+                                    >
+                                        🗑️
+                                    </button>
                                 </div>
 
-                                <div className="flex items-center justify-between pt-4 border-t border-gray-50">
+                                <div className="flex items-center justify-between pt-6 border-t theme-border relative z-10">
                                     <div>
-                                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Adherence</p>
-                                        <p className="text-sm font-black text-gray-900">{p.adherence}</p>
+                                        <p className="text-[9px] font-black theme-text-sub uppercase tracking-[0.2em] mb-1.5">{t('dash_compliance_rate')}</p>
+                                        <p className="text-xl font-black theme-text">{p.adherence}</p>
                                     </div>
-                                    <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${p.bg} ${p.color}`}>
-                                        {p.status}
+                                    <span className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all ${p.status === 'dash_at_risk'
+                                        ? 'border-red-200 dark:border-red-900/30 text-red-600 dark:text-red-400'
+                                        : 'border-green-200 dark:border-green-900/30 text-green-700 dark:text-green-400'
+                                        }`}>
+                                        {t(p.status)}
                                     </span>
                                 </div>
+                                <div className="absolute -right-8 -bottom-8 w-24 h-24 bg-teal-500/5 rounded-full blur-3xl" />
                             </div>
                         ))}
-
-                        <button className="border-2 border-dashed border-gray-100 rounded-2xl p-6 flex flex-col items-center justify-center gap-2 hover:border-teal-300 hover:bg-teal-50/30 transition-all group min-h-[160px]">
-                            <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-teal-100 group-hover:text-teal-600 transition-colors">
-                                <span className="text-xl">+</span>
-                            </div>
-                            <span className="text-xs font-bold text-gray-500 group-hover:text-teal-700">Register New Patient</span>
-                        </button>
                     </div>
                 </div>
 
-                {/* Ratings & Reviews Column */}
-                <div className="space-y-6">
-                    <div className="flex items-center justify-between">
-                        <h2 className="font-black text-gray-900 text-lg">Reviews & Feedback</h2>
-                        <span className="text-[10px] font-black bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-md">⭐ Top Rated</span>
+                {/* Feedback Hub */}
+                <div className="space-y-8">
+                    <div className="flex items-center justify-between px-2">
+                        <h2 className="font-black theme-text text-xl uppercase tracking-tight">{t('dash_feedback_hub')}</h2>
                     </div>
 
-                    <div className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-sm">
-                        <div className="p-6 border-b border-gray-50 bg-gray-50/50">
+                    <div className="border theme-border hover:border-teal-500 rounded-[3rem] overflow-hidden transition-all shadow-sm hover:shadow-2xl">
+                        <div className="p-10 border-b theme-border theme-bg/50">
                             <div className="flex items-baseline gap-2">
-                                <span className="text-4xl font-black text-gray-900">4.9</span>
-                                <span className="text-sm font-bold text-gray-400">/ 5.0</span>
+                                <span className="text-6xl font-black theme-text">4.9</span>
+                                <span className="text-base font-black theme-text-sub opacity-40 uppercase tracking-widest">/ 5.0</span>
                             </div>
-                            <div className="flex gap-1 mt-2">
+                            <div className="flex gap-1.5 mt-6">
                                 {[1, 2, 3, 4, 5].map(i => (
-                                    <span key={i} className="text-yellow-400 text-sm">★</span>
+                                    <span key={i} className="text-yellow-400 text-2xl drop-shadow-sm">★</span>
                                 ))}
                             </div>
-                            <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-4">98% Positive Feedback</p>
+                            <p className="text-[10px] theme-text-sub font-black uppercase tracking-[0.2em] mt-8 opacity-70">98% Positive Adherence Outcomes</p>
                         </div>
 
-                        <div className="p-2 space-y-1">
-                            {recentReviews.map(review => (
-                                <div key={review.id} className="p-4 hover:bg-gray-50 rounded-xl transition-colors group">
-                                    <div className="flex items-center justify-between mb-2">
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-xs font-bold text-gray-900">{review.author}</span>
-                                            <span className="text-[9px] font-bold text-gray-400 uppercase px-1.5 py-0.5 bg-gray-100 rounded">{review.role}</span>
+                        <div className="p-4 space-y-2">
+                            {[
+                                { authorKey: 'pat_sarah', author: 'Sarah Miller', role: 'Caregiver', comment: 'Excellent coordination on medication reports.', date: '2d ago' },
+                                { authorKey: 'pat_john', author: 'John Doe', role: 'Patient', comment: 'The AI feedback has been life-changing.', date: '1w ago' }
+                            ].map((review, i) => (
+                                <div key={i} className="p-6 hover:theme-bg rounded-[1.5rem] transition-all group">
+                                    <div className="flex items-center justify-between mb-3">
+                                        <div className="flex items-center gap-3">
+                                            <span className="text-xs font-black theme-text group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
+                                                {review.authorKey ? t(review.authorKey) : review.author}
+                                            </span>
+                                            <span className="text-[8px] font-black theme-text-sub uppercase px-2 py-0.5 rounded-md tracking-widest border theme-border">{t(`auth_role_${review.role.toLowerCase()}`)}</span>
                                         </div>
-                                        <span className="text-[10px] text-gray-300 font-medium">{review.date}</span>
+                                        <span className="text-[9px] theme-text-sub font-bold opacity-50">{review.date}</span>
                                     </div>
-                                    <div className="flex gap-0.5 mb-2">
-                                        {[...Array(review.rating)].map((_, i) => (
-                                            <span key={i} className="text-yellow-400 text-[10px]">★</span>
-                                        ))}
-                                    </div>
-                                    <p className="text-xs text-gray-600 leading-relaxed italic">"{review.comment}"</p>
+                                    <p className="text-xs theme-text leading-relaxed font-medium italic opacity-80">"{review.comment}"</p>
                                 </div>
                             ))}
                         </div>
 
-                        <button className="w-full py-4 text-xs font-black text-gray-400 hover:text-gray-900 border-t border-gray-50 transition-colors">
-                            Read All 128 Reviews
+                        <button onClick={() => addNotification('Loading full clinical feedback archives...', 'info')} className="w-full py-6 text-[10px] font-black theme-text-sub hover:text-teal-600 dark:hover:text-teal-400 border-t theme-border theme-bg/30 transition-all uppercase tracking-[0.2em] hover:bg-teal-50/20 dark:hover:bg-teal-900/10">
+                            {t('dash_read_archives')}
                         </button>
                     </div>
-
-                    {/* <div className="bg-gray-900 rounded-2xl p-6 text-white shadow-lg shadow-gray-200">
-                        <p className="text-[10px] font-bold text-teal-400 uppercase tracking-widest mb-2">Professional Growth</p>
-                        <h3 className="text-sm font-black mb-3">Improve your rating?</h3>
-                        <p className="text-[11px] opacity-70 leading-relaxed mb-4">Complete patient follow-ups within 24 hours to increase your "Response Time" score.</p>
-                        <button className="text-[10px] font-black underline hover:text-teal-400 transition-colors">View performance tips</button>
-                    </div> */}
                 </div>
             </div>
         </div>
     );
 }
-

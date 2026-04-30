@@ -1,13 +1,17 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNotification } from '../../context/NotificationContext';
 import useAuth from '../../hooks/useAuth';
 import authService from '../../services/authService';
 import Spinner from '../../components/ui/Spinner';
 import ROUTES from '../../constants/routes';
 
 export default function LoginPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { login } = useAuth();
+  const { addNotification } = useNotification();
   const [form, setForm] = useState({ email: '', password: '', role: 'Patient' });
   const [loading, setLoading] = useState(false);
 
@@ -17,139 +21,125 @@ export default function LoginPage() {
     try {
       const userData = await authService.login(form.email, form.password, form.role);
       login(userData);
+      addNotification(`Welcome back, ${userData.name}`, 'success');
       navigate(ROUTES.DASHBOARD);
     } catch (err) {
       console.error('Login failed:', err);
+      addNotification('Authentication failed. Please check your credentials.', 'error');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2">
+    <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2 theme-bg animate-fade-in">
+      {/* Left — Brand/Intro */}
+      <div className="hidden lg:flex flex-col justify-between bg-gray-950 p-16 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-teal-500/10 rounded-full blur-[100px] -mr-32 -mt-32" />
 
-      <div className="hidden lg:flex flex-col justify-between bg-gray-900 p-14">
-        <Link to={ROUTES.HOME} className="flex items-center gap-2 no-underline">
-          {/* <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center flex-shrink-0">
-            <span className="text-gray-900 font-black text-xs">MS</span>
-          </div>
-          <span className="text-white font-bold text-base">MedSutra AI</span> */}
+        <Link to={ROUTES.HOME} className="flex items-center gap-2.5 no-underline relative z-10">
         </Link>
 
-        <div>
-          <h2 className="text-3xl font-black text-white leading-snug mb-5">
-            Welcome back.<br />
-            Your health journey<br />
-            continues here.
+        <div className="relative z-10">
+          <h2 className="text-4xl lg:text-5xl font-black text-white leading-[1.1] mb-8 uppercase tracking-tighter">
+            {t('auth_welcome_back')}<br />
+            {t('auth_health_profile')}<br />
+            <span className="text-teal-500">{t('auth_is_ready')}</span>
           </h2>
-          <p className="text-gray-400 text-sm leading-relaxed max-w-xs">
-            MedSutra AI helps 50,000+ patients manage medications safely with smart reminders and AI verification.
+          <p className="text-gray-400 text-base leading-relaxed max-w-sm font-medium">
+            {t('auth_intro_desc')}
           </p>
-
-          {/* <div className="mt-10 grid grid-cols-3 gap-4">
-            {[
-              { val: '94%', label: 'Adherence' },
-              { val: '50K+', label: 'Patients' },
-              { val: '2M+', label: 'Doses Tracked' },
-            ].map(s => (
-              <div key={s.val} className="bg-white/5 rounded-xl p-4 border border-white/10">
-                <p className="text-white font-black text-xl mb-1">{s.val}</p>
-                <p className="text-gray-500 text-xs">{s.label}</p>
-              </div>
-            ))}
-          </div> */}
         </div>
 
-        <p className="text-gray-700 text-xs">
-          © {new Date().getFullYear()} MedSutra AI. All rights reserved.
+        <p className="text-gray-600 text-[10px] font-black uppercase tracking-widest relative z-10">
         </p>
       </div>
 
       {/* Right — Form */}
-      <div className="flex items-center justify-center px-6 py-16 bg-gray-50">
-        <div className="w-full max-w-sm">
+      <div className="flex items-center justify-center px-10 py-20 theme-bg">
+        <div className="w-full max-w-md">
 
           {/* Mobile logo */}
-          <Link to={ROUTES.HOME} className="lg:hidden flex items-center gap-2 no-underline mb-10">
-            <div className="w-7 h-7 rounded-md bg-gray-900 flex items-center justify-center">
+          <Link to={ROUTES.HOME} className="lg:hidden flex items-center gap-3 no-underline mb-12">
+            <div className="w-9 h-9 rounded-xl bg-gray-900 dark:bg-teal-600 flex items-center justify-center shadow-lg">
               <span className="text-white font-black text-xs">MS</span>
             </div>
-            <span className="font-bold text-gray-900">MedSutra AI</span>
+            <span className="font-black theme-text text-lg uppercase tracking-tight">{t('app_name')}</span>
           </Link>
 
-          <h1 className="text-2xl font-black text-gray-900 mb-2">Sign in</h1>
-          <p className="text-gray-500 text-sm mb-8">Enter your credentials to access your account</p>
+          <div className="mb-10">
+            <h1 className="text-3xl font-black theme-text mb-2 tracking-tight uppercase">{t('auth_authentication')}</h1>
+            <p className="theme-text-sub text-sm font-medium">{t('auth_credentials_desc')}</p>
+          </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-3">I am logging in as a</label>
-              <div className="grid grid-cols-3 gap-2">
+              <label className="block text-[10px] font-black uppercase tracking-[0.2em] theme-text-sub mb-4 px-1">{t('auth_select_role')}</label>
+              <div className="grid grid-cols-3 gap-3">
                 {['Patient', 'Caregiver', 'Doctor'].map(role => (
                   <button
                     key={role}
                     type="button"
                     onClick={() => setForm({ ...form, role })}
-                    className={`py-2 rounded-lg text-xs font-bold transition-all border ${form.role === role
-                      ? 'bg-gray-900 border-gray-900 text-white shadow-md'
-                      : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300'
+                    className={`py-3.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border shadow-sm active:scale-95 ${form.role === role
+                      ? 'bg-gray-900 dark:bg-teal-600 border-gray-900 dark:border-teal-500 text-white shadow-xl'
+                      : 'theme-surface theme-border theme-text-sub hover:border-gray-400 dark:hover:border-teal-900/50'
                       }`}
                   >
-                    {role}
+                    {t(`auth_role_${role.toLowerCase()}`)}
                   </button>
                 ))}
               </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Email address</label>
-              <input
-                type="email"
-                placeholder="you@example.com"
-                required
-                value={form.email}
-                onChange={e => setForm({ ...form, email: e.target.value })}
-                className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-400 focus:ring-2 focus:ring-gray-200 transition-all"
-              />
-            </div>
-
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <label className="text-sm font-semibold text-gray-700">Password</label>
-                <a href="#" className="text-xs text-gray-500 hover:text-gray-800 no-underline transition-colors">
-                  Forgot password?
-                </a>
+            <div className="space-y-6">
+              <div className="group">
+                <label className="block text-[10px] font-black uppercase tracking-[0.2em] theme-text-sub mb-2 px-1 group-focus-within:text-teal-600 transition-colors">{t('auth_email_label')}</label>
+                <input
+                  type="email"
+                  placeholder={t('auth_email_placeholder')}
+                  required
+                  value={form.email}
+                  onChange={e => setForm({ ...form, email: e.target.value })}
+                  className="w-full px-5 py-4 theme-surface border theme-border rounded-xl text-sm theme-text placeholder-gray-500 dark:placeholder-gray-600 focus:outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-500/5 transition-all font-medium"
+                />
               </div>
-              <input
-                type="password"
-                placeholder="••••••••"
-                required
-                value={form.password}
-                onChange={e => setForm({ ...form, password: e.target.value })}
-                className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-400 focus:ring-2 focus:ring-gray-200 transition-all"
-              />
+
+              <div className="group">
+                <div className="flex justify-between items-center mb-2 px-1">
+                  <label className="text-[10px] font-black uppercase tracking-[0.2em] theme-text-sub group-focus-within:text-teal-600 transition-colors">{t('auth_password_label')}</label>
+                </div>
+                <input
+                  type="password"
+                  placeholder={t('auth_password_placeholder')}
+                  required
+                  value={form.password}
+                  onChange={e => setForm({ ...form, password: e.target.value })}
+                  className="w-full px-5 py-4 theme-surface border theme-border rounded-xl text-sm theme-text placeholder-gray-500 dark:placeholder-gray-600 focus:outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-500/5 transition-all font-medium"
+                />
+              </div>
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="btn-primary w-full py-3 rounded-xl text-sm gap-2"
+              className="btn-primary w-full py-4.5 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] shadow-2xl shadow-teal-500/20 active:scale-[0.98] transition-all flex items-center justify-center gap-3 mt-4"
             >
               {loading
-                ? <span className="flex items-center justify-center gap-2">
-                  <Spinner />
-                  Signing in...
-                </span>
-                : 'Sign in'
+                ? <><Spinner /> {t('auth_btn_authenticating')}</>
+                : t('auth_btn_login')
               }
             </button>
           </form>
 
-          <p className="text-sm text-gray-500 text-center mt-7">
-            Don't have an account?{' '}
-            <Link to={ROUTES.SIGN_UP} className="text-gray-900 font-semibold hover:underline no-underline">
-              Sign up for free
-            </Link>
-          </p>
+          <div className="mt-12 pt-8 border-t theme-border text-center">
+            <p className="text-sm theme-text-sub font-medium">
+              {t('auth_new_entity')}{' '}
+              <Link to={ROUTES.SIGN_UP} className="text-teal-600 dark:text-teal-400 font-black hover:underline no-underline uppercase tracking-widest ml-1 text-xs">
+                {t('auth_init_profile')}
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
     </div>
