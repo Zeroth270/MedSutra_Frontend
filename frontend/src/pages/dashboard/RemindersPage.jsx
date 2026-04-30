@@ -21,7 +21,7 @@ export default function RemindersPage() {
 
   const fields = [
     { name: 'name', labelKey: 'med_prompt_name', placeholder: 'e.g. Lisinopril', required: true },
-    { name: 'time', labelKey: 'med_prompt_time', placeholder: 'e.g. 09:00 AM', required: true },
+    { name: 'time', labelKey: 'med_prompt_time', type: 'time', required: true },
     { 
       name: 'type', 
       labelKey: 'auth_select_role', 

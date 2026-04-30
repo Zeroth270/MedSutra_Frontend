@@ -29,10 +29,12 @@ export default function MedicationsPage() {
     { name: 'name', labelKey: 'auth_name_label', placeholderKey: 'med_prompt_name', required: true },
     { 
       name: 'type', 
-      labelKey: 'auth_select_role', 
+      labelKey: 'med_type_tablet', 
       type: 'select', 
       options: [
-        { value: 'med_type_tablet', labelKey: 'med_type_tablet' }
+        { value: 'med_type_tablet', labelKey: 'med_type_tablet' },
+        { value: 'med_type_capsule', labelKey: 'med_type_capsule' },
+        { value: 'med_type_syrup', labelKey: 'med_type_syrup' }
       ] 
     },
     { 
@@ -44,22 +46,27 @@ export default function MedicationsPage() {
         { value: 'med_freq_twice', labelKey: 'med_freq_twice' }
       ] 
     },
-    { name: 'time', labelKey: 'med_timing', placeholderKey: 'med_prompt_time', required: true },
+    { name: 'time', labelKey: 'med_timing', type: 'time', required: true },
     { name: 'stock', labelKey: 'med_stock', type: 'number', required: true }
   ];
 
   const handleSave = (data) => {
+    const processedData = {
+      ...data,
+      stock: parseInt(data.stock, 10) || 0
+    };
+
     if (editingMed) {
-      setMeds(meds.map(m => m.id === editingMed.id ? { ...m, ...data } : m));
-      addNotification(`${t('notif_updated')} (${data.name})`, 'success');
+      setMeds(meds.map(m => m.id === editingMed.id ? { ...m, ...processedData } : m));
+      addNotification(`${t('notif_updated')} (${processedData.name})`, 'success');
     } else {
       const newMed = {
-        ...data,
+        ...processedData,
         id: Date.now(),
-        status: data.stock < 10 ? 'dash_at_risk' : 'dash_stable'
+        status: processedData.stock < 10 ? 'dash_at_risk' : 'dash_stable'
       };
       setMeds([...meds, newMed]);
-      addNotification(`${t('notif_added')} (${data.name})`, 'success');
+      addNotification(`${t('notif_added')} (${processedData.name})`, 'success');
     }
   };
 
@@ -157,10 +164,10 @@ export default function MedicationsPage() {
                 <div className="flex-1">
                   <div className="flex justify-between items-center mb-2.5">
                     <span className="text-[9px] font-black theme-text-sub uppercase tracking-widest">{t('med_inventory_level')}</span>
-                    <span className="text-[9px] font-black theme-text-sub">{Math.round((med.stock / 30) * 100)}%</span>
+                    <span className="text-[9px] font-black theme-text-sub">{Math.round(((30 - med.stock) / 30) * 100)}%</span>
                   </div>
                   <div className="theme-bg rounded-full h-2 border theme-border overflow-hidden shadow-inner">
-                    <div className={`h-full rounded-full transition-all duration-700 ${isLow ? 'bg-red-500 shadow-[0_0_12px_rgba(239,68,68,0.3)]' : 'bg-teal-500 shadow-[0_0_12px_rgba(20,184,166,0.3)]'}`} style={{ width: `${(med.stock / 30) * 100}%` }} />
+                    <div className={`h-full rounded-full transition-all duration-700 ${isLow ? 'bg-red-500 shadow-[0_0_12px_rgba(239,68,68,0.3)]' : 'bg-teal-500 shadow-[0_0_12px_rgba(20,184,166,0.3)]'}`} style={{ width: `${((30 - med.stock) / 30) * 100}%` }} />
                   </div>
                 </div>
                 {!isPatient && (

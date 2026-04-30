@@ -26,7 +26,7 @@ export default function CaregiverDashboard() {
   const fields = [
     { name: 'name', labelKey: 'auth_name_label', placeholder: 'e.g. Sarah Miller', required: true },
     { name: 'med', labelKey: 'med_prompt_name', placeholder: 'e.g. Heart Rate Monitoring', required: true },
-    { name: 'time', labelKey: 'med_prompt_time', placeholder: 'e.g. 09:00 AM', required: true },
+    { name: 'time', labelKey: 'med_prompt_time', type: 'time', required: true },
     { 
       name: 'urgency', 
       labelKey: 'settings_alert_logic', 
