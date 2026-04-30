@@ -1,20 +1,22 @@
 import { useState, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import PageHeader from '../../components/ui/PageHeader';
 import Spinner from '../../components/ui/Spinner';
 
 const STEPS = [
-  { step: '01', title: 'Capture High-Res Photo', desc: 'Photograph your medication label or pill packet in clear lighting.' },
-  { step: '02', title: 'Neural Analysis', desc: 'Our AI Vision model extracts medical identifiers and dosages.' },
-  { step: '03', title: 'Safety Verification', desc: 'AI cross-references with your prescriptions to ensure safety.' },
+  { step: '01', title: 'step_1_title', desc: 'step_1_desc' },
+  { step: '02', title: 'step_2_title', desc: 'step_2_desc' },
+  { step: '03', title: 'step_3_title', desc: 'step_3_desc' },
 ];
 
 const INITIAL_HISTORY = [
-  { id: 1, med: 'Metformin 500mg', date: 'Today, 8:02 AM', result: 'Verified', ok: true },
-  { id: 2, med: 'Lisinopril 10mg', date: 'Yesterday, 2:15 PM', result: 'Verified', ok: true },
-  { id: 3, med: 'Unknown tablet', date: 'Apr 26, 6:00 PM', result: 'Mismatch Identified', ok: false },
+  { id: 1, med: 'Metformin 500mg', date: 'Today, 8:02 AM', result: 'ai_scan_match', ok: true },
+  { id: 2, med: 'Lisinopril 10mg', date: 'Yesterday, 2:15 PM', result: 'ai_scan_match', ok: true },
+  { id: 3, med: 'Unknown tablet', date: 'Apr 26, 6:00 PM', result: 'ai_scan_mismatch', ok: false },
 ];
 
 export default function AIVerificationPage() {
+  const { t } = useTranslation();
   const [dragging, setDragging] = useState(false);
   const [scanning, setScanning] = useState(false);
   const [history, setHistory] = useState(INITIAL_HISTORY);
@@ -30,14 +32,13 @@ export default function AIVerificationPage() {
         const newLog = {
             id: Date.now(),
             med: `${medName} (${source})`,
-            date: 'Just now',
-            result: 'Verified',
+            date: t('today'),
+            result: 'ai_scan_match',
             ok: true
         };
         setHistory([newLog, ...history]);
         
-        // "Give its reminders" part
-        const addReminder = window.confirm(`Neural scan complete: ${medName} verified.\n\nWould you like to set an automatic reminder for this medication?`);
+        const addReminder = window.confirm(`${t('rem_dose_taken')}: ${medName} ${t('ai_scan_match')}.\n\nWould you like to set an automatic reminder for this medication?`);
         if (addReminder) {
             alert('Reminder schedule synchronized. You will be notified for the next dose.');
         }
@@ -46,10 +47,6 @@ export default function AIVerificationPage() {
 
   const handleCameraToggle = () => {
     setCameraActive(true);
-    // Simulate camera warm up
-    setTimeout(() => {
-        // No-op, just show camera UI
-    }, 500);
   };
 
   const handleFileUpload = (e) => {
@@ -59,24 +56,22 @@ export default function AIVerificationPage() {
   };
 
   const clearLogs = () => {
-    if (window.confirm('Wipe neural verification history?')) {
+    if (window.confirm(t('med_confirm_delete'))) {
         setHistory([]);
     }
   };
 
   return (
     <div className="animate-fade-in space-y-10">
-      <PageHeader title="Neural Verification" subtitle="AI Vision analysis for precise medication safety confirmation." />
+      <PageHeader title={t('nav_ai_verification')} subtitle={t('ai_subtitle')} />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Scanner Box */}
         <div
           onDragOver={e => { e.preventDefault(); setDragging(true); }}
           onDragLeave={() => setDragging(false)}
           onDrop={e => { e.preventDefault(); setDragging(false); handleScan('Drop'); }}
           className={`group relative flex flex-col items-center justify-center gap-8 rounded-[3rem] p-16 border-2 border-dashed transition-all duration-500 overflow-hidden shadow-sm hover:shadow-2xl ${dragging || scanning || cameraActive ? 'border-teal-500 bg-teal-50/50 dark:bg-teal-900/10' : 'theme-border theme-surface hover:border-teal-400 hover:bg-teal-50/30 dark:hover:bg-teal-900/5'}`}
         >
-          {/* Decorative Background Element */}
           <div className="absolute inset-0 bg-gradient-to-br from-teal-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
           
           {cameraActive ? (
@@ -96,8 +91,8 @@ export default function AIVerificationPage() {
                 </div>
                 
                 <div className="text-center relative z-10">
-                    <h3 className="font-black theme-text text-xl uppercase tracking-tight mb-2">{scanning ? 'Neural Processing...' : 'Initialize Scanner'}</h3>
-                    <p className="theme-text-sub text-sm font-medium">{scanning ? 'Analyzing chemical markers via AI Vision' : 'Select a capture method to begin analysis'}</p>
+                    <h3 className="font-black theme-text text-xl uppercase tracking-tight mb-2">{scanning ? 'Neural Processing...' : t('ai_neural_scanner')}</h3>
+                    <p className="theme-text-sub text-sm font-medium">{scanning ? 'Analyzing chemical markers via AI Vision' : t('ai_scanner_desc')}</p>
                 </div>
                 
                 <div className="flex flex-col sm:flex-row gap-4 relative z-10 w-full max-w-sm">
@@ -113,23 +108,20 @@ export default function AIVerificationPage() {
                         disabled={scanning}
                         className="flex-1 flex items-center justify-center gap-3 bg-gray-900 dark:bg-teal-600 text-white px-8 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl shadow-teal-500/20 active:scale-95 transition-all"
                     >
-                        {scanning ? <Spinner /> : '📁 Upload Photo'}
+                        {scanning ? <Spinner /> : `📁 ${t('btn_signin')}`}
                     </button>
                     <button 
                         onClick={handleCameraToggle}
                         disabled={scanning}
                         className="flex-1 flex items-center justify-center gap-3 theme-bg border theme-border theme-text-sub px-8 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest hover:border-teal-500 hover:text-teal-600 transition-all active:scale-95 shadow-sm"
                     >
-                        📷 Take Photo
+                        📷 {t('ai_btn_start')}
                     </button>
                 </div>
-                
-                <p className="text-[10px] font-black theme-text-sub uppercase tracking-widest opacity-60">OR DROP FILE DIRECTLY INTO ARCHIVE</p>
             </>
           )}
         </div>
 
-        {/* Instructions Box */}
         <div className="theme-surface border theme-border rounded-[3rem] p-10 shadow-lg hover:shadow-xl transition-all">
           <div className="flex items-center justify-between mb-10 px-2">
             <h2 className="font-black theme-text text-lg uppercase tracking-tight">Workflow Logic</h2>
@@ -141,8 +133,8 @@ export default function AIVerificationPage() {
               <div key={s.step} className="flex gap-6 group">
                 <div className="w-12 h-12 theme-bg border theme-border rounded-2xl flex items-center justify-center text-sm font-black theme-text flex-shrink-0 shadow-md group-hover:bg-teal-600 group-hover:text-white group-hover:border-teal-600 transition-all duration-300 group-hover:scale-110">{s.step}</div>
                 <div>
-                  <p className="text-sm font-black theme-text uppercase tracking-tight mb-1.5 transition-colors group-hover:text-teal-600 dark:group-hover:text-teal-400">{s.title}</p>
-                  <p className="text-xs theme-text-sub leading-relaxed font-medium">{s.desc}</p>
+                  <p className="text-sm font-black theme-text uppercase tracking-tight mb-1.5 transition-colors group-hover:text-teal-600 dark:group-hover:text-teal-400">{t(s.title)}</p>
+                  <p className="text-xs theme-text-sub leading-relaxed font-medium">{t(s.desc)}</p>
                 </div>
               </div>
             ))}
@@ -150,7 +142,7 @@ export default function AIVerificationPage() {
 
           <div className="mt-12 bg-gray-950 rounded-[2rem] p-8 border border-gray-800 shadow-2xl relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-32 h-32 bg-teal-500/5 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-teal-500/20 transition-all" />
-            <p className="text-teal-400 text-[9px] font-black uppercase tracking-[0.2em] mb-3">System Confidence</p>
+            <p className="text-teal-400 text-[9px] font-black uppercase tracking-[0.2em] mb-3">{t('ai_stat_confidence')}</p>
             <div className="flex items-baseline gap-2 mb-4">
                 <span className="text-3xl font-black text-white">99.8%</span>
                 <span className="text-[10px] font-black text-gray-500 uppercase">Accuracy Rate</span>
@@ -162,11 +154,10 @@ export default function AIVerificationPage() {
         </div>
       </div>
 
-      {/* History Box */}
       <div className="theme-surface border theme-border rounded-[3rem] shadow-lg hover:shadow-2xl transition-all overflow-hidden">
         <div className="px-10 py-8 border-b theme-border flex items-center justify-between theme-bg/30">
-          <h2 className="font-black theme-text text-lg uppercase tracking-tight">Neural Verification Logs</h2>
-          <button onClick={clearLogs} className="text-[10px] font-black text-teal-600 dark:text-teal-400 hover:underline uppercase tracking-widest">Clear Logs</button>
+          <h2 className="font-black theme-text text-lg uppercase tracking-tight">{t('ai_recent_scans')}</h2>
+          <button onClick={clearLogs} className="text-[10px] font-black text-teal-600 dark:text-teal-400 hover:underline uppercase tracking-widest">{t('med_confirm_delete')}</button>
         </div>
         <div className="divide-y theme-border">
           {history.map((h) => (
@@ -178,12 +169,9 @@ export default function AIVerificationPage() {
                   <p className="text-[10px] theme-text-sub font-black mt-1 uppercase tracking-widest opacity-60">{h.date}</p>
                 </div>
               </div>
-              <span className={`text-[10px] font-black px-5 py-2.5 rounded-xl uppercase tracking-widest border shadow-sm self-start sm:self-auto transition-all ${h.ok ? 'border-green-200 dark:border-green-900/30 text-green-700 dark:text-green-400' : 'border-red-200 dark:border-red-900/30 text-red-600 dark:text-red-400'}`}>{h.result}</span>
+              <span className={`text-[10px] font-black px-5 py-2.5 rounded-xl uppercase tracking-widest border shadow-sm self-start sm:self-auto transition-all ${h.ok ? 'border-green-200 dark:border-green-900/30 text-green-700 dark:text-green-400' : 'border-red-200 dark:border-red-900/30 text-red-600 dark:text-red-400'}`}>{t(h.result)}</span>
             </div>
           ))}
-          {history.length === 0 && (
-            <div className="p-20 text-center theme-text-sub font-black text-[10px] uppercase tracking-widest opacity-60">No verification data on record</div>
-          )}
         </div>
       </div>
     </div>

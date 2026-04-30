@@ -143,3 +143,22 @@ html[data-theme="dark"] {
     transform: translateY(0);
   }
 }
+
+/* ───────────────────── Custom Scrollbar ───────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--teal-primary);
+  opacity: 0.5;
+}

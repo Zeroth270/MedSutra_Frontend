@@ -1,22 +1,24 @@
 import { useOutletContext } from 'react-router-dom';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import PatientDashboard from './PatientDashboard';
 
 const INITIAL_PATIENTS = [
-    { id: 1, name: 'John Doe', status: 'At Risk', adherence: '65%', lastSeen: '2 hrs ago', color: 'text-red-600', bg: 'bg-red-50', avatar: 'JD' },
-    { id: 2, name: 'Jane Smith', status: 'Stable', adherence: '98%', lastSeen: '5 hrs ago', color: 'text-green-700', bg: 'bg-green-50', avatar: 'JS' },
-    { id: 3, name: 'Robert Fox', status: 'Stable', adherence: '92%', lastSeen: '1 day ago', color: 'text-green-700', bg: 'bg-green-50', avatar: 'RF' },
+    { id: 1, nameKey: 'pat_john', name: 'John Doe', status: 'dash_at_risk', adherence: '65%', lastSeen: '2 hrs ago', color: 'text-red-600', bg: 'bg-red-50', avatar: 'JD' },
+    { id: 2, nameKey: 'pat_jane', name: 'Jane Smith', status: 'dash_stable', adherence: '98%', lastSeen: '5 hrs ago', color: 'text-green-700', bg: 'bg-green-50', avatar: 'JS' },
+    { id: 3, nameKey: 'pat_robert', name: 'Robert Fox', status: 'dash_stable', adherence: '92%', lastSeen: '1 day ago', color: 'text-green-700', bg: 'bg-green-50', avatar: 'RF' },
 ];
 
 export default function DoctorDashboard() {
+    const { t } = useTranslation();
     const { user } = useOutletContext();
     const [selectedPatient, setSelectedPatient] = useState(null);
     const [patients, setPatients] = useState(INITIAL_PATIENTS);
 
     const quickStats = [
-        { label: 'Total Patients', value: patients.length, icon: '👥' },
-        { label: 'Professional Rating', value: '4.9', sub: 'Based on 128 reviews', icon: '⭐' },
-        { label: 'Consultations', value: '12', icon: '📅' },
+        { label: 'dash_total_patients', value: patients.length, icon: '👥' },
+        { label: 'dash_professional_rating', value: '4.9', sub: 'Based on 128 reviews', icon: '⭐' },
+        { label: 'dash_consultations', value: '12', icon: '📅' },
     ];
 
     const handleRegister = () => {
@@ -27,7 +29,7 @@ export default function DoctorDashboard() {
         const newPatient = {
             id: Date.now(),
             name,
-            status: 'Stable',
+            status: 'dash_stable',
             adherence: '100%',
             lastSeen: 'Just now',
             avatar: initials || 'P'
@@ -50,7 +52,7 @@ export default function DoctorDashboard() {
                     className="mb-6 flex items-center gap-2 text-sm font-black theme-text-sub hover:theme-text transition-all group"
                 >
                     <span className="group-hover:-translate-x-1 transition-transform">←</span>
-                    <span className="uppercase tracking-widest text-[10px]">Back to Overview</span>
+                    <span className="uppercase tracking-widest text-[10px]">{t('dash_back_to_overview')}</span>
                 </button>
                 <PatientDashboard selectedPatient={selectedPatient} isDoctorView={true} />
             </div>
@@ -60,8 +62,8 @@ export default function DoctorDashboard() {
     return (
         <div className="animate-fade-in space-y-10">
             <div className="mb-8 px-1">
-                <h1 className="text-3xl font-black theme-text tracking-tight uppercase">Doctor Portal, Dr. {user.name}</h1>
-                <p className="theme-text-sub text-sm mt-1.5 font-medium">Monitor patient adherence, manage clinical care plans, and track performance.</p>
+                <h1 className="text-3xl font-black theme-text tracking-tight uppercase">{t('dash_doctor_portal')}, Dr. {user.name}</h1>
+                <p className="theme-text-sub text-sm mt-1.5 font-medium">{t('dash_doctor_desc')}</p>
             </div>
 
             {/* Performance Stats */}
@@ -69,7 +71,7 @@ export default function DoctorDashboard() {
                 {quickStats.map(s => (
                     <div key={s.label} className="border theme-border hover:border-teal-500 rounded-3xl p-8 transition-all group card-hover shadow-sm hover:shadow-xl">
                         <div className="flex items-center justify-between mb-6">
-                            <p className="text-[10px] font-black theme-text-sub uppercase tracking-[0.2em]">{s.label}</p>
+                            <p className="text-[10px] font-black theme-text-sub uppercase tracking-[0.2em]">{t(s.label)}</p>
                             <span className="text-2xl group-hover:scale-125 transition-transform drop-shadow-sm">{s.icon}</span>
                         </div>
                         <p className="text-4xl font-black theme-text mb-2 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">{s.value}</p>
@@ -82,8 +84,8 @@ export default function DoctorDashboard() {
                 {/* Patient List Column */}
                 <div className="lg:col-span-2 space-y-8">
                     <div className="flex items-center justify-between px-2">
-                        <h2 className="font-black theme-text text-xl uppercase tracking-tight">Active Clinical Accounts</h2>
-                        <button onClick={handleRegister} className="text-[10px] font-black text-teal-600 dark:text-teal-400 hover:underline uppercase tracking-widest">+ Register New</button>
+                        <h2 className="font-black theme-text text-xl uppercase tracking-tight">{t('dash_active_accounts')}</h2>
+                        <button onClick={handleRegister} className="text-[10px] font-black text-teal-600 dark:text-teal-400 hover:underline uppercase tracking-widest">{t('dash_register_new')}</button>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {patients.map((p) => (
@@ -98,8 +100,10 @@ export default function DoctorDashboard() {
                                             {p.avatar}
                                         </div>
                                         <div className="min-w-0">
-                                            <h3 className="font-black theme-text text-lg truncate group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors uppercase tracking-tight">{p.name}</h3>
-                                            <p className="text-[10px] theme-text-sub font-black uppercase tracking-widest mt-1.5 opacity-60">Activity: {p.lastSeen}</p>
+                                            <h3 className="font-black theme-text text-lg truncate group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors uppercase tracking-tight">
+                                                {p.nameKey ? t(p.nameKey) : p.name}
+                                            </h3>
+                                            <p className="text-[10px] theme-text-sub font-black uppercase tracking-widest mt-1.5 opacity-60">{t('dash_activity')}: {p.lastSeen}</p>
                                         </div>
                                     </div>
                                     <button
@@ -113,36 +117,26 @@ export default function DoctorDashboard() {
 
                                 <div className="flex items-center justify-between pt-6 border-t theme-border relative z-10">
                                     <div>
-                                        <p className="text-[9px] font-black theme-text-sub uppercase tracking-[0.2em] mb-1.5">Compliance Rate</p>
+                                        <p className="text-[9px] font-black theme-text-sub uppercase tracking-[0.2em] mb-1.5">{t('dash_compliance_rate')}</p>
                                         <p className="text-xl font-black theme-text">{p.adherence}</p>
                                     </div>
-                                    <span className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all ${p.status === 'At Risk'
+                                    <span className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all ${p.status === 'dash_at_risk'
                                         ? 'border-red-200 dark:border-red-900/30 text-red-600 dark:text-red-400'
                                         : 'border-green-200 dark:border-green-900/30 text-green-700 dark:text-green-400'
                                         }`}>
-                                        {p.status}
+                                        {t(p.status)}
                                     </span>
                                 </div>
                                 <div className="absolute -right-8 -bottom-8 w-24 h-24 bg-teal-500/5 rounded-full blur-3xl" />
                             </div>
                         ))}
-
-                        {/* <button onClick={handleRegister} className="border-2 border-dashed theme-border rounded-[2.5rem] p-10 flex flex-col items-center justify-center gap-5 hover:border-teal-300 dark:hover:border-teal-700 hover:theme-bg transition-all group min-h-[220px] shadow-sm">
-                            <div className="w-16 h-16 rounded-2xl theme-bg flex items-center justify-center theme-text-sub group-hover:bg-teal-100 dark:group-hover:bg-teal-900 group-hover:text-teal-600 transition-all shadow-md border theme-border">
-                                <span className="text-3xl font-black">+</span>
-                            </div>
-                            <div className="text-center">
-                                <span className="text-[10px] font-black theme-text group-hover:text-teal-700 dark:group-hover:text-teal-400 uppercase tracking-widest transition-colors mb-1">Onboard Patient</span>
-                                <p className="text-[9px] theme-text-sub font-bold uppercase tracking-widest opacity-60">Register new medical node</p>
-                            </div>
-                        </button> */}
                     </div>
                 </div>
 
                 {/* Feedback Hub */}
                 <div className="space-y-8">
                     <div className="flex items-center justify-between px-2">
-                        <h2 className="font-black theme-text text-xl uppercase tracking-tight">Feedback Hub</h2>
+                        <h2 className="font-black theme-text text-xl uppercase tracking-tight">{t('dash_feedback_hub')}</h2>
                     </div>
 
                     <div className="border theme-border hover:border-teal-500 rounded-[3rem] overflow-hidden transition-all shadow-sm hover:shadow-2xl">
@@ -161,14 +155,16 @@ export default function DoctorDashboard() {
 
                         <div className="p-4 space-y-2">
                             {[
-                                { author: 'Sarah Miller', role: 'Caregiver', comment: 'Excellent coordination on medication reports.', date: '2d ago' },
-                                { author: 'John Doe', role: 'Patient', comment: 'The AI feedback has been life-changing.', date: '1w ago' }
+                                { authorKey: 'pat_sarah', author: 'Sarah Miller', role: 'Caregiver', comment: 'Excellent coordination on medication reports.', date: '2d ago' },
+                                { authorKey: 'pat_john', author: 'John Doe', role: 'Patient', comment: 'The AI feedback has been life-changing.', date: '1w ago' }
                             ].map((review, i) => (
                                 <div key={i} className="p-6 hover:theme-bg rounded-[1.5rem] transition-all group">
                                     <div className="flex items-center justify-between mb-3">
                                         <div className="flex items-center gap-3">
-                                            <span className="text-xs font-black theme-text group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">{review.author}</span>
-                                            <span className="text-[8px] font-black theme-text-sub uppercase px-2 py-0.5 rounded-md tracking-widest border theme-border">{review.role}</span>
+                                            <span className="text-xs font-black theme-text group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
+                                                {review.authorKey ? t(review.authorKey) : review.author}
+                                            </span>
+                                            <span className="text-[8px] font-black theme-text-sub uppercase px-2 py-0.5 rounded-md tracking-widest border theme-border">{t(`auth_role_${review.role.toLowerCase()}`)}</span>
                                         </div>
                                         <span className="text-[9px] theme-text-sub font-bold opacity-50">{review.date}</span>
                                     </div>
@@ -178,7 +174,7 @@ export default function DoctorDashboard() {
                         </div>
 
                         <button onClick={() => alert('Loading full clinical feedback archives...')} className="w-full py-6 text-[10px] font-black theme-text-sub hover:text-teal-600 dark:hover:text-teal-400 border-t theme-border theme-bg/30 transition-all uppercase tracking-[0.2em] hover:bg-teal-50/20 dark:hover:bg-teal-900/10">
-                            Read Archives
+                            {t('dash_read_archives')}
                         </button>
                     </div>
                 </div>

@@ -1,19 +1,21 @@
 import { useOutletContext } from 'react-router-dom';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export default function PatientDashboard({ selectedPatient, isDoctorView }) {
+    const { t } = useTranslation();
     const { user } = useOutletContext();
     const [meds, setMeds] = useState([
-        { id: 1, name: 'Metformin 500mg', type: 'Tablet', frequency: 'Twice Daily', time: '8 AM & 9 PM', status: 'Active' },
-        { id: 2, name: 'Lisinopril 10mg', type: 'Tablet', frequency: 'Once Daily', time: '2 PM', status: 'Active' },
-        { id: 3, name: 'Atorvastatin 20mg', type: 'Tablet', frequency: 'Once Daily', time: '6 PM', status: 'Active' },
+        { id: 1, name: 'Metformin 500mg', type: 'med_type_tablet', frequency: 'med_freq_twice', time: '8 AM & 9 PM', status: 'dash_stable' },
+        { id: 2, name: 'Lisinopril 10mg', type: 'med_type_tablet', frequency: 'med_freq_once', time: '2 PM', status: 'dash_stable' },
+        { id: 3, name: 'Atorvastatin 20mg', type: 'med_type_tablet', frequency: 'med_freq_once', time: '6 PM', status: 'dash_stable' },
     ]);
 
     const stats = [
-        { label: 'Doses Taken', value: '142', sub: 'This month' },
-        { label: 'Adherence Rate', value: '94%', sub: 'Last 30 days' },
-        { label: 'Missed Doses', value: '9', sub: 'This month' },
-        { label: 'Next Reminder', value: '8 PM', sub: 'Metformin 500mg' },
+        { label: 'dash_stat_doses', value: '142', sub: 'dash_month' },
+        { label: 'dash_stat_rate', value: '94%', sub: 'dash_last_30' },
+        { label: 'dash_stat_missed', value: '9', sub: 'dash_month' },
+        { label: 'dash_stat_next', value: '8 PM', sub: 'Metformin 500mg' },
     ];
 
     const log = [
@@ -24,21 +26,21 @@ export default function PatientDashboard({ selectedPatient, isDoctorView }) {
     ];
 
     const removeMed = (id) => {
-        if (window.confirm('Are you sure you want to remove this medication?')) {
+        if (window.confirm(t('med_confirm_delete'))) {
             setMeds(meds.filter(m => m.id !== id));
         }
     };
 
     const addMed = () => {
-        const name = window.prompt('Enter medication name (e.g. Aspirin 75mg):');
+        const name = window.prompt(t('med_prompt_name'));
         if (name) {
             const newMed = {
                 id: Date.now(),
                 name,
-                type: 'Tablet',
-                frequency: 'Once Daily',
+                type: 'med_type_tablet',
+                frequency: 'med_freq_once',
                 time: '9 AM',
-                status: 'Active'
+                status: 'dash_stable'
             };
             setMeds([...meds, newMed]);
         }
@@ -49,10 +51,10 @@ export default function PatientDashboard({ selectedPatient, isDoctorView }) {
             <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6 px-1">
                 <div>
                     <h1 className="text-3xl font-black theme-text tracking-tight uppercase">
-                        {selectedPatient ? `Clinical Profile: ${selectedPatient.name}` : `Health Overview, ${user.name}`}
+                        {selectedPatient ? `${t('dash_health_overview')}: ${selectedPatient.nameKey ? t(selectedPatient.nameKey) : selectedPatient.name}` : `${t('dash_health_overview')}, ${user.name}`}
                     </h1>
                     <p className="theme-text-sub text-sm mt-1.5 font-medium">
-                        {selectedPatient ? `Comprehensive adherence analytics and medication management.` : 'Track your clinical goals and medication schedules.'}
+                        {selectedPatient ? t('med_subtitle_specialist') : t('dash_track_goals')}
                     </p>
                 </div>
                 {isDoctorView && (
@@ -60,7 +62,7 @@ export default function PatientDashboard({ selectedPatient, isDoctorView }) {
                         onClick={addMed}
                         className="btn-primary px-8 py-4 rounded-xl text-xs font-black uppercase tracking-widest shadow-xl shadow-teal-500/20 hover:scale-105 active:scale-95 transition-all"
                     >
-                        + Prescribe Medication
+                        {t('med_btn_add')}
                     </button>
                 )}
             </div>
@@ -69,9 +71,9 @@ export default function PatientDashboard({ selectedPatient, isDoctorView }) {
             <div className="grid grid-cols-2 xl:grid-cols-4 gap-6 mb-12">
                 {stats.map(s => (
                     <div key={s.label} className="border theme-border hover:border-teal-500 rounded-3xl p-8 transition-all group card-hover shadow-sm hover:shadow-xl">
-                        <p className="text-[10px] font-black theme-text uppercase tracking-[0.2em] mb-6">{s.label}</p>
+                        <p className="text-[10px] font-black theme-text uppercase tracking-[0.2em] mb-6">{t(s.label)}</p>
                         <p className="text-4xl font-black theme-text mb-2 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">{s.value}</p>
-                        <p className="text-[10px] theme-text-sub font-black uppercase tracking-widest">{s.sub}</p>
+                        <p className="text-[10px] theme-text-sub font-black uppercase tracking-widest">{t(s.sub)}</p>
                     </div>
                 ))}
             </div>
@@ -81,13 +83,13 @@ export default function PatientDashboard({ selectedPatient, isDoctorView }) {
                 <div className="lg:col-span-2 space-y-10">
                     <section>
                         <div className="flex items-center justify-between mb-6 px-2">
-                            <h2 className="font-black theme-text text-xs uppercase tracking-[0.2em]">Active Prescription Plan</h2>
+                            <h2 className="font-black theme-text text-xs uppercase tracking-[0.2em]">{t('dash_active_plan')}</h2>
                             {isDoctorView ? (
-                                <span className="text-[10px] font-black text-teal-600 bg-teal-50 dark:bg-teal-900/20 px-3 py-1.5 rounded-xl border border-teal-100 dark:border-teal-800/50 uppercase tracking-widest shadow-sm">Clinical Mode</span>
+                                <span className="text-[10px] font-black text-teal-600 bg-teal-50 dark:bg-teal-900/20 px-3 py-1.5 rounded-xl border border-teal-100 dark:border-teal-800/50 uppercase tracking-widest shadow-sm">{t('dash_clinical_mode')}</span>
                             ) : (
                                 <span className="text-[10px] font-black theme-text-sub theme-bg px-3 py-1.5 rounded-xl border theme-border uppercase tracking-widest flex items-center gap-2">
                                     <span className="w-1.5 h-1.5 rounded-full bg-teal-500" />
-                                    Clinical Sync Active
+                                    {t('dash_clinical_sync')}
                                 </span>
                             )}
                         </div>
@@ -98,22 +100,22 @@ export default function PatientDashboard({ selectedPatient, isDoctorView }) {
                                         <div className="w-16 h-16 rounded-2xl theme-bg flex items-center justify-center text-3xl group-hover:scale-110 transition-transform shadow-lg">💊</div>
                                         <div>
                                             <p className="text-xl font-black theme-text group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors uppercase tracking-tight">{med.name}</p>
-                                            <p className="text-[10px] text-teal-600 dark:text-teal-400 font-black mt-1.5 uppercase tracking-widest">{med.frequency} · SCHED: {med.time}</p>
+                                            <p className="text-[10px] text-teal-600 dark:text-teal-400 font-black mt-1.5 uppercase tracking-widest">{t(med.frequency)} · SCHED: {med.time}</p>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-5 relative z-10">
                                         <span className={`text-[10px] font-black px-4 py-2 rounded-xl uppercase tracking-widest border transition-all ${
-                                            med.status === 'Active' 
+                                            med.status === 'dash_stable' 
                                             ? 'border-green-200 dark:border-green-900/30 text-green-700 dark:text-green-400'
-                                            : 'border-gray-200 dark:border-gray-700 text-gray-500'
+                                            : 'border-red-200 dark:border-red-900/30 text-red-600 dark:text-red-400'
                                         }`}>
-                                            {med.status}
+                                            {t(med.status)}
                                         </span>
                                         {isDoctorView && (
                                             <button 
                                                 onClick={() => removeMed(med.id)}
                                                 className="w-11 h-11 rounded-2xl border theme-border flex items-center justify-center theme-text-sub hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-100 dark:hover:border-red-900 transition-all shadow-sm"
-                                                title="Remove Medication"
+                                                title={t('med_remove_title')}
                                             >
                                                 ✕
                                             </button>
@@ -121,7 +123,7 @@ export default function PatientDashboard({ selectedPatient, isDoctorView }) {
                                     </div>
                                     {!isDoctorView && (
                                         <div className="absolute right-6 top-6 opacity-0 group-hover:opacity-100 transition-opacity">
-                                            <span className="text-[8px] font-black theme-text-sub uppercase tracking-widest border theme-border px-2 py-1 rounded">Verified</span>
+                                            <span className="text-[8px] font-black theme-text-sub uppercase tracking-widest border theme-border px-2 py-1 rounded">{t('dash_verified')}</span>
                                         </div>
                                     )}
                                     <div className="absolute -right-8 -bottom-8 w-24 h-24 bg-teal-500/5 rounded-full blur-3xl" />
@@ -131,7 +133,7 @@ export default function PatientDashboard({ selectedPatient, isDoctorView }) {
                         {!isDoctorView && (
                             <div className="mt-6 px-4 py-3 theme-bg border theme-border border-dashed rounded-2xl flex items-center justify-center gap-3 opacity-60">
                                 <span className="text-xs">🔒</span>
-                                <p className="text-[10px] font-black theme-text-sub uppercase tracking-widest">Protocol managed by Clinical Specialist. Contact care team for adjustments.</p>
+                                <p className="text-[10px] font-black theme-text-sub uppercase tracking-widest">{t('dash_protocol_managed')}</p>
                             </div>
                         )}
                     </section>
@@ -139,7 +141,7 @@ export default function PatientDashboard({ selectedPatient, isDoctorView }) {
                     {/* Schedule Log */}
                     <section>
                         <div className="flex items-center justify-between mb-6 px-2">
-                            <h2 className="font-black theme-text text-xs uppercase tracking-[0.2em]">Daily Adherence Log</h2>
+                            <h2 className="font-black theme-text text-xs uppercase tracking-[0.2em]">{t('dash_adherence_log')}</h2>
                         </div>
                         <div className="space-y-4">
                             {log.map((item, i) => (
@@ -156,7 +158,7 @@ export default function PatientDashboard({ selectedPatient, isDoctorView }) {
                                                 ? 'border-red-200 dark:border-red-900/30 text-red-600 dark:text-red-400'
                                                 : 'border-yellow-200 dark:border-yellow-900/30 text-yellow-700 dark:text-yellow-500'
                                     }`}>
-                                        {item.status}
+                                        {t(`dash_${item.status.toLowerCase()}`)}
                                     </span>
                                     <div className="absolute -left-10 -top-10 w-24 h-24 bg-teal-500/5 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
                                 </div>
@@ -169,35 +171,18 @@ export default function PatientDashboard({ selectedPatient, isDoctorView }) {
                 <div className="space-y-8">
                     <div className="bg-gray-950 border border-gray-800 rounded-[3rem] p-10 text-white shadow-2xl relative overflow-hidden group">
                         <div className="absolute top-0 right-0 w-48 h-48 bg-teal-500/10 rounded-full blur-[80px] -mr-24 -mt-24 group-hover:bg-teal-500/20 transition-all duration-700"></div>
-                        <h3 className="text-[10px] font-black text-teal-400 uppercase tracking-[0.3em] mb-10 relative z-10">Neural Analysis</h3>
+                        <h3 className="text-[10px] font-black text-teal-400 uppercase tracking-[0.3em] mb-10 relative z-10">{t('dash_neural_analysis')}</h3>
                         <div className="space-y-6 relative z-10">
                             <div className="p-7 bg-white/5 rounded-[2rem] border border-white/10 hover:bg-white/10 transition-all cursor-default group/item">
-                                <p className="text-[9px] font-black text-green-400 mb-3 uppercase tracking-[0.2em]">Adherence Trend</p>
-                                <p className="text-sm leading-relaxed text-gray-300 font-medium italic opacity-90">"Morning compliance has improved by <span className="text-green-400 font-black not-italic">12%</span> this week. Performance is optimal."</p>
+                                <p className="text-[9px] font-black text-green-400 mb-3 uppercase tracking-[0.2em]">{t('dash_adherence_trend')}</p>
+                                <p className="text-sm leading-relaxed text-gray-300 font-medium italic opacity-90">"{t('dash_trend_msg')}"</p>
                             </div>
                             <div className="p-7 bg-white/5 rounded-[2rem] border border-white/10 hover:bg-white/10 transition-all cursor-default group/item">
-                                <p className="text-[9px] font-black text-yellow-400 mb-3 uppercase tracking-[0.2em]">Optimization</p>
-                                <p className="text-sm leading-relaxed text-gray-300 font-medium italic opacity-90">"Evening doses are occasionally delayed. Suggest adjusting 21:00 nudge to 20:45."</p>
+                                <p className="text-[9px] font-black text-yellow-400 mb-3 uppercase tracking-[0.2em]">{t('dash_optimization')}</p>
+                                <p className="text-sm leading-relaxed text-gray-300 font-medium italic opacity-90">"{t('dash_opt_msg')}"</p>
                             </div>
                         </div>
                     </div>
-
-                    {isDoctorView && (
-                        <div className="border theme-border hover:border-teal-500 rounded-[3rem] p-10 transition-all shadow-sm hover:shadow-xl">
-                            <h3 className="font-black theme-text text-[10px] uppercase tracking-[0.3em] mb-10 px-2">Clinical Logic</h3>
-                            <div className="space-y-3">
-                                <button className="w-full text-left px-6 py-5 rounded-2xl border theme-border text-[10px] font-black theme-text-sub hover:theme-bg hover:text-teal-600 dark:hover:text-teal-400 transition-all uppercase tracking-[0.2em] flex items-center gap-4 group">
-                                    <span className="text-2xl group-hover:scale-125 transition-transform">📄</span> Export Clinical Data
-                                </button>
-                                <button className="w-full text-left px-6 py-5 rounded-2xl border theme-border text-[10px] font-black theme-text-sub hover:theme-bg hover:text-teal-600 dark:hover:text-teal-400 transition-all uppercase tracking-[0.2em] flex items-center gap-4 group">
-                                    <span className="text-2xl group-hover:scale-125 transition-transform">🔔</span> Push Neural Nudge
-                                </button>
-                                <button className="w-full text-left px-6 py-5 rounded-2xl border border-red-100 dark:border-red-900/50 text-[10px] font-black text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/10 transition-all uppercase tracking-[0.2em] flex items-center gap-4 group">
-                                    <span className="text-2xl group-hover:scale-125 transition-transform">⚠️</span> Flag Critical Review
-                                </button>
-                            </div>
-                        </div>
-                    )}
                 </div>
             </div>
         </div>

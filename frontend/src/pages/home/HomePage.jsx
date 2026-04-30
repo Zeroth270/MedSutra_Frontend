@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import ROUTES from '../../constants/routes';
 
 const FEATURES = [
@@ -28,6 +29,8 @@ const STEPS = [
 ];
 
 export default function HomePage() {
+  const { t } = useTranslation();
+
   return (
     <main className="theme-bg transition-colors duration-300">
 
@@ -35,26 +38,26 @@ export default function HomePage() {
       <section id="home" className="pt-32 pb-24 px-6">
         <div className="max-w-3xl mx-auto text-center">
           <div className="inline-block px-4 py-1.5 rounded-full text-[10px] font-black theme-text-sub uppercase tracking-widest mb-10">
-            AI-Powered Medication Management
+            {t('hero_badge')}
           </div>
           <h1 className="text-4xl md:text-6xl font-black theme-text leading-tight tracking-tight mb-8">
-            Manage medications with<br />confidence and clarity
+            {t('hero_title')}
           </h1>
           <p className="text-lg theme-text-sub leading-relaxed mb-12 max-w-xl mx-auto font-medium">
-            MedSutra AI helps patients stay on track with smart reminders, AI verification, and real-time caregiver alerts — all in one place.
+            {t('hero_subtitle')}
           </p>
           <div className="flex flex-wrap items-center justify-center gap-5">
             <Link
               to={ROUTES.SIGN_UP}
               className="btn-primary px-10 py-4 text-xs font-black uppercase tracking-widest rounded-xl no-underline shadow-xl shadow-teal-500/20 active:scale-95 transition-all"
             >
-              Start for Free
+              {t('btn_start')}
             </Link>
             <a
               href="#features"
               className="text-xs font-black uppercase tracking-widest theme-text-sub hover:theme-text px-10 py-4 transition-all no-underline"
             >
-              How it works
+              {t('btn_how_it_works')}
             </a>
           </div>
         </div>
@@ -64,9 +67,9 @@ export default function HomePage() {
       <section id="about" className="py-24 px-6 theme-bg border-y theme-border">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-20">
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] theme-text-sub mb-5">Workflow</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] theme-text-sub mb-5">{t('section_workflow')}</p>
             <h2 className="text-3xl md:text-5xl font-black theme-text tracking-tight">
-              Up and running in minutes
+              {t('workflow_title')}
             </h2>
           </div>
 
@@ -74,8 +77,8 @@ export default function HomePage() {
             {STEPS.map((step, i) => (
               <div key={i} className="rounded-3xl p-8 transition-all duration-300 group">
                 <p className="text-4xl font-black text-gray-100 dark:text-gray-800 mb-6 group-hover:text-teal-500/20 transition-colors">{step.number}</p>
-                <h3 className="font-black theme-text mb-4 text-base uppercase tracking-tight">{step.title}</h3>
-                <p className="text-sm theme-text-sub leading-relaxed font-medium">{step.desc}</p>
+                <h3 className="font-black theme-text mb-4 text-base uppercase tracking-tight">{t(`step_${i + 1}_title`)}</h3>
+                <p className="text-sm theme-text-sub leading-relaxed font-medium">{t(`step_${i + 1}_desc`)}</p>
               </div>
             ))}
           </div>
@@ -86,12 +89,12 @@ export default function HomePage() {
       <section id="features" className="py-24 px-6">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-20">
-            <p className="text-[10px] font-black uppercase tracking-[0.2em] theme-text-sub mb-5">Features</p>
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] theme-text-sub mb-5">{t('section_features')}</p>
             <h2 className="text-3xl md:text-5xl font-black theme-text tracking-tight mb-6">
-              Stay on track effortlessly
+              {t('features_title')}
             </h2>
             <p className="theme-text-sub max-w-2xl mx-auto leading-relaxed font-medium text-lg">
-              A complete platform designed to eliminate medication errors and bring peace of mind to patients and caregivers alike.
+              {t('features_subtitle')}
             </p>
           </div>
 
@@ -104,8 +107,8 @@ export default function HomePage() {
                 <div className="w-10 h-10 rounded-xl bg-gray-900 dark:bg-teal-600 flex items-center justify-center mb-8 flex-shrink-0 shadow-lg">
                   <span className="text-white text-xs font-black">{String(i + 1).padStart(2, '0')}</span>
                 </div>
-                <h3 className="text-xl font-black theme-text mb-4 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors uppercase tracking-tight">{f.title}</h3>
-                <p className="theme-text-sub leading-relaxed text-base font-medium">{f.desc}</p>
+                <h3 className="text-xl font-black theme-text mb-4 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors uppercase tracking-tight">{t(`feat_${i + 1}_title`)}</h3>
+                <p className="theme-text-sub leading-relaxed text-base font-medium">{t(`feat_${i + 1}_desc`)}</p>
               </div>
             ))}
           </div>

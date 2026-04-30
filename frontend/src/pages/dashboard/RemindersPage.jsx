@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import PageHeader from '../../components/ui/PageHeader';
 
 const INITIAL_REMINDERS = [
@@ -9,12 +10,13 @@ const INITIAL_REMINDERS = [
 ];
 
 export default function RemindersPage() {
+  const { t } = useTranslation();
   const [reminders, setReminders] = useState(INITIAL_REMINDERS);
 
   const handleAdd = () => {
-    const med = window.prompt('Enter medication for reminder:');
+    const med = window.prompt(t('med_prompt_name'));
     if (!med) return;
-    const time = window.prompt('Enter time (e.g. 10:00 PM):', '10:00 PM');
+    const time = window.prompt(t('med_prompt_time'), '10:00 PM');
 
     const newReminder = {
       id: Date.now(),
@@ -29,7 +31,7 @@ export default function RemindersPage() {
   };
 
   const handleRemove = (id) => {
-    if (window.confirm('Disable this clinical alert?')) {
+    if (window.confirm(t('med_confirm_delete'))) {
       setReminders(reminders.filter(r => r.id !== id));
     }
   };
@@ -45,33 +47,30 @@ export default function RemindersPage() {
   return (
     <div className="animate-fade-in">
       <PageHeader
-        title="Reminders"
-        subtitle="Smart clinical alerts to keep your schedule precise."
-        actionLabel="+ New Reminder"
+        title={t('nav_reminders')}
+        subtitle={t('rem_subtitle')}
+        actionLabel={t('dash_register_new')}
         onAction={handleAdd}
       />
 
-      {/* Stats Boxes */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
         {[
-          { label: 'Active Alerts', value: reminders.filter(r => r.status === 'Active').length, color: 'text-teal-600' },
-          { label: 'Snoozed', value: reminders.filter(r => r.status === 'Snoozed').length, color: 'text-yellow-500' },
-          { label: 'Total Set', value: reminders.length, color: 'theme-text' },
+          { label: 'dash_active_accounts', value: reminders.filter(r => r.status === 'Active').length, color: 'text-teal-600' },
+          { label: 'dash_missed', value: reminders.filter(r => r.status === 'Snoozed').length, color: 'text-yellow-500' },
+          { label: 'med_stat_total', value: reminders.length, color: 'theme-text' },
         ].map(s => (
           <div key={s.label} className="border theme-border hover:border-teal-500 rounded-[2rem] p-8 transition-all card-hover group shadow-sm hover:shadow-xl">
-            <p className="text-[10px] font-black theme-text-sub uppercase tracking-[0.2em] mb-4">{s.label}</p>
+            <p className="text-[10px] font-black theme-text-sub uppercase tracking-[0.2em] mb-4">{t(s.label)}</p>
             <p className={`text-4xl font-black ${s.color} group-hover:scale-110 transition-transform origin-left`}>{s.value}</p>
           </div>
         ))}
       </div>
 
-      {/* Reminders Boxes */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {reminders.map((r) => {
           const isActive = r.status === 'Active';
           return (
             <div key={r.id} className="border theme-border hover:border-teal-500 rounded-[2.5rem] p-8 transition-all group card-hover relative overflow-hidden shadow-sm hover:shadow-2xl">
-              {/* Decorative Glow */}
               <div className={`absolute top-0 right-0 w-32 h-32 blur-[60px] opacity-10 -mr-16 -mt-16 transition-all group-hover:opacity-20 ${isActive ? 'bg-teal-500' : 'bg-yellow-500'}`} />
 
               <div className="flex items-start justify-between mb-8 relative z-10">
@@ -90,17 +89,17 @@ export default function RemindersPage() {
                     ? 'border-green-200 dark:border-green-900/30 text-green-700 dark:text-green-400'
                     : 'border-yellow-200 dark:border-yellow-900/30 text-yellow-700 dark:text-yellow-500'}`}
                 >
-                  {r.status}
+                  {t(isActive ? 'dash_stable' : 'dash_at_risk')}
                 </button>
               </div>
 
               <div className="flex items-end justify-between relative z-10">
                 <div>
-                  <p className="text-[10px] font-black theme-text-sub uppercase tracking-widest mb-2 px-1">Scheduled Time</p>
+                  <p className="text-[10px] font-black theme-text-sub uppercase tracking-widest mb-2 px-1">{t('med_timing')}</p>
                   <p className="text-5xl font-black theme-text group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors tracking-tighter">{r.time}</p>
                   <div className="mt-6 flex items-center gap-2">
                     <div className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-teal-500 animate-pulse' : 'bg-gray-400'}`} />
-                    <p className="text-[10px] theme-text-sub font-black uppercase tracking-widest opacity-60">Next: {r.next}</p>
+                    <p className="text-[10px] theme-text-sub font-black uppercase tracking-widest opacity-60">{t('dash_stat_next')}: {r.next}</p>
                   </div>
                 </div>
                 <div className="flex gap-2">
@@ -115,17 +114,6 @@ export default function RemindersPage() {
             </div>
           );
         })}
-
-        {/* Add New Reminder Box */}
-        {/* <button onClick={handleAdd} className="border-2 border-dashed theme-border rounded-[2.5rem] p-10 flex flex-col items-center justify-center gap-5 hover:border-teal-300 dark:hover:border-teal-700 hover:theme-bg transition-all group min-h-[300px] shadow-sm">
-          <div className="w-16 h-16 rounded-2xl theme-bg border theme-border flex items-center justify-center theme-text-sub group-hover:bg-teal-100 dark:group-hover:bg-teal-900 group-hover:text-teal-600 transition-all shadow-md">
-            <span className="text-3xl font-black">+</span>
-          </div>
-          <div className="text-center">
-            <p className="text-[10px] font-black theme-text group-hover:text-teal-700 dark:group-hover:text-teal-400 uppercase tracking-[0.2em] transition-colors mb-1">Configure New Alert</p>
-            <p className="text-[9px] theme-text-sub font-bold uppercase tracking-[0.2em] opacity-60">Set smart reminder logic</p>
-          </div>
-        </button> */}
       </div>
     </div>
   );

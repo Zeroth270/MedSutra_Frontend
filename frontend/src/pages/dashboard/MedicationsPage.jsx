@@ -1,15 +1,17 @@
 import { useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import PageHeader from '../../components/ui/PageHeader';
 
 const INITIAL_MEDS = [
-  { id: 1, name: 'Metformin 500mg', type: 'Tablet', frequency: 'Twice Daily', time: '8 AM & 9 PM', stock: 28, status: 'Active' },
-  { id: 2, name: 'Lisinopril 10mg', type: 'Tablet', frequency: 'Once Daily', time: '2 PM', stock: 14, status: 'Active' },
-  { id: 3, name: 'Atorvastatin 20mg', type: 'Tablet', frequency: 'Once Daily', time: '6 PM', stock: 6, status: 'Low Stock' },
-  { id: 4, name: 'Aspirin 75mg', type: 'Tablet', frequency: 'Once Daily', time: '8 AM', stock: 30, status: 'Active' },
+  { id: 1, name: 'Metformin 500mg', type: 'med_type_tablet', frequency: 'med_freq_twice', time: '8 AM & 9 PM', stock: 28, status: 'dash_stable' },
+  { id: 2, name: 'Lisinopril 10mg', type: 'med_type_tablet', frequency: 'med_freq_once', time: '2 PM', stock: 14, status: 'dash_stable' },
+  { id: 3, name: 'Atorvastatin 20mg', type: 'med_type_tablet', frequency: 'med_freq_once', time: '6 PM', stock: 6, status: 'dash_at_risk' },
+  { id: 4, name: 'Aspirin 75mg', type: 'med_type_tablet', frequency: 'med_freq_once', time: '8 AM', stock: 30, status: 'dash_stable' },
 ];
 
 export default function MedicationsPage() {
+  const { t } = useTranslation();
   const { user } = useOutletContext();
   const [meds, setMeds] = useState(INITIAL_MEDS);
 
@@ -17,25 +19,25 @@ export default function MedicationsPage() {
 
   const handleAdd = () => {
     if (isPatient) return;
-    const name = window.prompt('Enter medication name:');
+    const name = window.prompt(t('med_prompt_name'));
     if (!name) return;
-    const time = window.prompt('Enter schedule (e.g. 9 AM):', '9 AM');
+    const time = window.prompt(t('med_prompt_time'), '9 AM');
 
     const newMed = {
       id: Date.now(),
       name,
-      type: 'Tablet',
-      frequency: 'Once Daily',
+      type: 'med_type_tablet',
+      frequency: 'med_freq_once',
       time: time || '9 AM',
       stock: 30,
-      status: 'Active'
+      status: 'dash_stable'
     };
     setMeds([...meds, newMed]);
   };
 
   const handleRemove = (id) => {
     if (isPatient) return;
-    if (window.confirm('Delete this medication protocol?')) {
+    if (window.confirm(t('med_confirm_delete'))) {
       setMeds(meds.filter(m => m.id !== id));
     }
   };
@@ -43,7 +45,7 @@ export default function MedicationsPage() {
   const handleEdit = (id) => {
     if (isPatient) return;
     const med = meds.find(m => m.id === id);
-    const newName = window.prompt('Edit medication name:', med.name);
+    const newName = window.prompt(t('med_prompt_edit'), med.name);
     if (newName) {
       setMeds(meds.map(m => m.id === id ? { ...m, name: newName } : m));
     }
@@ -52,23 +54,22 @@ export default function MedicationsPage() {
   return (
     <div className="animate-fade-in">
       <PageHeader
-        title="Medications"
-        subtitle={isPatient ? "View your prescribed medications. Managed by your Clinical Care Team." : "Manage and track prescription pharmacy protocols."}
-        actionLabel={!isPatient ? "+ Add Medication" : null}
+        title={t('nav_medications')}
+        subtitle={isPatient ? t('med_subtitle_patient') : t('med_subtitle_specialist')}
+        actionLabel={!isPatient ? t('med_btn_add') : null}
         onAction={handleAdd}
       />
 
-      {/* Stats Boxes */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
         {[
-          { label: 'Total Scripts', value: meds.length, icon: '📋' },
-          { label: 'Active Course', value: meds.filter(m => m.status === 'Active').length, icon: '⚡' },
-          { label: 'Critical Refill', value: meds.filter(m => m.status === 'Low Stock').length, icon: '⚠️' },
-          { label: 'Next Refill', value: '3 days', icon: '📦' },
+          { label: 'med_stat_total', value: meds.length, icon: '📋' },
+          { label: 'med_stat_active', value: meds.filter(m => m.status === 'dash_stable').length, icon: '⚡' },
+          { label: 'med_stat_critical', value: meds.filter(m => m.status === 'dash_at_risk').length, icon: '⚠️' },
+          { label: 'med_stat_refill', value: `3 ${t('dash_days')}`, icon: '📦' },
         ].map(s => (
           <div key={s.label} className="border theme-border hover:border-teal-500 rounded-[2rem] p-8 transition-all group card-hover shadow-sm hover:shadow-xl">
             <div className="flex items-center justify-between mb-4">
-              <p className="text-[10px] font-black theme-text uppercase tracking-[0.2em]">{s.label}</p>
+              <p className="text-[10px] font-black theme-text uppercase tracking-[0.2em]">{t(s.label)}</p>
               <span className="text-xl group-hover:scale-110 transition-transform">{s.icon}</span>
             </div>
             <p className="text-4xl font-black theme-text mb-1 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">{s.value}</p>
@@ -76,10 +77,9 @@ export default function MedicationsPage() {
         ))}
       </div>
 
-      {/* Medication Cards (Boxes) */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {meds.map((med) => {
-          const isLow = med.status === 'Low Stock';
+          const isLow = med.status === 'dash_at_risk';
           return (
             <div key={med.id} className="border theme-border hover:border-teal-500 rounded-[2.5rem] p-8 transition-all group card-hover relative overflow-hidden shadow-sm hover:shadow-2xl">
               <div className="flex items-start justify-between mb-8 relative z-10">
@@ -87,31 +87,31 @@ export default function MedicationsPage() {
                   <div className="w-14 h-14 rounded-2xl theme-bg flex items-center justify-center text-3xl group-hover:scale-110 transition-all shadow-sm">💊</div>
                   <div>
                     <h3 className="text-xl font-black theme-text  transition-colors uppercase tracking-tight">{med.name}</h3>
-                    <p className="text-[10px] text-teal-600 dark:text-teal-400 font-black mt-1.5 uppercase tracking-widest">{med.type} · {med.frequency}</p>
+                    <p className="text-[10px] text-teal-600 dark:text-teal-400 font-black mt-1.5 uppercase tracking-widest">{t(med.type)} · {t(med.frequency)}</p>
                   </div>
                 </div>
                 <span className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all ${isLow
                   ? 'border-red-200 dark:border-red-900/30 text-red-600 dark:text-red-400'
                   : 'border-green-200 dark:border-green-900/30 text-green-700 dark:text-green-400'}`}>
-                  {med.status}
+                  {t(med.status)}
                 </span>
               </div>
 
               <div className="grid grid-cols-2 gap-6 mb-8 p-6 rounded-[1.5rem] relative z-10 shadow-sm border theme-border hover:border-teal-500/30 transition-colors">
                 <div>
-                  <p className="text-[9px] font-black text-teal-600 dark:text-teal-400 uppercase tracking-widest mb-1.5">Timing</p>
+                  <p className="text-[9px] font-black text-teal-600 dark:text-teal-400 uppercase tracking-widest mb-1.5">{t('med_timing')}</p>
                   <p className="text-sm font-black theme-text">{med.time}</p>
                 </div>
                 <div>
-                  <p className="text-[9px] font-black text-teal-600 dark:text-teal-400 uppercase tracking-widest mb-1.5">Current Stock</p>
-                  <p className={`text-sm font-black ${isLow ? 'text-red-500' : 'theme-text'}`}>{med.stock} Units Left</p>
+                  <p className="text-[9px] font-black text-teal-600 dark:text-teal-400 uppercase tracking-widest mb-1.5">{t('med_stock')}</p>
+                  <p className={`text-sm font-black ${isLow ? 'text-red-500' : 'theme-text'}`}>{med.stock} {t('med_units_left')}</p>
                 </div>
               </div>
 
               <div className="flex items-center justify-between gap-6 relative z-10">
                 <div className="flex-1">
                   <div className="flex justify-between items-center mb-2.5">
-                    <span className="text-[9px] font-black theme-text-sub uppercase tracking-widest">Inventory Level</span>
+                    <span className="text-[9px] font-black theme-text-sub uppercase tracking-widest">{t('med_inventory_level')}</span>
                     <span className="text-[9px] font-black theme-text-sub">{Math.round((med.stock / 30) * 100)}%</span>
                   </div>
                   <div className="theme-bg rounded-full h-2 border theme-border overflow-hidden shadow-inner">
@@ -134,27 +134,6 @@ export default function MedicationsPage() {
             </div>
           );
         })}
-
-        {/* Add New Box (Only for Non-Patients) */}
-        {/* {!isPatient ? (
-            <button onClick={handleAdd} className="border-2 border-dashed theme-border rounded-[2.5rem] p-10 flex flex-col items-center justify-center gap-5 hover:border-teal-300 dark:hover:border-teal-700 hover:theme-bg transition-all group min-h-[300px] shadow-sm">
-                <div className="w-16 h-16 rounded-2xl theme-bg border theme-border flex items-center justify-center theme-text-sub group-hover:bg-teal-100 dark:group-hover:bg-teal-900 group-hover:text-teal-600 transition-all shadow-md">
-                    <span className="text-3xl font-black">+</span>
-                </div>
-                <div className="text-center">
-                    <p className="text-[10px] font-black theme-text group-hover:text-teal-700 dark:group-hover:text-teal-400 uppercase tracking-[0.2em] transition-colors mb-1">Add New Medication</p>
-                    <p className="text-[9px] theme-text-sub font-bold uppercase tracking-[0.2em] opacity-60">Initialize new protocol</p>
-                </div>
-            </button>
-        ) : (
-            <div className="border-2 border-dashed theme-border rounded-[2.5rem] p-10 flex flex-col items-center justify-center gap-5 bg-gray-50/30 dark:bg-gray-900/10 opacity-60 min-h-[300px]">
-                <div className="w-16 h-16 rounded-2xl theme-bg border theme-border flex items-center justify-center theme-text-sub text-3xl">🔒</div>
-                <div className="text-center">
-                    <p className="text-[10px] font-black theme-text uppercase tracking-[0.2em] mb-1">Restricted Access</p>
-                    <p className="text-[9px] theme-text-sub font-bold uppercase tracking-[0.2em]">Contact your doctor to edit medications</p>
-                </div>
-            </div>
-        )} */}
       </div>
     </div>
   );

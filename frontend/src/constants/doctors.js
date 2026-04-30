@@ -1,7 +1,8 @@
 export const MOCK_DOCTORS = [
   {
-    name: 'Dr. Sarah Johnson',
-    specialty: 'Cardiologist',
+    id: 'sarah',
+    nameKey: 'doc_sarah',
+    specialtyKey: 'spec_cardio',
     rating: 4.9,
     experience: 12,
     availability: 'Available',
@@ -9,8 +10,9 @@ export const MOCK_DOCTORS = [
     image: 'https://images.unsplash.com/photo-1559839734-2b71ca197ec2?auto=format&fit=crop&q=80&w=200&h=200'
   },
   {
-    name: 'Dr. Michael Chen',
-    specialty: 'Neurologist',
+    id: 'michael',
+    nameKey: 'doc_michael',
+    specialtyKey: 'spec_neuro',
     rating: 4.8,
     experience: 15,
     availability: 'Tomorrow',
@@ -18,8 +20,9 @@ export const MOCK_DOCTORS = [
     image: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&q=80&w=200&h=200'
   },
   {
-    name: 'Dr. Elena Rodriguez',
-    specialty: 'Endocrinologist',
+    id: 'elena',
+    nameKey: 'doc_elena',
+    specialtyKey: 'spec_endo',
     rating: 4.7,
     experience: 8,
     availability: 'Available',
@@ -27,8 +30,9 @@ export const MOCK_DOCTORS = [
     image: 'https://images.unsplash.com/photo-1594824476967-48c8b964273f?auto=format&fit=crop&q=80&w=200&h=200'
   },
   {
-    name: 'Dr. David Kim',
-    specialty: 'Pulmonologist',
+    id: 'david',
+    nameKey: 'doc_david',
+    specialtyKey: 'spec_pulmo',
     rating: 4.9,
     experience: 10,
     availability: 'Available',

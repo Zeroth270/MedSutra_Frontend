@@ -1,34 +1,40 @@
 import { useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import DoctorCard from '../../../components/dashboard/DoctorCard';
 import { MOCK_DOCTORS } from '../../../constants/doctors';
 
 const INITIAL_MONITORED = [
-  { id: 1, name: 'Sarah Miller (Mother)', status: 'Missed Dose', time: '10:30 AM', med: 'Blood Pressure', urgency: 'high' },
-  { id: 2, name: 'James Miller (Father)', status: 'On Track', time: '8:00 AM', med: 'Vitamins', urgency: 'low' },
+  { id: 1, nameKey: 'pat_sarah_miller', name: 'Sarah Miller (Mother)', status: 'dash_missed', time: '10:30 AM', med: 'Blood Pressure', urgency: 'high' },
+  { id: 2, nameKey: 'pat_james_miller', name: 'James Miller (Father)', status: 'dash_taken', time: '8:00 AM', med: 'Vitamins', urgency: 'low' },
 ];
 
 export default function CaregiverDashboard() {
+  const { t } = useTranslation();
   const { user } = useOutletContext();
   const [searchQuery, setSearchQuery] = useState('');
   const [monitored, setMonitored] = useState(INITIAL_MONITORED);
   const [activeNetwork, setActiveNetwork] = useState([]);
 
-  const filteredDoctors = MOCK_DOCTORS.filter(doc =>
-    doc.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    doc.specialty.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    doc.diseases.some(d => d.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
+  const filteredDoctors = MOCK_DOCTORS.filter(doc => {
+    const name = doc.nameKey ? t(doc.nameKey).toLowerCase() : (doc.name || '').toLowerCase();
+    const specialty = doc.specialtyKey ? t(doc.specialtyKey).toLowerCase() : (doc.specialty || '').toLowerCase();
+    const query = searchQuery.toLowerCase();
+    
+    return name.includes(query) || 
+           specialty.includes(query) || 
+           (doc.diseases && doc.diseases.some(d => d.toLowerCase().includes(query)));
+  });
 
   const handleAddPatient = () => {
-    const name = window.prompt('Enter patient name to monitor:');
+    const name = window.prompt(t('dash_register_patient'));
     if (!name) return;
-    const med = window.prompt('Enter primary medication:', 'General Care');
+    const med = window.prompt(t('med_prompt_name'), 'General Care');
 
     const newPatient = {
       id: Date.now(),
       name,
-      status: 'On Track',
+      status: 'dash_taken',
       time: '9:00 AM',
       med: med || 'General',
       urgency: 'low'
@@ -37,44 +43,46 @@ export default function CaregiverDashboard() {
   };
 
   const handleRemove = (id) => {
-    if (window.confirm('Stop monitoring this patient?')) {
+    if (window.confirm(t('med_confirm_delete'))) {
       setMonitored(monitored.filter(p => p.id !== id));
     }
   };
 
   const handleBook = (doctor) => {
-    if (activeNetwork.some(d => d.name === doctor.name)) {
-      alert(`${doctor.name} is already in your active network.`);
+    const doctorName = doctor.nameKey ? t(doctor.nameKey) : doctor.name;
+    if (activeNetwork.some(d => (d.nameKey ? t(d.nameKey) : d.name) === doctorName)) {
+      alert(`${doctorName} is already in your active network.`);
       return;
     }
     setActiveNetwork([doctor, ...activeNetwork]);
-    alert(`${doctor.name} has been added to your Active Care Network.`);
+    alert(`${doctorName} has been added to your Active Care Network.`);
   };
 
-  const handleRemoveSpecialist = (name) => {
-    setActiveNetwork(activeNetwork.filter(d => d.name !== name));
+  const handleRemoveSpecialist = (doctor) => {
+    const doctorName = doctor.nameKey ? t(doctor.nameKey) : doctor.name;
+    setActiveNetwork(activeNetwork.filter(d => (d.nameKey ? t(d.nameKey) : d.name) !== doctorName));
   };
 
   return (
     <div className="animate-fade-in space-y-12">
       <div className="mb-10 px-1 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <h1 className="text-3xl font-black theme-text tracking-tight uppercase">Caregiver Portal, {user.name}</h1>
-          <p className="theme-text-sub text-sm mt-1.5 font-medium">Manage and monitor health schedules for your clinical network.</p>
+          <h1 className="text-3xl font-black theme-text tracking-tight uppercase">{t('dash_caregiver_portal')}, {user.name}</h1>
+          <p className="theme-text-sub text-sm mt-1.5 font-medium">{t('dash_caregiver_desc')}</p>
         </div>
         <button
           onClick={handleAddPatient}
           className="bg-gray-900 dark:bg-teal-600 text-white px-8 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-xl shadow-teal-500/20"
         >
-          + Register Patient
+          {t('dash_register_patient')}
         </button>
       </div>
 
       {/* Monitored Patients Section */}
       <section className="space-y-8">
         <div className="flex items-center justify-between px-2">
-          <h2 className="text-[10px] font-black theme-text-sub uppercase tracking-[0.2em]">Active Monitored Nodes</h2>
-          <span className="text-[10px] font-black text-teal-600 border border-teal-200 dark:border-teal-900/30 px-4 py-2 rounded-xl uppercase tracking-widest shadow-sm">{monitored.length} Accounts</span>
+          <h2 className="text-[10px] font-black theme-text-sub uppercase tracking-[0.2em]">{t('dash_monitored_nodes')}</h2>
+          <span className="text-[10px] font-black text-teal-600 border border-teal-200 dark:border-teal-900/30 px-4 py-2 rounded-xl uppercase tracking-widest shadow-sm">{monitored.length} {t('dash_accounts')}</span>
         </div>
         <div className="grid grid-cols-1 gap-6">
           {monitored.map((p) => (
@@ -82,21 +90,23 @@ export default function CaregiverDashboard() {
               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 relative z-10">
                 <div className="flex items-center gap-6">
                   <div className={`w-16 h-16 rounded-2xl flex items-center justify-center font-black text-2xl transition-transform group-hover:scale-110 shadow-lg border-2 ${p.urgency === 'high' ? 'border-red-200 dark:border-red-900/30 text-red-600 dark:text-red-400' : 'border-green-200 dark:border-green-900/30 text-green-700 dark:text-green-400'}`}>
-                    {p.name.charAt(0)}
+                    {(p.nameKey ? t(p.nameKey) : p.name).charAt(0)}
                   </div>
                   <div>
-                    <h3 className="text-xl font-black theme-text group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors uppercase tracking-tight">{p.name}</h3>
-                    <p className="text-[10px] theme-text-sub font-black mt-1.5 uppercase tracking-widest opacity-70">Activity: {p.med} · {p.time}</p>
+                    <h3 className="text-xl font-black theme-text group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors uppercase tracking-tight">
+                      {p.nameKey ? t(p.nameKey) : p.name}
+                    </h3>
+                    <p className="text-[10px] theme-text-sub font-black mt-1.5 uppercase tracking-widest opacity-70">{t('dash_activity')}: {p.med} · {p.time}</p>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-6">
                   <div className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-sm border ${p.urgency === 'high' ? 'bg-red-600 text-white border-red-700 shadow-red-500/20' : 'theme-bg theme-text-sub theme-border'}`}>
-                    {p.status}
+                    {t(p.status)}
                   </div>
                   <div className="flex gap-2">
-                    <button onClick={() => alert(`Initiating secure consult for ${p.name}...`)} className="bg-gray-900 dark:bg-teal-600 text-white px-8 py-3.5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all active:scale-95 shadow-xl shadow-gray-900/10">
-                      Consult
+                    <button onClick={() => alert(`Initiating secure consult for ${p.nameKey ? t(p.nameKey) : p.name}...`)} className="bg-gray-900 dark:bg-teal-600 text-white px-8 py-3.5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all active:scale-95 shadow-xl shadow-gray-900/10">
+                      {t('dash_consult')}
                     </button>
                     <button onClick={() => handleRemove(p.id)} className="w-12 h-12 rounded-xl border theme-border flex items-center justify-center theme-text-sub hover:text-red-500 transition-all">
                       ✕
@@ -114,8 +124,8 @@ export default function CaregiverDashboard() {
                 <span className="text-3xl font-black">+</span>
               </div>
               <div className="text-center">
-                <span className="text-[10px] font-black theme-text-sub uppercase tracking-[0.2em] group-hover:text-teal-700 dark:group-hover:text-teal-400 transition-colors">Register Monitored Node</span>
-                <p className="text-[9px] theme-text-sub font-bold uppercase tracking-widest mt-1 opacity-60">Add patient to clinical circle</p>
+                <span className="text-[10px] font-black theme-text-sub uppercase tracking-[0.2em] group-hover:text-teal-700 dark:group-hover:text-teal-400 transition-colors">{t('dash_register_patient')}</span>
+                <p className="text-[9px] theme-text-sub font-bold uppercase tracking-widest mt-1 opacity-60">{t('dash_caregiver_desc')}</p>
               </div>
             </button>
           )}
@@ -126,23 +136,23 @@ export default function CaregiverDashboard() {
       {activeNetwork.length > 0 && (
         <section className="space-y-8 pt-4">
           <div className="flex items-center justify-between px-2">
-            <h2 className="text-[10px] font-black theme-text-sub uppercase tracking-[0.2em]">Active Care Network</h2>
-            <span className="text-[10px] font-black text-teal-600 border border-teal-200 dark:border-teal-900/30 px-4 py-2 rounded-xl uppercase tracking-widest shadow-sm">{activeNetwork.length} Specialists</span>
+            <h2 className="text-[10px] font-black theme-text-sub uppercase tracking-[0.2em]">{t('link_active_handshakes')}</h2>
+            <span className="text-[10px] font-black text-teal-600 border border-teal-200 dark:border-teal-900/30 px-4 py-2 rounded-xl uppercase tracking-widest shadow-sm">{activeNetwork.length} {t('dash_stable')}</span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {activeNetwork.map((doc) => (
-              <div key={doc.name} className="theme-surface border theme-border rounded-[2rem] p-6 shadow-sm hover:shadow-xl transition-all group relative overflow-hidden">
+              <div key={doc.nameKey || doc.name} className="theme-surface border theme-border rounded-[2rem] p-6 shadow-sm hover:shadow-xl transition-all group relative overflow-hidden">
                 <div className="flex items-center gap-4 relative z-10">
-                  <img src={doc.image} alt={doc.name} className="w-12 h-12 rounded-xl object-cover border theme-border" />
+                  <img src={doc.image} alt={doc.nameKey ? t(doc.nameKey) : doc.name} className="w-12 h-12 rounded-xl object-cover border theme-border" />
                   <div className="flex-1 min-w-0">
-                    <p className="font-black theme-text text-sm uppercase tracking-tight truncate">{doc.name}</p>
-                    <p className="text-[9px] theme-text-sub font-black uppercase tracking-widest opacity-70">{doc.specialty}</p>
+                    <p className="font-black theme-text text-sm uppercase tracking-tight truncate">{doc.nameKey ? t(doc.nameKey) : doc.name}</p>
+                    <p className="text-[9px] theme-text-sub font-black uppercase tracking-widest opacity-70">{doc.specialtyKey ? t(doc.specialtyKey) : doc.specialty}</p>
                   </div>
-                  <button onClick={() => handleRemoveSpecialist(doc.name)} className="text-gray-400 hover:text-red-500 transition-colors">✕</button>
+                  <button onClick={() => handleRemoveSpecialist(doc)} className="text-gray-400 hover:text-red-500 transition-colors">✕</button>
                 </div>
                 <div className="mt-4 pt-4 border-t theme-border flex justify-between items-center relative z-10">
-                  <span className="text-[9px] font-black text-green-600 dark:text-green-400 uppercase tracking-widest">Connected</span>
-                  <button onClick={() => alert(`Initiating clinical consult with ${doc.name}...`)} className="text-[9px] font-black text-teal-600 uppercase tracking-[0.2em] hover:underline">Consult Now</button>
+                  <span className="text-[9px] font-black text-green-600 dark:text-green-400 uppercase tracking-widest">{t('dash_clinical_sync')}</span>
+                  <button onClick={() => alert(`Initiating clinical consult with ${doc.nameKey ? t(doc.nameKey) : doc.name}...`)} className="text-[9px] font-black text-teal-600 uppercase tracking-[0.2em] hover:underline">{t('dash_consult')}</button>
                 </div>
                 <div className="absolute -right-8 -bottom-8 w-24 h-24 bg-teal-500/5 rounded-full blur-2xl" />
               </div>
@@ -155,13 +165,13 @@ export default function CaregiverDashboard() {
       <section className="space-y-10 pt-12 border-t theme-border">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 px-2">
           <div>
-            <h2 className="text-[10px] font-black theme-text-sub uppercase tracking-[0.2em]">Specialist Consultation</h2>
-            <p className="text-xs theme-text-sub mt-1.5 font-medium">Select and consult with specialists for your network.</p>
+            <h2 className="text-[10px] font-black theme-text-sub uppercase tracking-[0.2em]">{t('dash_specialist_consult')}</h2>
+            <p className="text-xs theme-text-sub mt-1.5 font-medium">{t('dash_caregiver_desc')}</p>
           </div>
           <div className="relative group">
             <input
               type="text"
-              placeholder="Filter specialists..."
+              placeholder={t('dash_filter_specialists')}
               className="pl-12 pr-8 py-4 border theme-border rounded-2xl text-xs theme-text focus:ring-4 focus:ring-teal-500/10 focus:border-teal-500 outline-none w-full md:w-96 transition-all shadow-sm font-medium"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -178,31 +188,16 @@ export default function CaregiverDashboard() {
 
         {filteredDoctors.length === 0 && (
           <div className="py-20 text-center theme-bg rounded-[2.5rem] border border-dashed theme-border">
-            <p className="theme-text-sub font-black text-[10px] uppercase tracking-[0.2em]">No clinical specialists found</p>
+            <p className="theme-text-sub font-black text-[10px] uppercase tracking-[0.2em]">{t('dash_no_specialists')}</p>
             <button
               onClick={() => setSearchQuery('')}
               className="mt-4 text-teal-600 dark:text-teal-400 font-black text-xs hover:underline uppercase tracking-widest"
             >
-              Clear Filters
+              {t('dash_clear_filters')}
             </button>
           </div>
         )}
       </section>
-
-      {/* Health Insights / Tips for Caregivers */}
-      {/* <div className="bg-gray-950 border border-gray-800 rounded-[3rem] p-12 text-white shadow-2xl relative overflow-hidden group">
-        <div className="relative z-10 max-w-xl">
-          <h3 className="text-3xl font-black mb-4 uppercase tracking-tight">Caregiver Excellence</h3>
-          <p className="text-sm opacity-70 leading-relaxed mb-10 font-medium">
-            Access exclusive training modules and AI-driven clinical insights to provide the best possible care for your patients.
-          </p>
-          <button onClick={() => alert('Launching Neural Training Hub...')} className="bg-white text-gray-900 px-10 py-4 rounded-xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all active:scale-95 shadow-xl">
-            Launch Training Hub
-          </button>
-        </div>
-        <div className="absolute right-[-60px] top-[-60px] w-96 h-96 bg-teal-500/10 rounded-full blur-[100px] group-hover:bg-teal-500/20 transition-all duration-700"></div>
-        <div className="absolute right-[10%] bottom-[-100px] w-80 h-80 bg-white/5 rounded-full blur-[80px]"></div>
-      </div> */}
     </div>
   );
 }

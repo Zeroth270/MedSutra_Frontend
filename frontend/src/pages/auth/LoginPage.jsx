@@ -1,11 +1,13 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import useAuth from '../../hooks/useAuth';
 import authService from '../../services/authService';
 import Spinner from '../../components/ui/Spinner';
 import ROUTES from '../../constants/routes';
 
 export default function LoginPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { login } = useAuth();
   const [form, setForm] = useState({ email: '', password: '', role: 'Patient' });
@@ -32,25 +34,20 @@ export default function LoginPage() {
         <div className="absolute top-0 right-0 w-96 h-96 bg-teal-500/10 rounded-full blur-[100px] -mr-32 -mt-32" />
 
         <Link to={ROUTES.HOME} className="flex items-center gap-2.5 no-underline relative z-10">
-          {/* <div className="w-10 h-10 rounded-xl bg-teal-600 flex items-center justify-center flex-shrink-0 shadow-lg">
-            <span className="text-white font-black text-sm tracking-tight">MS</span>
-          </div>
-          <span className="text-white font-black text-xl tracking-tight uppercase">MedSutra AI</span> */}
         </Link>
 
         <div className="relative z-10">
           <h2 className="text-4xl lg:text-5xl font-black text-white leading-[1.1] mb-8 uppercase tracking-tighter">
-            Welcome back.<br />
-            Your health profile<br />
-            <span className="text-teal-500">is ready.</span>
+            {t('auth_welcome_back')}<br />
+            {t('auth_health_profile')}<br />
+            <span className="text-teal-500">{t('auth_is_ready')}</span>
           </h2>
           <p className="text-gray-400 text-base leading-relaxed max-w-sm font-medium">
-            MedSutra AI clinical systems are actively monitoring patient nodes for optimal adherence performance.
+            {t('auth_intro_desc')}
           </p>
         </div>
 
         <p className="text-gray-600 text-[10px] font-black uppercase tracking-widest relative z-10">
-          {/* © {new Date().getFullYear()} MedSutra Clinical Systems */}
         </p>
       </div>
 
@@ -63,17 +60,17 @@ export default function LoginPage() {
             <div className="w-9 h-9 rounded-xl bg-gray-900 dark:bg-teal-600 flex items-center justify-center shadow-lg">
               <span className="text-white font-black text-xs">MS</span>
             </div>
-            <span className="font-black theme-text text-lg uppercase tracking-tight">MedSutra AI</span>
+            <span className="font-black theme-text text-lg uppercase tracking-tight">{t('app_name')}</span>
           </Link>
 
           <div className="mb-10">
-            <h1 className="text-3xl font-black theme-text mb-2 tracking-tight uppercase">Authentication</h1>
-            <p className="theme-text-sub text-sm font-medium">Enter your credentials to access clinical data.</p>
+            <h1 className="text-3xl font-black theme-text mb-2 tracking-tight uppercase">{t('auth_authentication')}</h1>
+            <p className="theme-text-sub text-sm font-medium">{t('auth_credentials_desc')}</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-[10px] font-black uppercase tracking-[0.2em] theme-text-sub mb-4 px-1">Select Access Role</label>
+              <label className="block text-[10px] font-black uppercase tracking-[0.2em] theme-text-sub mb-4 px-1">{t('auth_select_role')}</label>
               <div className="grid grid-cols-3 gap-3">
                 {['Patient', 'Caregiver', 'Doctor'].map(role => (
                   <button
@@ -85,7 +82,7 @@ export default function LoginPage() {
                       : 'theme-surface theme-border theme-text-sub hover:border-gray-400 dark:hover:border-teal-900/50'
                       }`}
                   >
-                    {role}
+                    {t(`auth_role_${role.toLowerCase()}`)}
                   </button>
                 ))}
               </div>
@@ -93,10 +90,10 @@ export default function LoginPage() {
 
             <div className="space-y-6">
               <div className="group">
-                <label className="block text-[10px] font-black uppercase tracking-[0.2em] theme-text-sub mb-2 px-1 group-focus-within:text-teal-600 transition-colors">Digital Identity (Email)</label>
+                <label className="block text-[10px] font-black uppercase tracking-[0.2em] theme-text-sub mb-2 px-1 group-focus-within:text-teal-600 transition-colors">{t('auth_email_label')}</label>
                 <input
                   type="email"
-                  placeholder="you@domain.com"
+                  placeholder={t('auth_email_placeholder')}
                   required
                   value={form.email}
                   onChange={e => setForm({ ...form, email: e.target.value })}
@@ -106,14 +103,11 @@ export default function LoginPage() {
 
               <div className="group">
                 <div className="flex justify-between items-center mb-2 px-1">
-                  <label className="text-[10px] font-black uppercase tracking-[0.2em] theme-text-sub group-focus-within:text-teal-600 transition-colors">Access Key (Password)</label>
-                  {/* <a href="#" className="text-[9px] font-black uppercase tracking-widest theme-text-sub hover:text-teal-600 transition-colors">
-                    Reset Key
-                  </a> */}
+                  <label className="text-[10px] font-black uppercase tracking-[0.2em] theme-text-sub group-focus-within:text-teal-600 transition-colors">{t('auth_password_label')}</label>
                 </div>
                 <input
                   type="password"
-                  placeholder="••••••••••••"
+                  placeholder={t('auth_password_placeholder')}
                   required
                   value={form.password}
                   onChange={e => setForm({ ...form, password: e.target.value })}
@@ -128,17 +122,17 @@ export default function LoginPage() {
               className="btn-primary w-full py-4.5 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] shadow-2xl shadow-teal-500/20 active:scale-[0.98] transition-all flex items-center justify-center gap-3 mt-4"
             >
               {loading
-                ? <><Spinner /> Authenticating...</>
-                : 'Secure Access'
+                ? <><Spinner /> {t('auth_btn_authenticating')}</>
+                : t('auth_btn_login')
               }
             </button>
           </form>
 
           <div className="mt-12 pt-8 border-t theme-border text-center">
             <p className="text-sm theme-text-sub font-medium">
-              New entity?{' '}
+              {t('auth_new_entity')}{' '}
               <Link to={ROUTES.SIGN_UP} className="text-teal-600 dark:text-teal-400 font-black hover:underline no-underline uppercase tracking-widest ml-1 text-xs">
-                Initialize Profile
+                {t('auth_init_profile')}
               </Link>
             </p>
           </div>
