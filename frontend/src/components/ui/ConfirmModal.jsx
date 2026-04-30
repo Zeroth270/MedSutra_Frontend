@@ -36,16 +36,19 @@ export default function ConfirmModal({ isOpen, onClose, onConfirm, title, messag
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
       {/* High-fidelity Backdrop */}
-      <div 
-        className="absolute inset-0 bg-gray-950/40 dark:bg-gray-950/80 backdrop-blur-md animate-fade-in"
+      <div
+        className="absolute inset-0 bg-white/40 dark:bg-gray-950/80 backdrop-blur-md animate-fade-in"
         onClick={onClose}
       />
-      
+
       {/* Professional Modal Container */}
-      <div className="relative w-full max-w-md bg-white dark:bg-gray-900 rounded-[2.5rem] border theme-border shadow-[0_20px_50px_rgba(0,0,0,0.15)] overflow-hidden animate-slide-in">
-        {/* Subtle decorative glow */}
-        <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-48 h-48 ${config.glow} rounded-full blur-[60px] -mt-24`} />
-        
+      <div className="relative w-full max-w-md theme-surface rounded-[2.5rem] border theme-border shadow-[0_20px_50px_rgba(0,0,0,0.15)] overflow-hidden animate-slide-in">
+        {/* Top Accent Border */}
+        <div className={`absolute top-0 left-0 right-0 h-1.5 ${config.btn.split(' ')[0]}`} />
+
+        {/* Enhanced decorative glow */}
+        <div className={`absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 ${config.glow.replace('/5', '/10')} rounded-full blur-[80px] -mt-32`} />
+
         <div className="relative z-10 p-10">
           {/* Header Area with Icon */}
           <div className="flex flex-col items-center text-center mb-8">
@@ -65,7 +68,7 @@ export default function ConfirmModal({ isOpen, onClose, onConfirm, title, messag
           <div className="flex flex-col sm:flex-row gap-4 pt-4">
             <button
               onClick={onClose}
-              className="flex-1 py-4.5 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] theme-text-sub hover:theme-text theme-surface border theme-border hover:border-gray-400 dark:hover:border-gray-600 transition-all active:scale-95"
+              className="flex-1 py-4.5 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] theme-text-sub hover:theme-text bg-gray-50 dark:bg-gray-800/50 border theme-border transition-all active:scale-95"
             >
               {t('nav_cancel') || 'Cancel'}
             </button>
@@ -82,12 +85,12 @@ export default function ConfirmModal({ isOpen, onClose, onConfirm, title, messag
         </div>
 
         {/* Dismiss Button (Top Right) */}
-        <button 
+        {/* <button
           onClick={onClose}
           className="absolute top-6 right-6 w-10 h-10 rounded-xl flex items-center justify-center theme-text-sub hover:theme-bg hover:theme-text transition-all active:scale-90"
         >
           ✕
-        </button>
+        </button> */}
       </div>
     </div>
   );

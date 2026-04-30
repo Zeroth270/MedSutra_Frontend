@@ -9,7 +9,8 @@ const EntityModal = ({ isOpen, onClose, onSave, title, initialData = {}, fields 
     if (isOpen) {
       setFormData(initialData || {});
     }
-  }, [isOpen, initialData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -28,7 +29,7 @@ const EntityModal = ({ isOpen, onClose, onSave, title, initialData = {}, fields 
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
       {/* Backdrop */}
       <div 
-        className="absolute inset-0 bg-gray-950/60 backdrop-blur-md animate-fade-in"
+        className="absolute inset-0 bg-white/40 dark:bg-gray-950/80 backdrop-blur-md animate-fade-in"
         onClick={onClose}
       />
       
@@ -41,7 +42,7 @@ const EntityModal = ({ isOpen, onClose, onSave, title, initialData = {}, fields 
             <h2 className="text-2xl font-black theme-text uppercase tracking-tight">{title}</h2>
             <button 
               onClick={onClose}
-              className="w-10 h-10 rounded-xl border theme-border flex items-center justify-center theme-text-sub hover:theme-text transition-all active:scale-90"
+              className="w-10 h-10 rounded-xl border theme-border flex items-center justify-center theme-text-sub hover:theme-text hover:theme-bg transition-all active:scale-90"
             >
               ✕
             </button>
@@ -58,7 +59,7 @@ const EntityModal = ({ isOpen, onClose, onSave, title, initialData = {}, fields 
                     name={field.name}
                     value={formData[field.name] || ''}
                     onChange={handleChange}
-                    className="w-full px-6 py-4 theme-bg border theme-border rounded-xl text-sm theme-text focus:outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-500/5 transition-all font-medium appearance-none"
+                    className="w-full px-6 py-4 theme-bg border theme-border rounded-xl text-sm theme-text focus:outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-500/5 transition-all font-medium"
                     required={field.required}
                   >
                     {field.options.map(opt => (
@@ -82,14 +83,14 @@ const EntityModal = ({ isOpen, onClose, onSave, title, initialData = {}, fields 
             <div className="pt-4 flex flex-col sm:flex-row gap-4">
               <button
                 type="submit"
-                className="btn-primary flex-1 py-4.5 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] shadow-xl shadow-teal-500/20 active:scale-95 transition-all order-2 sm:order-1"
+                className="bg-gray-900 dark:bg-teal-600 text-white flex-1 py-4.5 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] shadow-xl shadow-teal-500/10 hover:scale-[1.02] active:scale-95 transition-all order-2 sm:order-1"
               >
                 {t('settings_commit')}
               </button>
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 py-4.5 theme-surface border theme-border rounded-xl text-[10px] font-black theme-text-sub uppercase tracking-[0.2em] hover:theme-text hover:border-gray-400 dark:hover:border-gray-600 transition-all order-1 sm:order-2"
+                className="flex-1 py-4.5 bg-white dark:bg-gray-800 border theme-border rounded-xl text-[10px] font-black theme-text-sub uppercase tracking-[0.2em] hover:theme-text transition-all order-1 sm:order-2"
               >
                 {t('exit')}
               </button>

@@ -20,7 +20,7 @@ export default function PatientDashboard({ selectedPatient, isDoctorView }) {
 
     const fields = [
         { name: 'name', labelKey: 'med_prompt_name', placeholder: 'e.g. Aspirin', required: true },
-        { name: 'time', labelKey: 'med_prompt_time', placeholder: 'e.g. 9:00 AM', required: true },
+        { name: 'time', labelKey: 'med_prompt_time', type: 'time', required: true },
         { 
             name: 'frequency', 
             labelKey: 'med_timing', 

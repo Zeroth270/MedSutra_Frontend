@@ -1,5 +1,5 @@
-@import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import "tailwindcss";
 
 @theme {
   --dark-mode: selector(.dark);
@@ -176,4 +176,24 @@ html[data-theme="dark"] {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--teal-primary);
   opacity: 0.5;
+}
+
+/* ───────────────────── Form Inputs ───────────────────── */
+/* Make the native time picker clock icon larger and easier to click */
+input[type="time"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  padding: 10px;
+  transform: scale(1.8);
+  opacity: 0.5;
+  transition: opacity 0.2s, transform 0.2s;
+  margin-right: -4px;
+}
+
+input[type="time"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 0.8;
+  transform: scale(2);
+}
+
+.dark input[type="time"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
 }
