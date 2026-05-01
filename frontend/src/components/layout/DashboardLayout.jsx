@@ -32,7 +32,7 @@ export default function DashboardLayout() {
   const sidebarW = sidebarOpen ? 240 : 64;
 
   return (
-    <div className="flex min-h-screen theme-bg" style={{ fontFamily: "'Inter', sans-serif" }}>
+    <div className="flex min-h-screen theme-bg">
       <aside style={{ width: sidebarW, minWidth: sidebarW, transition: 'width 0.22s ease, min-width 0.22s ease' }} className="fixed left-0 top-0 h-screen z-50 border-r theme-border flex flex-col overflow-hidden">
         <div className="flex items-center border-b theme-border flex-shrink-0" style={{ height: 64, padding: '0 16px', justifyContent: sidebarOpen ? 'space-between' : 'center' }}>
           {sidebarOpen && (
