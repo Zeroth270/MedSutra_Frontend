@@ -11,9 +11,12 @@ async function request(endpoint, options = {}) {
   const url = `${API_BASE_URL}${endpoint}`;
 
   const headers = {
-    'Content-Type': 'application/json',
     ...options.headers,
   };
+
+  if (!(options.body instanceof FormData) && !headers['Content-Type'] && options.method !== 'GET' && options.method !== 'DELETE') {
+    headers['Content-Type'] = 'application/json';
+  }
 
   /* Attach JWT token if available */
   const stored = localStorage.getItem('medsutra_user');
@@ -36,8 +39,8 @@ async function request(endpoint, options = {}) {
 
 const api = {
   get: (endpoint) => request(endpoint, { method: 'GET' }),
-  post: (endpoint, body) => request(endpoint, { method: 'POST', body: JSON.stringify(body) }),
-  put: (endpoint, body) => request(endpoint, { method: 'PUT', body: JSON.stringify(body) }),
+  post: (endpoint, body, options = {}) => request(endpoint, { method: 'POST', body: body instanceof FormData ? body : JSON.stringify(body), ...options }),
+  put: (endpoint, body, options = {}) => request(endpoint, { method: 'PUT', body: body instanceof FormData ? body : JSON.stringify(body), ...options }),
   delete: (endpoint) => request(endpoint, { method: 'DELETE' }),
 };
 

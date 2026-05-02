@@ -7,6 +7,7 @@ import EntityModal from '../../../components/ui/EntityModal';
 import ConfirmModal from '../../../components/ui/ConfirmModal';
 import { MOCK_DOCTORS } from '../../../constants/doctors';
 import api from '../../../services/api';
+import { Trash2, Search } from 'lucide-react';
 
 export default function CaregiverDashboard() {
   const { t } = useTranslation();
@@ -171,7 +172,7 @@ export default function CaregiverDashboard() {
                       {t('dash_consult')}
                     </button>
                     <button onClick={() => handleRemove(p.id)} className="w-12 h-12 rounded-xl border theme-border flex items-center justify-center theme-text-sub hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-200 dark:border-red-800 transition-all shadow-sm" title={t('med_remove_title')}>
-                      🗑️
+                      <Trash2 size={20} />
                     </button>
                   </div>
                 </div>
@@ -238,7 +239,9 @@ export default function CaregiverDashboard() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
-            <span className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 text-lg group-focus-within:text-teal-500 transition-colors">🔍</span>
+            <span className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-teal-500 transition-colors">
+              <Search size={18} />
+            </span>
           </div>
         </div>
 

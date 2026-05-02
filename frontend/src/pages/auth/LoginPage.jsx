@@ -68,17 +68,17 @@ export default function LoginPage() {
           </Link>
 
           <div className="mb-10">
-            <h1 className="text-3xl font-black theme-text mb-2 tracking-tight uppercase">{t('auth_authentication')}</h1>
-            <p className="theme-text-sub text-sm font-medium">{t('auth_credentials_desc')}</p>
+            <h1 className="text-3xl font-black theme-text mb-2 tracking-tight uppercase">{t('Login')}</h1>
+            <p className="theme-text-sub text-sm font-medium">{t('Enter your Credentials')}</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-6">
               <div className="group">
-                <label className="block text-[10px] font-black uppercase tracking-[0.2em] theme-text-sub mb-2 px-1 group-focus-within:text-teal-600 transition-colors">{t('auth_email_label')}</label>
+                <label className="block text-[10px] font-black uppercase tracking-[0.2em] theme-text-sub mb-2 px-1 group-focus-within:text-teal-600 transition-colors">{t('Email')}</label>
                 <input
                   type="email"
-                  placeholder={t('auth_email_placeholder')}
+                  placeholder={t('Enter your Email')}
                   required
                   value={form.email}
                   onChange={e => setForm({ ...form, email: e.target.value })}
@@ -88,11 +88,11 @@ export default function LoginPage() {
 
               <div className="group">
                 <div className="flex justify-between items-center mb-2 px-1">
-                  <label className="text-[10px] font-black uppercase tracking-[0.2em] theme-text-sub group-focus-within:text-teal-600 transition-colors">{t('auth_password_label')}</label>
+                  <label className="text-[10px] font-black uppercase tracking-[0.2em] theme-text-sub group-focus-within:text-teal-600 transition-colors">{t('Password')}</label>
                 </div>
                 <input
                   type="password"
-                  placeholder={t('auth_password_placeholder')}
+                  placeholder={t('Enter your Password')}
                   required
                   value={form.password}
                   onChange={e => setForm({ ...form, password: e.target.value })}
@@ -108,16 +108,16 @@ export default function LoginPage() {
             >
               {loading
                 ? <><Spinner /> {t('auth_btn_authenticating')}</>
-                : t('auth_btn_login')
+                : t('Login')
               }
             </button>
           </form>
 
           <div className="mt-12 pt-8 border-t theme-border text-center">
             <p className="text-sm theme-text-sub font-medium">
-              {t('auth_new_entity')}{' '}
+              {t('New User ?')}{' '}
               <Link to={ROUTES.SIGN_UP} className="text-teal-600 dark:text-teal-400 font-black hover:underline no-underline uppercase tracking-widest ml-1 text-xs">
-                {t('auth_init_profile')}
+                {t('Sign Up')}
               </Link>
             </p>
           </div>

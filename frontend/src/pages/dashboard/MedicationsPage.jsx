@@ -6,6 +6,7 @@ import PageHeader from '../../components/ui/PageHeader';
 import EntityModal from '../../components/ui/EntityModal';
 import ConfirmModal from '../../components/ui/ConfirmModal';
 import api from '../../services/api';
+import { ClipboardList, Zap, AlertTriangle, Package, Pill, Pencil, Trash2 } from 'lucide-react';
 
 export default function MedicationsPage() {
   const { t } = useTranslation();
@@ -17,19 +18,54 @@ export default function MedicationsPage() {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
 
+  const [currentTime, setCurrentTime] = useState(() => {
+    const now = new Date();
+    return `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+  });
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const now = new Date();
+      setCurrentTime(`${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`);
+    }, 60000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const getIntakeStatus = (med) => {
+    const today = new Date().toISOString().split('T')[0];
+    const savedStatus = localStorage.getItem(`med-${med.id}-status-${today}`);
+    if (savedStatus === 'taken' || med.intakeStatus === 'taken') return 'taken';
+
+    if (!med.time) return 'pending';
+    
+    const [cHr, cMin] = currentTime.split(':').map(Number);
+    const [mHr, mMin] = med.time.split(':').map(Number);
+    
+    const currentTotalMins = cHr * 60 + cMin;
+    const medTotalMins = mHr * 60 + mMin;
+    
+    if (currentTotalMins > medTotalMins) {
+      return 'missed';
+    } else if (medTotalMins - currentTotalMins <= 2) {
+      return 'pending';
+    } else {
+      return 'too_early';
+    }
+  };
+
   const isDoctor = user?.role?.toLowerCase() === 'doctor';
 
   const baseFields = [
     { name: 'name', labelKey: 'auth_name_label', placeholderKey: 'med_prompt_name', required: true },
     { name: 'dosage', labelKey: 'med_dosage', type: 'text', placeholderKey: 'e.g., 500mg', required: true },
-    { 
-      name: 'frequency', 
-      labelKey: 'settings_alert_logic', 
-      type: 'select', 
+    {
+      name: 'frequency',
+      labelKey: 'settings_alert_logic',
+      type: 'select',
       options: [
         { value: 'Daily', labelKey: 'med_freq_once' },
         { value: 'Twice a Day', labelKey: 'med_freq_twice' }
-      ] 
+      ]
     },
     { name: 'time', labelKey: 'med_timing', type: 'time', required: true },
     { name: 'startDate', labelKey: 'start_date', type: 'date', required: true },
@@ -105,6 +141,13 @@ export default function MedicationsPage() {
     }
   };
 
+  const handleTake = (id) => {
+    const today = new Date().toISOString().split('T')[0];
+    localStorage.setItem(`med-${id}-status-${today}`, 'taken');
+    setMeds(meds.map(m => m.id === id ? { ...m, intakeStatus: 'taken' } : m));
+    addNotification('Medication marked as taken', 'success');
+  };
+
   return (
     <div className="animate-fade-in">
       <PageHeader
@@ -136,15 +179,15 @@ export default function MedicationsPage() {
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
         {[
-          { label: 'med_stat_total', value: meds.length, icon: '📋' },
-          { label: 'med_stat_active', value: meds.filter(m => m.status === 'dash_stable').length, icon: '⚡' },
-          { label: 'med_stat_critical', value: meds.filter(m => m.status === 'dash_at_risk').length, icon: '⚠️' },
-          { label: 'med_stat_refill', value: `3 ${t('dash_days')}`, icon: '📦' },
+          { label: 'Total Medications', value: meds.length, icon: <ClipboardList size={28} className="text-blue-500" /> },
+          { label: 'Taken Dosages', value: meds.filter(m => getIntakeStatus(m) === 'taken').length, icon: <Zap size={28} className="text-teal-500" /> },
+          { label: 'Missed Dosages', value: meds.filter(m => getIntakeStatus(m) === 'missed').length, icon: <AlertTriangle size={28} className="text-red-500" /> },
+          { label: 'Medications Refill', value: `3 ${t('dash_days')}`, icon: <Package size={28} className="text-indigo-500" /> },
         ].map(s => (
           <div key={s.label} className="border theme-border hover:border-teal-500 rounded-[2rem] p-8 transition-all group card-hover shadow-sm hover:shadow-xl">
             <div className="flex items-center justify-between mb-4">
               <p className="text-[10px] font-black theme-text uppercase tracking-[0.2em]">{t(s.label)}</p>
-              <span className="text-xl group-hover:scale-110 transition-transform">{s.icon}</span>
+              <span className="group-hover:scale-110 transition-transform">{s.icon}</span>
             </div>
             <p className="text-4xl font-black theme-text mb-1 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">{s.value}</p>
           </div>
@@ -158,7 +201,9 @@ export default function MedicationsPage() {
             <div key={med.id} className="border theme-border hover:border-teal-500 rounded-[2.5rem] p-8 transition-all group card-hover relative overflow-hidden shadow-sm hover:shadow-2xl">
               <div className="flex items-start justify-between mb-8 relative z-10">
                 <div className="flex items-center gap-5">
-                  <div className="w-14 h-14 rounded-2xl theme-bg flex items-center justify-center text-3xl group-hover:scale-110 transition-all shadow-sm">💊</div>
+                  <div className="w-14 h-14 rounded-2xl theme-bg border theme-border flex items-center justify-center group-hover:scale-110 transition-all shadow-sm">
+                    <Pill size={24} className="text-teal-500" />
+                  </div>
                   <div>
                     <h3 className="text-xl font-black theme-text  transition-colors uppercase tracking-tight">{med.name}</h3>
                     <p className="text-[10px] text-teal-600 dark:text-teal-400 font-black mt-1.5 uppercase tracking-widest">{med.dosage} · {med.frequency}</p>
@@ -177,34 +222,46 @@ export default function MedicationsPage() {
                   <p className="text-sm font-black theme-text">{med.time}</p>
                 </div>
                 <div>
-                  <p className="text-[9px] font-black text-teal-600 dark:text-teal-400 uppercase tracking-widest mb-1.5">Date Range</p>
+                  <p className="text-[9px] font-black text-teal-600 dark:text-teal-400 uppercase tracking-widest mb-1.5">{t('Days Left')}</p>
                   <p className={`text-sm font-black ${isLow ? 'text-red-500' : 'theme-text'}`}>{med.startDate} to {med.endDate}</p>
                 </div>
               </div>
 
               <div className="flex items-center justify-between gap-6 relative z-10">
                 <div className="flex-1">
-                  <div className="flex justify-between items-center mb-2.5">
-                    <span className="text-[9px] font-black theme-text-sub uppercase tracking-widest">Progress</span>
-                    <span className="text-[9px] font-black theme-text-sub">50%</span>
-                  </div>
-                  <div className="theme-bg rounded-full h-2 border theme-border overflow-hidden shadow-inner">
-                    <div className={`h-full rounded-full transition-all duration-700 ${isLow ? 'bg-red-500 shadow-[0_0_12px_rgba(239,68,68,0.3)]' : 'bg-teal-500 shadow-[0_0_12px_rgba(20,184,166,0.3)]'}`} style={{ width: `50%` }} />
-                  </div>
+                  {getIntakeStatus(med) === 'pending' ? (
+                    <button 
+                      onClick={() => handleTake(med.id)}
+                      className="w-full py-3 bg-teal-500/10 hover:bg-teal-500/20 text-teal-600 dark:text-teal-400 border border-teal-500/20 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all"
+                    >
+                      ✓ {t('Taken')}
+                    </button>
+                  ) : getIntakeStatus(med) === 'too_early' ? (
+                    <button 
+                      disabled
+                      className="w-full py-3 bg-gray-500/5 text-gray-400 dark:text-gray-500 border border-gray-500/10 rounded-xl text-[10px] font-black uppercase tracking-widest cursor-not-allowed transition-all"
+                    >
+                      ⏱ Available at {med.time}
+                    </button>
+                  ) : (
+                    <div className={`flex items-center justify-center py-3 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all ${getIntakeStatus(med) === 'taken' ? 'bg-teal-500/10 text-teal-600 dark:text-teal-400 border-teal-500/20' : 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20'}`}>
+                      {getIntakeStatus(med) === 'taken' ? `✓ ${t('Taken')}` : `✕ ${t('Missed')}`}
+                    </div>
+                  )}
                 </div>
                 {isDoctor && (
                   <div className="flex gap-2">
-                    <button 
+                    <button
                       onClick={() => {
                         setEditingMed(med);
                         setModalOpen(true);
-                      }} 
+                      }}
                       className="w-10 h-10 rounded-xl border theme-border flex items-center justify-center theme-text-sub hover:theme-text hover:bg-gray-100 dark:hover:bg-gray-800 transition-all"
                     >
-                      ✎
+                      <Pencil size={18} />
                     </button>
                     <button onClick={() => handleRemove(med.id)} className="w-10 h-10 rounded-xl border theme-border flex items-center justify-center theme-text-sub hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-200 dark:hover:border-red-800 transition-all" title={t('med_remove_title')}>
-                      🗑️
+                      <Trash2 size={18} />
                     </button>
                   </div>
                 )}

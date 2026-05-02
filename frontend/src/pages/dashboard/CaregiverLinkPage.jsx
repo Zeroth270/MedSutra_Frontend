@@ -28,15 +28,15 @@ export default function CaregiverLinkPage() {
 
   const fields = [
     { name: 'name', labelKey: 'auth_name_label', placeholderKey: 'auth_name_placeholder', required: true },
-    { 
-      name: 'role', 
-      labelKey: 'auth_select_role', 
-      type: 'select', 
+    {
+      name: 'role',
+      labelKey: 'auth_select_role',
+      type: 'select',
       options: [
         { value: 'Caregiver', labelKey: 'auth_role_caregiver' },
         { value: 'Family Member', labelKey: 'spec_family' },
         { value: 'Specialist', labelKey: 'spec_primary' }
-      ] 
+      ]
     }
   ];
 
@@ -72,20 +72,20 @@ export default function CaregiverLinkPage() {
   const handleBook = (doctor) => {
     const doctorName = doctor.nameKey ? t(doctor.nameKey) : doctor.name;
     if (caregivers.some(c => (c.nameKey ? t(c.nameKey) : c.name) === doctorName)) {
-        addNotification(`${doctorName}: ${t('notif_updated')}`, 'info');
-        return;
+      addNotification(`${doctorName}: ${t('notif_updated')}`, 'info');
+      return;
     }
 
     const newCaregiver = {
-        id: Date.now(),
-        nameKey: doctor.nameKey,
-        name: doctor.name,
-        roleKey: doctor.specialtyKey,
-        role: doctor.specialty,
-        status: 'dash_stable',
-        initial: doctorName.charAt(0).toUpperCase()
+      id: Date.now(),
+      nameKey: doctor.nameKey,
+      name: doctor.name,
+      roleKey: doctor.specialtyKey,
+      role: doctor.specialty,
+      status: 'dash_stable',
+      initial: doctorName.charAt(0).toUpperCase()
     };
-    
+
     setCaregivers([newCaregiver, ...caregivers]);
     addNotification(`${doctorName}: ${t('notif_added')}`, 'success');
   };
@@ -102,10 +102,10 @@ export default function CaregiverLinkPage() {
     const name = doc.nameKey ? t(doc.nameKey).toLowerCase() : doc.name.toLowerCase();
     const specialty = doc.specialtyKey ? t(doc.specialtyKey).toLowerCase() : doc.specialty.toLowerCase();
     const query = searchQuery.toLowerCase();
-    
-    return name.includes(query) || 
-           specialty.includes(query) || 
-           doc.diseases.some(d => d.toLowerCase().includes(query));
+
+    return name.includes(query) ||
+      specialty.includes(query) ||
+      doc.diseases.some(d => d.toLowerCase().includes(query));
   });
 
   return (
@@ -141,7 +141,7 @@ export default function CaregiverLinkPage() {
         <div className="lg:col-span-2 space-y-12">
           <section>
             <div className="flex items-center justify-between mb-8 px-2">
-              <h2 className="font-black theme-text text-xl uppercase tracking-tight">{t('link_active_handshakes')}</h2>
+              <h2 className="font-black theme-text text-xl uppercase tracking-tight">{t('Active Network')}</h2>
               <span className="text-[10px] font-black text-teal-600 border border-teal-200 dark:border-teal-900/30 px-4 py-2 rounded-xl uppercase tracking-[0.2em] shadow-sm">{caregivers.length} {t('dash_stable')}</span>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -162,16 +162,16 @@ export default function CaregiverLinkPage() {
                   <div className="flex items-center justify-between pt-6 border-t theme-border relative z-10">
                     <span className="text-[10px] font-black border border-green-200 dark:border-green-900/30 text-green-700 dark:text-green-400 px-4 py-2 rounded-xl uppercase tracking-widest shadow-sm">{t(c.status)}</span>
                     <div className="flex gap-2">
-                      <button 
+                      <button
                         onClick={() => {
                           setEditingCaregiver(c);
                           setModalOpen(true);
-                        }} 
+                        }}
                         className="text-[10px] theme-text-sub hover:theme-text font-black uppercase tracking-[0.2em] transition-all"
                       >
-                        ✏️ {t('risk_configure')}
+                         {t('Edit')}
                       </button>
-                      <button onClick={() => handleRemove(c.id)} className="text-[10px] text-red-500 font-black uppercase tracking-[0.2em] transition-all ml-2">{t('link_btn_revoke')}</button>
+                      <button onClick={() => handleRemove(c.id)} className="text-[10px] text-red-500 font-black uppercase tracking-[0.2em] transition-all ml-2">{t('Remove')}</button>
                     </div>
                   </div>
 

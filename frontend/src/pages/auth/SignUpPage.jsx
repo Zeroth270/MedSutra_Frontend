@@ -80,13 +80,13 @@ export default function SignUpPage() {
           </Link>
 
           <div className="mb-10">
-            <h1 className="text-3xl font-black theme-text mb-2 uppercase tracking-tight">{t('auth_create_entity')}</h1>
+            <h1 className="text-3xl font-black theme-text mb-2 uppercase tracking-tight">{t('Sign Up')}</h1>
             <p className="theme-text-sub text-sm font-medium">{t('auth_init_desc')}</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-[10px] font-black theme-text-sub uppercase tracking-[0.2em] mb-4 px-1">{t('auth_select_role')}</label>
+              <label className="block text-[10px] font-black theme-text-sub uppercase tracking-[0.2em] mb-4 px-1">{t('Select your role')}</label>
               <div className="grid grid-cols-3 gap-3">
                 {[{ key: 'PATIENT', label: 'patient' }, { key: 'CAREGIVER', label: 'caregiver' }, { key: 'DOCTOR', label: 'doctor' }].map(({ key, label }) => (
                   <button
@@ -106,10 +106,10 @@ export default function SignUpPage() {
 
             <div className="space-y-6">
               <div className="group">
-                <label className="block text-[10px] font-black theme-text-sub uppercase tracking-[0.2em] mb-2 px-1 group-focus-within:text-teal-600 transition-colors">{t('auth_name_label')}</label>
+                <label className="block text-[10px] font-black theme-text-sub uppercase tracking-[0.2em] mb-2 px-1 group-focus-within:text-teal-600 transition-colors">{t('Full Name')}</label>
                 <input
                   type="text"
-                  placeholder={t('auth_name_placeholder')}
+                  placeholder={t('Enter Your Full Name')}
                   required
                   value={form.name}
                   onChange={e => setForm({ ...form, name: e.target.value })}
@@ -118,10 +118,10 @@ export default function SignUpPage() {
               </div>
 
               <div className="group">
-                <label className="block text-[10px] font-black theme-text-sub uppercase tracking-[0.2em] mb-2 px-1 group-focus-within:text-teal-600 transition-colors">{t('auth_email_label')}</label>
+                <label className="block text-[10px] font-black theme-text-sub uppercase tracking-[0.2em] mb-2 px-1 group-focus-within:text-teal-600 transition-colors">{t('Email Address')}</label>
                 <input
                   type="email"
-                  placeholder={t('auth_email_placeholder')}
+                  placeholder={t('Enter your Email')}
                   required
                   value={form.email}
                   onChange={e => setForm({ ...form, email: e.target.value })}
@@ -130,10 +130,10 @@ export default function SignUpPage() {
               </div>
 
               <div className="group">
-                <label className="block text-[10px] font-black theme-text-sub uppercase tracking-[0.2em] mb-2 px-1 group-focus-within:text-teal-600 transition-colors">{t('auth_password_label')}</label>
+                <label className="block text-[10px] font-black theme-text-sub uppercase tracking-[0.2em] mb-2 px-1 group-focus-within:text-teal-600 transition-colors">{t('Password')}</label>
                 <input
                   type="password"
-                  placeholder={t('auth_password_placeholder')}
+                  placeholder={t('Enter Your Password')}
                   required
                   value={form.password}
                   onChange={e => setForm({ ...form, password: e.target.value })}
@@ -143,10 +143,10 @@ export default function SignUpPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="group">
-                  <label className="block text-[10px] font-black theme-text-sub uppercase tracking-[0.2em] mb-2 px-1 group-focus-within:text-teal-600 transition-colors">{t('auth_phone_label') || 'Phone'}</label>
+                  <label className="block text-[10px] font-black theme-text-sub uppercase tracking-[0.2em] mb-2 px-1 group-focus-within:text-teal-600 transition-colors">{t('Phone Number') || 'Phone'}</label>
                   <input
                     type="tel"
-                    placeholder={t('auth_phone_placeholder') || '+91 XXXXX XXXXX'}
+                    placeholder={t('Enter Your Phone Number') || '+91 XXXXX XXXXX'}
                     required
                     value={form.phone}
                     onChange={e => setForm({ ...form, phone: e.target.value })}
@@ -155,10 +155,10 @@ export default function SignUpPage() {
                 </div>
 
                 <div className="group">
-                  <label className="block text-[10px] font-black theme-text-sub uppercase tracking-[0.2em] mb-2 px-1 group-focus-within:text-teal-600 transition-colors">{t('auth_age_label') || 'Age'}</label>
+                  <label className="block text-[10px] font-black theme-text-sub uppercase tracking-[0.2em] mb-2 px-1 group-focus-within:text-teal-600 transition-colors">{t('Age') || 'Age'}</label>
                   <input
                     type="number"
-                    placeholder={t('auth_age_placeholder') || 'Age'}
+                    placeholder={t('Enter Your Age') || 'Age'}
                     required
                     min="1"
                     max="150"
@@ -177,16 +177,16 @@ export default function SignUpPage() {
             >
               {loading
                 ? <><Spinner /> {t('auth_btn_initializing')}</>
-                : t('auth_btn_signup')
+                : t('Sign Up')
               }
             </button>
           </form>
 
           <div className="mt-10 pt-8 border-t theme-border text-center">
             <p className="text-sm theme-text-sub font-medium">
-              {t('auth_existing_entity')}{' '}
+              {t('Already have an Account?')}{' '}
               <Link to={ROUTES.LOGIN} className="text-teal-600 dark:text-teal-400 font-black hover:underline no-underline uppercase tracking-widest ml-1 text-xs">
-                {t('auth_signin_access')}
+                {t('Login')}
               </Link>
             </p>
           </div>

@@ -4,10 +4,11 @@ import { useNotification } from '../../context/NotificationContext';
 import PageHeader from '../../components/ui/PageHeader';
 import EntityModal from '../../components/ui/EntityModal';
 import ConfirmModal from '../../components/ui/ConfirmModal';
+import { Pill, Pencil, Pause, Play, Trash2 } from 'lucide-react';
 
 const INITIAL_REMINDERS = [
-  { id: 1, name: 'Atorvastatin', time: '09:00 AM', status: 'Active', type: 'Tablet', next: 'Tomorrow', icon: '💊' },
-  { id: 2, name: 'Lisinopril', time: '08:00 PM', status: 'Active', type: 'Tablet', next: 'In 2 hrs', icon: '💊' },
+  { id: 1, name: 'Atorvastatin', time: '09:00 AM', status: 'Active', type: 'Tablet', next: 'Tomorrow', icon: <Pill size={32} className="text-teal-500" /> },
+  { id: 2, name: 'Lisinopril', time: '08:00 PM', status: 'Active', type: 'Tablet', next: 'In 2 hrs', icon: <Pill size={32} className="text-teal-500" /> },
 ];
 
 export default function RemindersPage() {
@@ -22,15 +23,15 @@ export default function RemindersPage() {
   const fields = [
     { name: 'name', labelKey: 'med_prompt_name', placeholder: 'e.g. Lisinopril', required: true },
     { name: 'time', labelKey: 'med_prompt_time', type: 'time', required: true },
-    { 
-      name: 'type', 
-      labelKey: 'auth_select_role', 
-      type: 'select', 
+    {
+      name: 'type',
+      labelKey: 'auth_select_role',
+      type: 'select',
       options: [
         { value: 'Tablet', labelKey: 'med_type_tablet' },
         { value: 'Capsule', labelKey: 'med_type_capsule' },
         { value: 'Syrup', labelKey: 'med_type_syrup' }
-      ] 
+      ]
     }
   ];
 
@@ -39,7 +40,7 @@ export default function RemindersPage() {
       setReminders(reminders.map(r => r.id === editingReminder.id ? { ...r, ...data } : r));
       addNotification(`${t('notif_updated')} (${data.name})`, 'success');
     } else {
-      setReminders([...reminders, { ...data, id: Date.now(), status: 'Active', next: 'Soon', icon: '💊' }]);
+      setReminders([...reminders, { ...data, id: Date.now(), status: 'Active', next: 'Soon', icon: <Pill size={32} className="text-teal-500" /> }]);
       addNotification(`${t('notif_added')} (${data.name})`, 'success');
     }
   };
@@ -73,7 +74,7 @@ export default function RemindersPage() {
       <PageHeader
         title={t('nav_reminders')}
         subtitle={t('rem_subtitle')}
-        actionLabel={t('med_btn_add')}
+        actionLabel={t('rem_btn_add')}
         onAction={() => {
           setEditingReminder(null);
           setModalOpen(true);
@@ -92,16 +93,16 @@ export default function RemindersPage() {
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
         onSave={handleSave}
-        title={editingReminder ? t('dash_optimization') : t('med_btn_add')}
+        title={editingReminder ? t('dash_optimization') : t('Add Reminder')}
         initialData={editingReminder}
         fields={fields}
       />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
         {[
-          { label: 'dash_active_accounts', value: reminders.filter(r => r.status === 'Active').length, color: 'text-teal-600' },
-          { label: 'dash_missed', value: reminders.filter(r => r.status === 'Snoozed').length, color: 'text-yellow-500' },
-          { label: 'med_stat_total', value: reminders.length, color: 'theme-text' },
+          { label: 'Active Dosages', value: reminders.filter(r => r.status === 'Active').length, color: 'text-teal-600' },
+          { label: 'Missed Dosages', value: reminders.filter(r => r.status === 'Snoozed').length, color: 'text-yellow-500' },
+          { label: 'Total Dosages', value: reminders.length, color: 'theme-text' },
         ].map(s => (
           <div key={s.label} className="border theme-border hover:border-teal-500 rounded-[2rem] p-8 transition-all card-hover group shadow-sm hover:shadow-xl">
             <p className="text-[10px] font-black theme-text-sub uppercase tracking-[0.2em] mb-4">{t(s.label)}</p>
@@ -119,7 +120,7 @@ export default function RemindersPage() {
 
               <div className="flex items-start justify-between mb-8 relative z-10">
                 <div className="flex items-center gap-5">
-                  <div className="w-16 h-16 rounded-2xl theme-bg flex items-center justify-center text-3xl group-hover:scale-110 transition-all shadow-lg">
+                  <div className="w-16 h-16 rounded-2xl theme-bg border theme-border flex items-center justify-center group-hover:scale-110 transition-all shadow-lg">
                     {r.icon}
                   </div>
                   <div>
@@ -147,21 +148,21 @@ export default function RemindersPage() {
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <button 
+                  <button
                     onClick={() => {
                       setEditingReminder(r);
                       setModalOpen(true);
-                    }} 
-                    className="w-12 h-12 rounded-2xl border theme-border flex items-center justify-center theme-text-sub hover:theme-text hover:bg-gray-100 dark:hover:bg-gray-800 transition-all shadow-sm" 
+                    }}
+                    className="w-12 h-12 rounded-2xl border theme-border flex items-center justify-center theme-text-sub hover:theme-text hover:bg-gray-100 dark:hover:bg-gray-800 transition-all shadow-sm"
                     title="Edit"
                   >
-                    ✏️
+                    <Pencil size={20} />
                   </button>
                   <button onClick={() => handleToggle(r.id)} className="w-12 h-12 rounded-2xl border theme-border flex items-center justify-center theme-text-sub hover:theme-text hover:bg-gray-100 dark:hover:bg-gray-800 transition-all shadow-sm" title="Toggle Status">
-                    {isActive ? '⏸️' : '▶️'}
+                    {isActive ? <Pause size={20} /> : <Play size={20} />}
                   </button>
                   <button onClick={() => handleRemove(r.id)} className="w-12 h-12 rounded-2xl border theme-border flex items-center justify-center theme-text-sub hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all shadow-sm" title="Delete">
-                    🗑️
+                    <Trash2 size={20} />
                   </button>
                 </div>
               </div>

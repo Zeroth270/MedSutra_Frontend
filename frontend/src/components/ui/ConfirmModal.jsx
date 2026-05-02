@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { AlertTriangle, Bell, Info } from 'lucide-react';
 
 /**
  * A professional, high-fidelity confirmation modal for destructive or critical actions.
@@ -12,19 +13,19 @@ export default function ConfirmModal({ isOpen, onClose, onConfirm, title, messag
   // Icon mapping based on action type
   const typeConfig = {
     danger: {
-      icon: '⚠️',
+      icon: <AlertTriangle size={32} className="text-red-500" />,
       color: 'text-red-500',
       btn: 'bg-red-600 hover:bg-red-700 shadow-red-500/20',
       glow: 'bg-red-500/5'
     },
     warning: {
-      icon: '🔔',
+      icon: <Bell size={32} className="text-orange-500" />,
       color: 'text-orange-500',
       btn: 'bg-orange-600 hover:bg-orange-700 shadow-orange-500/20',
       glow: 'bg-orange-500/5'
     },
     info: {
-      icon: 'ℹ️',
+      icon: <Info size={32} className="text-teal-500" />,
       color: 'text-teal-500',
       btn: 'bg-teal-600 hover:bg-teal-700 shadow-teal-500/20',
       glow: 'bg-teal-500/5'
@@ -52,7 +53,7 @@ export default function ConfirmModal({ isOpen, onClose, onConfirm, title, messag
         <div className="relative z-10 p-10">
           {/* Header Area with Icon */}
           <div className="flex flex-col items-center text-center mb-8">
-            <div className={`w-16 h-16 rounded-2xl theme-bg border theme-border flex items-center justify-center text-3xl mb-6 shadow-sm group-hover:scale-110 transition-transform`}>
+            <div className={`w-16 h-16 rounded-2xl theme-bg border theme-border flex items-center justify-center mb-6 shadow-sm group-hover:scale-110 transition-transform`}>
               {config.icon}
             </div>
             <h2 className="text-2xl font-black theme-text uppercase tracking-tight mb-3">

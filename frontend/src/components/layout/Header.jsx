@@ -25,9 +25,9 @@ export default function Header() {
 
         <nav className="hidden md:flex items-center gap-2">
           {NAV_LINKS.map(link => (
-            <a 
-              key={link.label} 
-              href={link.href} 
+            <a
+              key={link.label}
+              href={link.href}
               className="px-5 py-2 text-[10px] font-black uppercase tracking-widest transition-all duration-300 no-underline rounded-xl hover:scale-105 active:scale-95 theme-text-sub hover:theme-text hover:theme-bg"
             >
               {t(`nav_${link.label.toLowerCase().replace(/\s+/g, '_')}`)}
@@ -37,20 +37,20 @@ export default function Header() {
 
         <div className="flex items-center gap-4">
           <LanguageSelector />
-          <button 
+          <button
             onClick={toggleTheme}
             className="w-11 h-11 rounded-2xl flex items-center justify-center transition-all duration-300 shadow-sm active:scale-90 hover:scale-110 theme-bg theme-text-sub hover:theme-text"
             title={t('switch_theme')}
           >
             <span className="text-xl transform transition-transform group-hover:scale-120">{theme === 'light' ? '🌙' : '☀️'}</span>
           </button>
-          
+
           <div className="mx-1"></div>
 
           {isAuthenticated ? (
             <div className="flex items-center gap-3">
-              <Link 
-                to={ROUTES.DASHBOARD} 
+              <Link
+                to={ROUTES.DASHBOARD}
                 className="text-[10px] font-black uppercase tracking-widest px-5 py-2.5 rounded-xl transition-all duration-300 flex items-center gap-3 no-underline shadow-sm hover:scale-105 active:scale-95 theme-text-sub hover:theme-text theme-bg hover:theme-bg"
               >
                 <div className="w-7 h-7 rounded-lg bg-gray-900 dark:bg-teal-600 flex items-center justify-center text-white text-xs font-black shadow-md group-hover:scale-110">{user.avatar}</div>
@@ -60,8 +60,8 @@ export default function Header() {
             </div>
           ) : (
             <div className="flex items-center gap-4">
-              <Link to={ROUTES.LOGIN} className="text-[10px] font-black uppercase tracking-widest px-6 py-2.5 rounded-xl transition-all duration-300 no-underline hover:scale-105 active:scale-95 theme-text-sub hover:theme-text hover:theme-bg">{t('btn_signin')}</Link>
-              <Link to={ROUTES.SIGN_UP} className="btn-primary text-[10px] font-black uppercase tracking-[0.15em] px-8 py-3.5 rounded-xl no-underline shadow-xl shadow-teal-500/20 hover:scale-105 active:scale-95 transition-all duration-300 hover:shadow-teal-500/40">{t('btn_join')}</Link>
+              <Link to={ROUTES.LOGIN} className="text-[10px] font-black uppercase tracking-widest px-6 py-2.5 rounded-xl transition-all duration-300 no-underline hover:scale-105 active:scale-95 theme-text-sub hover:theme-text hover:theme-bg">{t('Login')}</Link>
+              <Link to={ROUTES.SIGN_UP} className="btn-primary text-[10px] font-black uppercase tracking-[0.15em] px-8 py-3.5 rounded-xl no-underline shadow-xl shadow-teal-500/20 hover:scale-105 active:scale-95 transition-all duration-300 hover:shadow-teal-500/40">{t('Sign Up')}</Link>
             </div>
           )}
         </div>

@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { DASHBOARD_NAV } from '../../constants/navigation';
 import ROUTES from '../../constants/routes';
 import LanguageSelector from '../ui/LanguageSelector';
+import { LogOut, Sun, Moon } from 'lucide-react';
 
 export default function DashboardLayout() {
   const navigate = useNavigate();
@@ -86,7 +87,7 @@ export default function DashboardLayout() {
                     padding: sidebarOpen ? '10px 14px' : '12px 0'
                   }}
                 >
-                  <span className={`text-xl flex-shrink-0 transition-transform group-hover:scale-110 ${sidebarOpen ? 'mr-3' : 'm-0'} ${isActive ? 'grayscale-0' : 'grayscale group-hover:grayscale-0'}`}>
+                  <span className={`flex-shrink-0 transition-transform group-hover:scale-110 ${sidebarOpen ? 'mr-3' : 'm-0'} ${isActive ? 'text-teal-600 dark:text-teal-400' : 'opacity-70 group-hover:opacity-100 group-hover:text-teal-500'}`}>
                     {item.icon}
                   </span>
                   {sidebarOpen && <span className="truncate font-black text-sm uppercase tracking-tight">{t(`nav_${item.label.toLowerCase().replace(/\s+/g, '_')}`)}</span>}
@@ -106,7 +107,7 @@ export default function DashboardLayout() {
               padding: sidebarOpen ? '10px 14px' : '12px 0'
             }}
           >
-            <span className={`text-xl flex-shrink-0 transition-transform group-hover:scale-110 ${sidebarOpen ? 'mr-3' : 'm-0'}`}>🚪</span>
+            <span className={`flex-shrink-0 transition-transform group-hover:scale-110 ${sidebarOpen ? 'mr-3' : 'm-0'}`}><LogOut size={20} /></span>
             {sidebarOpen && <span className="font-black tracking-tight text-xs uppercase">{t('sign_out')}</span>}
           </button>
         </div>
@@ -125,7 +126,7 @@ export default function DashboardLayout() {
               className="w-10 h-10 rounded-xl theme-bg border theme-border flex items-center justify-center theme-text-sub hover:theme-text hover:border-teal-500/50 transition-all shadow-sm active:scale-90"
               title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
             >
-              <span className="text-lg">{theme === 'light' ? '🌙' : '☀️'}</span>
+              <span className="flex items-center justify-center">{theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}</span>
             </button>
             <div className="flex items-center gap-4 border-l theme-border pl-6">
               <div className="text-right hidden sm:block">

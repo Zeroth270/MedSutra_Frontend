@@ -246,21 +246,29 @@ html[data-theme="dark"] {
 }
 
 /* ───────────────────── Form Inputs ───────────────────── */
-/* Make the native time picker clock icon larger and easier to click */
-input[type="time"]::-webkit-calendar-picker-indicator {
+
+input[type="time"], input[type="date"] {
+  font-family: var(--font-ui);
+  letter-spacing: 0.05em;
   cursor: pointer;
-  padding: 10px;
-  transform: scale(1.8);
-  opacity: 0.5;
-  transition: opacity 0.2s, transform 0.2s;
-  margin-right: -4px;
 }
 
-input[type="time"]::-webkit-calendar-picker-indicator:hover {
-  opacity: 0.8;
-  transform: scale(2);
+input[type="time"]::-webkit-calendar-picker-indicator,
+input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  opacity: 0.6;
+  transition: all 0.2s ease;
+  padding: 6px;
+  border-radius: 8px;
 }
 
-.dark input[type="time"]::-webkit-calendar-picker-indicator {
-  filter: invert(1);
+input[type="time"]::-webkit-calendar-picker-indicator:hover,
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+  background-color: rgba(156, 163, 175, 0.2);
+}
+
+.dark input[type="time"]::-webkit-calendar-picker-indicator,
+.dark input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1) brightness(0.9);
 }

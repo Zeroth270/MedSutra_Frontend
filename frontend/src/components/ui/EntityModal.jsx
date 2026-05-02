@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Clock, Calendar } from 'lucide-react';
+import ClockTimePicker from './ClockTimePicker';
 
 const EntityModal = ({ isOpen, onClose, onSave, title, initialData = {}, fields = [] }) => {
   const { t } = useTranslation();
@@ -26,21 +28,21 @@ const EntityModal = ({ isOpen, onClose, onSave, title, initialData = {}, fields 
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
+    <div className="fixed inset-0 z-[100] flex items-start pt-20 sm:pt-28 justify-center p-4 sm:p-6">
       {/* Backdrop */}
-      <div 
+      <div
         className="absolute inset-0 bg-white/40 dark:bg-gray-950/80 backdrop-blur-md animate-fade-in"
         onClick={onClose}
       />
-      
+
       {/* Modal Content */}
-      <div className="relative w-full max-w-lg theme-surface border theme-border rounded-[2.5rem] shadow-2xl overflow-hidden animate-slide-in p-8 sm:p-10">
+      <div id="entity-modal-card" className="relative w-full max-w-lg theme-surface border theme-border rounded-[2.5rem] shadow-2xl overflow-hidden animate-slide-in p-8 sm:p-10">
         <div className="absolute top-0 right-0 w-64 h-64 bg-teal-500/10 rounded-full blur-[80px] -mr-32 -mt-32" />
-        
+
         <div className="relative z-10">
           <div className="flex items-center justify-between mb-8 px-1">
             <h2 className="text-2xl font-black theme-text uppercase tracking-tight">{title}</h2>
-            <button 
+            <button
               onClick={onClose}
               className="w-10 h-10 rounded-xl border theme-border flex items-center justify-center theme-text-sub hover:theme-text hover:theme-bg transition-all active:scale-90"
             >
@@ -66,21 +68,34 @@ const EntityModal = ({ isOpen, onClose, onSave, title, initialData = {}, fields 
                       <option key={opt.value} value={opt.value}>{t(opt.labelKey)}</option>
                     ))}
                   </select>
-                ) : (
-                  <input
-                    type={field.type || 'text'}
+                ) : field.type === 'time' ? (
+                  <ClockTimePicker
                     name={field.name}
                     value={formData[field.name] || ''}
                     onChange={handleChange}
                     placeholder={field.placeholder || (field.placeholderKey ? t(field.placeholderKey) : '')}
-                    className="w-full px-6 py-4 theme-bg border theme-border rounded-xl text-sm theme-text placeholder-gray-500 focus:outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-500/5 transition-all font-medium"
                     required={field.required}
                   />
+                ) : (
+                  <div className="relative w-full">
+                    {field.type === 'date' && (
+                      <Calendar size={18} className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+                    )}
+                    <input
+                      type={field.type || 'text'}
+                      name={field.name}
+                      value={formData[field.name] || ''}
+                      onChange={handleChange}
+                      placeholder={field.placeholder || (field.placeholderKey ? t(field.placeholderKey) : '')}
+                      className={`w-full px-6 py-4 theme-bg border theme-border rounded-xl text-sm theme-text placeholder-gray-500 focus:outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-500/5 transition-all font-medium ${field.type === 'date' ? 'pl-12' : ''}`}
+                      required={field.required}
+                    />
+                  </div>
                 )}
               </div>
             ))}
 
-            <div className="pt-4 flex flex-col sm:flex-row gap-4">
+            <div className="pt-2 flex flex-col sm:flex-row gap-4">
               <button
                 type="submit"
                 className="bg-gray-900 dark:bg-teal-600 text-white flex-1 py-4.5 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] shadow-xl shadow-teal-500/10 hover:scale-[1.02] active:scale-95 transition-all order-2 sm:order-1"

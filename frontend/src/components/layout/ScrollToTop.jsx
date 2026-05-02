@@ -8,7 +8,10 @@ export default function ScrollToTop() {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    window.scrollTo(0, 0);
+    // Wrap in a short timeout to ensure the new page content has rendered
+    setTimeout(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    }, 10);
   }, [pathname]);
 
   return null;

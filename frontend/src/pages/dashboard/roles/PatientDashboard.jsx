@@ -5,6 +5,7 @@ import { useNotification } from '../../../context/NotificationContext';
 import ConfirmModal from '../../../components/ui/ConfirmModal';
 import EntityModal from '../../../components/ui/EntityModal';
 import api from '../../../services/api';
+import { Pill, Trash2, Lock } from 'lucide-react';
 
 export default function PatientDashboard({ selectedPatient, isDoctorView }) {
     const { t } = useTranslation();
@@ -18,6 +19,48 @@ export default function PatientDashboard({ selectedPatient, isDoctorView }) {
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [deletingId, setDeletingId] = useState(null);
     const [modalOpen, setModalOpen] = useState(false);
+
+    const [currentTime, setCurrentTime] = useState(() => {
+        const now = new Date();
+        return `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+    });
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            const now = new Date();
+            setCurrentTime(`${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`);
+        }, 60000);
+        return () => clearInterval(timer);
+    }, []);
+
+    const getIntakeStatus = (med) => {
+        const today = new Date().toISOString().split('T')[0];
+        const savedStatus = localStorage.getItem(`med-${med.id}-status-${today}`);
+        if (savedStatus === 'taken' || med.intakeStatus === 'taken') return 'taken';
+
+        if (!med.time) return 'pending';
+        
+        const [cHr, cMin] = currentTime.split(':').map(Number);
+        const [mHr, mMin] = med.time.split(':').map(Number);
+        
+        const currentTotalMins = cHr * 60 + cMin;
+        const medTotalMins = mHr * 60 + mMin;
+        
+        if (currentTotalMins > medTotalMins) {
+            return 'missed';
+        } else if (medTotalMins - currentTotalMins <= 2) {
+            return 'pending';
+        } else {
+            return 'too_early';
+        }
+    };
+
+    const handleTake = (id) => {
+        const today = new Date().toISOString().split('T')[0];
+        localStorage.setItem(`med-${id}-status-${today}`, 'taken');
+        setMeds(meds.map(m => m.id === id ? { ...m, intakeStatus: 'taken' } : m));
+        addNotification('Medication marked as taken', 'success');
+    };
 
     useEffect(() => {
         const fetchDashboardData = async () => {
@@ -198,27 +241,52 @@ export default function PatientDashboard({ selectedPatient, isDoctorView }) {
                             {meds.map((med) => (
                                 <div key={med.id} className="border theme-border hover:border-teal-500 rounded-[2rem] px-8 py-8 flex items-center justify-between transition-all group card-hover relative overflow-hidden shadow-sm hover:shadow-2xl">
                                     <div className="flex items-center gap-6 relative z-10">
-                                        <div className="w-16 h-16 rounded-2xl theme-bg flex items-center justify-center text-3xl group-hover:scale-110 transition-transform shadow-lg">💊</div>
+                                        <div className="w-16 h-16 rounded-2xl theme-bg border theme-border flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg">
+                                            <Pill size={28} className="text-teal-500" />
+                                        </div>
                                         <div>
                                             <p className="text-xl font-black theme-text group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors uppercase tracking-tight">{med.name}</p>
                                             <p className="text-[10px] text-teal-600 dark:text-teal-400 font-black mt-1.5 uppercase tracking-widest">{t(med.frequency)} · SCHED: {med.time}</p>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-5 relative z-10">
-                                        <span className={`text-[10px] font-black px-4 py-2 rounded-xl uppercase tracking-widest border transition-all ${
-                                            med.status === 'dash_stable' 
-                                            ? 'border-green-200 dark:border-green-900/30 text-green-700 dark:text-green-400'
-                                            : 'border-red-200 dark:border-red-900/30 text-red-600 dark:text-red-400'
-                                        }`}>
-                                            {t(med.status)}
-                                        </span>
+                                        {!isDoctorView ? (
+                                            getIntakeStatus(med) === 'pending' ? (
+                                                <button 
+                                                    onClick={() => handleTake(med.id)}
+                                                    className="px-4 py-2 bg-teal-500/10 hover:bg-teal-500/20 text-teal-600 dark:text-teal-400 border border-teal-500/20 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shadow-sm"
+                                                >
+                                                    ✓ {t('Taken')}
+                                                </button>
+                                            ) : getIntakeStatus(med) === 'too_early' ? (
+                                                <button 
+                                                    disabled
+                                                    className="px-4 py-2 bg-gray-500/5 text-gray-400 dark:text-gray-500 border border-gray-500/10 rounded-xl text-[10px] font-black uppercase tracking-widest cursor-not-allowed transition-all"
+                                                >
+                                                    ⏱ {med.time}
+                                                </button>
+                                            ) : (
+                                                <div className={`flex items-center justify-center px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all shadow-sm ${getIntakeStatus(med) === 'taken' ? 'bg-teal-500/10 text-teal-600 dark:text-teal-400 border-teal-500/20' : 'bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20'}`}>
+                                                    {getIntakeStatus(med) === 'taken' ? `✓ ${t('Taken')}` : `✕ ${t('Missed')}`}
+                                                </div>
+                                            )
+                                        ) : (
+                                            <span className={`text-[10px] font-black px-4 py-2 rounded-xl uppercase tracking-widest border transition-all shadow-sm ${
+                                                getIntakeStatus(med) === 'taken' ? 'border-green-200 dark:border-green-900/30 text-green-700 dark:text-green-400' :
+                                                getIntakeStatus(med) === 'missed' ? 'border-red-200 dark:border-red-900/30 text-red-600 dark:text-red-400' :
+                                                'border-gray-200 dark:border-gray-800 text-gray-500'
+                                            }`}>
+                                                {getIntakeStatus(med) === 'taken' ? 'Taken' : getIntakeStatus(med) === 'missed' ? 'Missed' : 'Pending'}
+                                            </span>
+                                        )}
+
                                         {isDoctorView && (
                                             <button 
                                                 onClick={() => handleRemove(med.id)}
                                                 className="w-11 h-11 rounded-2xl border theme-border flex items-center justify-center theme-text-sub hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-200 dark:hover:border-red-800 transition-all shadow-sm"
                                                 title={t('med_remove_title')}
                                             >
-                                                🗑️
+                                                <Trash2 size={20} />
                                             </button>
                                         )}
                                     </div>
@@ -236,7 +304,7 @@ export default function PatientDashboard({ selectedPatient, isDoctorView }) {
                         </div>
                         {!isDoctorView && (
                             <div className="mt-6 px-4 py-3 theme-bg border theme-border border-dashed rounded-2xl flex items-center justify-center gap-3 opacity-60">
-                                <span className="text-xs">🔒</span>
+                                <Lock size={14} />
                                 <p className="text-[10px] font-black theme-text-sub uppercase tracking-widest">{t('dash_protocol_managed')}</p>
                             </div>
                         )}

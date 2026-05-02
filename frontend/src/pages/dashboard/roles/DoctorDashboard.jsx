@@ -6,6 +6,7 @@ import PatientDashboard from './PatientDashboard';
 import ConfirmModal from '../../../components/ui/ConfirmModal';
 import EntityModal from '../../../components/ui/EntityModal';
 import api from '../../../services/api';
+import { Users, CheckCircle, AlertTriangle, Trash2 } from 'lucide-react';
 
 export default function DoctorDashboard() {
     const { t } = useTranslation();
@@ -87,9 +88,9 @@ export default function DoctorDashboard() {
     };
 
     const quickStats = [
-        { label: 'dash_total_patients', value: patients.length, icon: '👥' },
-        { label: 'dash_stable', value: patients.filter(p => p.status === 'dash_stable').length, icon: '✅' },
-        { label: 'dash_at_risk', value: patients.filter(p => p.status === 'dash_at_risk').length, icon: '⚠️' },
+        { label: 'dash_total_patients', value: patients.length, icon: <Users size={28} className="text-blue-500" /> },
+        { label: 'dash_stable', value: patients.filter(p => p.status === 'dash_stable').length, icon: <CheckCircle size={28} className="text-green-500" /> },
+        { label: 'dash_at_risk', value: patients.filter(p => p.status === 'dash_at_risk').length, icon: <AlertTriangle size={28} className="text-amber-500" /> },
     ];
 
     const handleRemovePatient = (e, id) => {
@@ -150,7 +151,7 @@ export default function DoctorDashboard() {
                     <div key={s.label} className="border theme-border hover:border-teal-500 rounded-3xl p-8 transition-all group card-hover shadow-sm hover:shadow-xl">
                         <div className="flex items-center justify-between mb-6">
                             <p className="text-[10px] font-black theme-text-sub uppercase tracking-[0.2em]">{t(s.label)}</p>
-                            <span className="text-2xl group-hover:scale-125 transition-transform drop-shadow-sm">{s.icon}</span>
+                            <span className="group-hover:scale-125 transition-transform drop-shadow-sm">{s.icon}</span>
                         </div>
                         <p className="text-4xl font-black theme-text mb-2 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">{s.value}</p>
                         <p className="text-[10px] theme-text-sub font-black uppercase tracking-widest">{s.sub || 'Real-time Sync'}</p>
@@ -189,7 +190,7 @@ export default function DoctorDashboard() {
                                         className="w-10 h-10 rounded-xl border theme-border flex items-center justify-center theme-text-sub hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 hover:border-red-200 dark:hover:border-red-800 transition-all shadow-sm"
                                         title={t('med_remove_title')}
                                     >
-                                        🗑️
+                                        <Trash2 size={20} />
                                     </button>
                                 </div>
 
