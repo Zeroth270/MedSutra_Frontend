@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useNotification } from '../../../context/NotificationContext';
@@ -6,22 +6,44 @@ import DoctorCard from '../../../components/dashboard/DoctorCard';
 import EntityModal from '../../../components/ui/EntityModal';
 import ConfirmModal from '../../../components/ui/ConfirmModal';
 import { MOCK_DOCTORS } from '../../../constants/doctors';
-
-const INITIAL_MONITORED = [
-  { id: 1, nameKey: 'pat_sarah_miller', name: 'Sarah Miller (Mother)', status: 'dash_missed', time: '10:30 AM', med: 'Blood Pressure', urgency: 'high' },
-  { id: 2, nameKey: 'pat_james_miller', name: 'James Miller (Father)', status: 'dash_taken', time: '8:00 AM', med: 'Vitamins', urgency: 'low' },
-];
+import api from '../../../services/api';
 
 export default function CaregiverDashboard() {
   const { t } = useTranslation();
   const { user } = useOutletContext();
   const { addNotification } = useNotification();
   const [searchQuery, setSearchQuery] = useState('');
-  const [monitored, setMonitored] = useState(INITIAL_MONITORED);
+  const [monitored, setMonitored] = useState([]);
   const [activeNetwork, setActiveNetwork] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
+
+  useEffect(() => {
+    const fetchCaregiverDashboard = async () => {
+      if (!user?.id) return;
+      try {
+        const data = await api.get(`/dashboard/caregiver/${user.id}`);
+        if (data && data.patientDashboards) {
+          const mapped = data.patientDashboards.map(p => ({
+            id: p.patientId,
+            name: p.patientName,
+            status: p.riskLevel === 'HIGH' || p.riskLevel === 'CRITICAL' ? 'dash_at_risk' : 'dash_stable',
+            time: 'Recent',
+            med: p.riskDescription || 'Monitoring',
+            adherence: Math.round(p.adherencePercentage || 0) + '%',
+            urgency: p.riskLevel === 'HIGH' || p.riskLevel === 'CRITICAL' ? 'high' : 'low'
+          }));
+          setMonitored(mapped);
+        }
+      } catch (err) {
+        console.error('Failed to fetch caregiver dashboard:', err);
+        addNotification('Failed to load monitored patients', 'error');
+      }
+    };
+
+    fetchCaregiverDashboard();
+  }, [user?.id]);
 
   const fields = [
     { name: 'name', labelKey: 'auth_name_label', placeholder: 'e.g. Sarah Miller', required: true },
@@ -136,7 +158,7 @@ export default function CaregiverDashboard() {
                     <h3 className="text-xl font-black theme-text group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors uppercase tracking-tight">
                       {p.nameKey ? t(p.nameKey) : p.name}
                     </h3>
-                    <p className="text-[10px] theme-text-sub font-black mt-1.5 uppercase tracking-widest opacity-70">{t('dash_activity')}: {p.med} · {p.time}</p>
+                    <p className="text-[10px] theme-text-sub font-black mt-1.5 uppercase tracking-widest opacity-70">{t('dash_activity')}: {p.med} · ADH: {p.adherence}</p>
                   </div>
                 </div>
 

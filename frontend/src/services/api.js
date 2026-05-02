@@ -2,7 +2,7 @@
  * Base API configuration.
  * Reads the backend URL from environment variables.
  */
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080';
 
 /**
  * Generic fetch wrapper with JSON handling and error management.

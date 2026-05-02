@@ -43,9 +43,9 @@ export default function LanguageSelector() {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-64 max-h-[400px] overflow-y-auto theme-surface border theme-border rounded-2xl shadow-2xl z-[60] animate-fade-in">
-          <div className="p-2 grid grid-cols-1 gap-1">
-            <div className="px-3 py-2 text-[9px] font-black uppercase tracking-[0.2em] theme-text-sub border-b theme-border mb-1">
+        <div className="absolute right-0 mt-2 w-80 max-h-[400px] overflow-y-auto theme-surface border theme-border rounded-2xl shadow-2xl z-[60] animate-fade-in">
+          <div className="p-2 grid grid-cols-2 gap-1">
+            <div className="col-span-2 px-3 py-2 text-[9px] font-black uppercase tracking-[0.2em] theme-text-sub border-b theme-border mb-1">
               Select Language
             </div>
             {LANGUAGES.map((lang) => (

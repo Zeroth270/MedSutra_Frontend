@@ -12,14 +12,14 @@ export default function SignUpPage() {
   const navigate = useNavigate();
   const { login } = useAuth();
   const { addNotification } = useNotification();
-  const [form, setForm] = useState({ name: '', email: '', password: '', role: 'Patient' });
+  const [form, setForm] = useState({ name: '', email: '', password: '', phone: '', age: '', role: 'PATIENT' });
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const userData = await authService.register(form.name, form.email, form.password, form.role);
+      const userData = await authService.register(form.name, form.email, form.password, form.phone, form.age, form.role);
       login(userData);
       addNotification(`Profile created successfully! Welcome, ${userData.name}`, 'success');
       navigate(ROUTES.DASHBOARD);
@@ -88,17 +88,17 @@ export default function SignUpPage() {
             <div>
               <label className="block text-[10px] font-black theme-text-sub uppercase tracking-[0.2em] mb-4 px-1">{t('auth_select_role')}</label>
               <div className="grid grid-cols-3 gap-3">
-                {['Patient', 'Caregiver', 'Doctor'].map(role => (
+                {[{ key: 'PATIENT', label: 'patient' }, { key: 'CAREGIVER', label: 'caregiver' }, { key: 'DOCTOR', label: 'doctor' }].map(({ key, label }) => (
                   <button
-                    key={role}
+                    key={key}
                     type="button"
-                    onClick={() => setForm({ ...form, role })}
-                    className={`py-3.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border shadow-sm active:scale-95 ${form.role === role
+                    onClick={() => setForm({ ...form, role: key })}
+                    className={`py-3.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border shadow-sm active:scale-95 ${form.role === key
                       ? 'bg-gray-900 dark:bg-teal-600 border-gray-900 dark:border-teal-500 text-white shadow-xl'
                       : 'theme-surface border theme-border theme-text-sub hover:theme-text hover:border-gray-400 dark:hover:border-gray-600'
                       }`}
                   >
-                    {t(`auth_role_${role.toLowerCase()}`)}
+                    {t(`auth_role_${label}`)}
                   </button>
                 ))}
               </div>
@@ -139,6 +139,34 @@ export default function SignUpPage() {
                   onChange={e => setForm({ ...form, password: e.target.value })}
                   className="w-full px-5 py-4 theme-surface border theme-border rounded-xl text-sm theme-text placeholder-gray-500 focus:outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-500/5 transition-all font-medium"
                 />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="group">
+                  <label className="block text-[10px] font-black theme-text-sub uppercase tracking-[0.2em] mb-2 px-1 group-focus-within:text-teal-600 transition-colors">{t('auth_phone_label') || 'Phone'}</label>
+                  <input
+                    type="tel"
+                    placeholder={t('auth_phone_placeholder') || '+91 XXXXX XXXXX'}
+                    required
+                    value={form.phone}
+                    onChange={e => setForm({ ...form, phone: e.target.value })}
+                    className="w-full px-5 py-4 theme-surface border theme-border rounded-xl text-sm theme-text placeholder-gray-500 focus:outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-500/5 transition-all font-medium"
+                  />
+                </div>
+
+                <div className="group">
+                  <label className="block text-[10px] font-black theme-text-sub uppercase tracking-[0.2em] mb-2 px-1 group-focus-within:text-teal-600 transition-colors">{t('auth_age_label') || 'Age'}</label>
+                  <input
+                    type="number"
+                    placeholder={t('auth_age_placeholder') || 'Age'}
+                    required
+                    min="1"
+                    max="150"
+                    value={form.age}
+                    onChange={e => setForm({ ...form, age: e.target.value })}
+                    className="w-full px-5 py-4 theme-surface border theme-border rounded-xl text-sm theme-text placeholder-gray-500 focus:outline-none focus:border-teal-500 focus:ring-4 focus:ring-teal-500/5 transition-all font-medium"
+                  />
+                </div>
               </div>
             </div>
 

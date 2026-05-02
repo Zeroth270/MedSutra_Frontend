@@ -1,22 +1,50 @@
 import { useOutletContext } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNotification } from '../../../context/NotificationContext';
 import ConfirmModal from '../../../components/ui/ConfirmModal';
 import EntityModal from '../../../components/ui/EntityModal';
+import api from '../../../services/api';
 
 export default function PatientDashboard({ selectedPatient, isDoctorView }) {
     const { t } = useTranslation();
     const { user } = useOutletContext();
     const { addNotification } = useNotification();
-    const [meds, setMeds] = useState([
-        { id: 1, name: 'Metformin 500mg', type: 'med_type_tablet', frequency: 'med_freq_twice', time: '8 AM & 9 PM', status: 'dash_stable' },
-        { id: 2, name: 'Lisinopril 10mg', type: 'med_type_tablet', frequency: 'med_freq_once', time: '2 PM', status: 'dash_stable' },
-        { id: 3, name: 'Atorvastatin 20mg', type: 'med_type_tablet', frequency: 'med_freq_once', time: '6 PM', status: 'dash_stable' },
-    ]);
+    
+    const patientId = selectedPatient?.id || user.id;
+
+    const [meds, setMeds] = useState([]);
+    const [dashboardData, setDashboardData] = useState(null);
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [deletingId, setDeletingId] = useState(null);
     const [modalOpen, setModalOpen] = useState(false);
+
+    useEffect(() => {
+        const fetchDashboardData = async () => {
+            if (!patientId) return;
+            try {
+                const [medData, dashData] = await Promise.all([
+                    api.get(`/medications/${patientId}`),
+                    api.get(`/dashboard/patient/${patientId}`)
+                ]);
+                
+                const mappedMeds = medData.map(m => ({
+                    id: m.medId,
+                    name: m.name,
+                    frequency: m.frequency,
+                    time: m.time,
+                    status: 'dash_stable' // Can be derived from real conditions if needed
+                }));
+                setMeds(mappedMeds);
+                setDashboardData(dashData);
+            } catch (error) {
+                console.error("Error fetching patient dashboard:", error);
+                addNotification("Failed to load dashboard data", "error");
+            }
+        };
+
+        fetchDashboardData();
+    }, [patientId]);
 
     const fields = [
         { name: 'name', labelKey: 'med_prompt_name', placeholder: 'e.g. Aspirin', required: true },
@@ -26,50 +54,82 @@ export default function PatientDashboard({ selectedPatient, isDoctorView }) {
             labelKey: 'med_timing', 
             type: 'select', 
             options: [
-                { value: 'med_freq_once', labelKey: 'med_freq_once' },
-                { value: 'med_freq_twice', labelKey: 'med_freq_twice' }
+                { value: 'Daily', labelKey: 'med_freq_once' },
+                { value: 'Twice a Day', labelKey: 'med_freq_twice' }
             ] 
         }
     ];
 
-    const handleSave = (data) => {
-        const newMed = {
-            id: Date.now(),
-            ...data,
-            type: 'med_type_tablet',
-            status: 'dash_stable'
-        };
-        setMeds([...meds, newMed]);
-        addNotification(`${t('notif_added')} (${data.name})`, 'success');
+    const handleSave = async (data) => {
+        try {
+            const payload = {
+                patientId: patientId,
+                name: data.name,
+                dosage: "Standard", // Default since it's not in this simple form
+                time: data.time,
+                frequency: data.frequency,
+                startDate: new Date().toISOString().split('T')[0],
+                endDate: new Date().toISOString().split('T')[0]
+            };
+            const newMed = await api.post('/medications', payload);
+            setMeds([...meds, {
+                id: newMed.medId,
+                name: newMed.name,
+                frequency: newMed.frequency,
+                time: newMed.time,
+                status: 'dash_stable'
+            }]);
+            addNotification(`${t('notif_added')} (${data.name})`, 'success');
+        } catch (err) {
+            console.error('Failed to save medication:', err);
+            addNotification('Failed to save medication', 'error');
+        }
     };
 
     const stats = [
-        { label: 'dash_stat_doses', value: '142', sub: 'dash_month' },
-        { label: 'dash_stat_rate', value: '94%', sub: 'dash_last_30' },
-        { label: 'dash_stat_missed', value: '9', sub: 'dash_month' },
-        { label: 'dash_stat_next', value: '8 PM', sub: 'Metformin 500mg' },
+        { label: 'dash_stat_doses', value: dashboardData?.totalDoses || 0, sub: 'dash_month' },
+        { label: 'dash_stat_rate', value: `${Math.round(dashboardData?.adherencePercentage || 0)}%`, sub: 'dash_last_30' },
+        { label: 'dash_stat_missed', value: dashboardData?.missedDoses || 0, sub: 'dash_month' },
+        { label: 'dash_stat_next', value: meds.length > 0 ? meds[0].time : '--:--', sub: meds.length > 0 ? meds[0].name : 'No meds' },
     ];
 
-    const log = [
-        { time: '8:00 AM', med: 'Metformin 500mg', status: 'Taken', dot: 'bg-green-400' },
-        { time: '2:00 PM', med: 'Lisinopril 10mg', status: 'Taken', dot: 'bg-green-400' },
-        { time: '6:00 PM', med: 'Atorvastatin 20mg', status: 'Missed', dot: 'bg-red-400' },
-        { time: '9:00 PM', med: 'Metformin 500mg', status: 'Pending', dot: 'bg-yellow-400' },
-    ];
+    const log = dashboardData?.recentIntakeLogs?.map(item => {
+        let status = 'Pending';
+        let dot = 'bg-yellow-400';
+        if (item.taken) {
+            status = 'Taken';
+            dot = 'bg-green-400';
+        } else {
+            status = 'Missed';
+            dot = 'bg-red-400';
+        }
+        return {
+            time: item.takenTime ? new Date(item.takenTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '--:--',
+            med: item.medicationName,
+            status: status,
+            dot: dot
+        };
+    }) || [];
 
     const handleRemove = (id) => {
         setDeletingId(id);
         setConfirmOpen(true);
     };
 
-    const executeRemove = () => {
-        const med = meds.find(m => m.id === deletingId);
-        setMeds(meds.filter(m => m.id !== deletingId));
-        addNotification(`${t('notif_removed')} (${med.name})`, 'warning');
-        setConfirmOpen(false);
-        setDeletingId(null);
+    const executeRemove = async () => {
+        try {
+            const med = meds.find(m => m.id === deletingId);
+            await api.delete(`/medications/${deletingId}`);
+            setMeds(meds.filter(m => m.id !== deletingId));
+            addNotification(`${t('notif_removed')} (${med.name})`, 'warning');
+        } catch (err) {
+            console.error('Failed to delete medication:', err);
+            addNotification('Failed to delete medication', 'error');
+        } finally {
+            setConfirmOpen(false);
+            setDeletingId(null);
+        }
     };
-
 
     return (
         <div className="animate-fade-in">
@@ -170,6 +230,9 @@ export default function PatientDashboard({ selectedPatient, isDoctorView }) {
                                     <div className="absolute -right-8 -bottom-8 w-24 h-24 bg-teal-500/5 rounded-full blur-3xl" />
                                 </div>
                             ))}
+                            {meds.length === 0 && (
+                                <p className="text-sm theme-text-sub opacity-70 p-4">No active medications.</p>
+                            )}
                         </div>
                         {!isDoctorView && (
                             <div className="mt-6 px-4 py-3 theme-bg border theme-border border-dashed rounded-2xl flex items-center justify-center gap-3 opacity-60">
@@ -204,6 +267,9 @@ export default function PatientDashboard({ selectedPatient, isDoctorView }) {
                                     <div className="absolute -left-10 -top-10 w-24 h-24 bg-teal-500/5 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
                                 </div>
                             ))}
+                            {log.length === 0 && (
+                                <p className="text-sm theme-text-sub opacity-70 p-4">No recent logs available.</p>
+                            )}
                         </div>
                     </section>
                 </div>
@@ -216,7 +282,7 @@ export default function PatientDashboard({ selectedPatient, isDoctorView }) {
                         <div className="space-y-6 relative z-10">
                             <div className="p-7 bg-white/5 rounded-[2rem] border border-white/10 hover:bg-white/10 transition-all cursor-default group/item">
                                 <p className="text-[9px] font-black text-green-400 mb-3 uppercase tracking-[0.2em]">{t('dash_adherence_trend')}</p>
-                                <p className="text-sm leading-relaxed text-gray-300 font-medium italic opacity-90">"{t('dash_trend_msg')}"</p>
+                                <p className="text-sm leading-relaxed text-gray-300 font-medium italic opacity-90">"{dashboardData?.riskDescription || t('dash_trend_msg')}"</p>
                             </div>
                             <div className="p-7 bg-white/5 rounded-[2rem] border border-white/10 hover:bg-white/10 transition-all cursor-default group/item">
                                 <p className="text-[9px] font-black text-yellow-400 mb-3 uppercase tracking-[0.2em]">{t('dash_optimization')}</p>

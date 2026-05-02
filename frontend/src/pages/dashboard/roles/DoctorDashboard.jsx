@@ -1,26 +1,62 @@
 import { useOutletContext } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNotification } from '../../../context/NotificationContext';
 import PatientDashboard from './PatientDashboard';
 import ConfirmModal from '../../../components/ui/ConfirmModal';
 import EntityModal from '../../../components/ui/EntityModal';
-
-const INITIAL_PATIENTS = [
-    { id: 1, nameKey: 'pat_john', name: 'John Doe', status: 'dash_at_risk', adherence: '65%', lastSeen: '2 hrs ago', color: 'text-red-600', bg: 'bg-red-50', avatar: 'JD' },
-    { id: 2, nameKey: 'pat_jane', name: 'Jane Smith', status: 'dash_stable', adherence: '98%', lastSeen: '5 hrs ago', color: 'text-green-700', bg: 'bg-green-50', avatar: 'JS' },
-    { id: 3, nameKey: 'pat_robert', name: 'Robert Fox', status: 'dash_stable', adherence: '92%', lastSeen: '1 day ago', color: 'text-green-700', bg: 'bg-green-50', avatar: 'RF' },
-];
+import api from '../../../services/api';
 
 export default function DoctorDashboard() {
     const { t } = useTranslation();
     const { user } = useOutletContext();
     const { addNotification } = useNotification();
     const [selectedPatient, setSelectedPatient] = useState(null);
-    const [patients, setPatients] = useState(INITIAL_PATIENTS);
+    const [patients, setPatients] = useState([]);
+    const [alerts, setAlerts] = useState([]);
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [deletingId, setDeletingId] = useState(null);
     const [modalOpen, setModalOpen] = useState(false);
+
+    const fetchPatients = async () => {
+        if (!user?.id) return;
+        try {
+            const data = await api.get(`/dashboard/doctor/${user.id}`);
+            const dashboards = data?.patientDashboards || [];
+            const allAlerts = [];
+            const mapped = dashboards.map(p => {
+                const initials = p.patientName?.split(' ').map(n => n[0]).join('').toUpperCase() || 'P';
+                
+                // Map backend riskLevel to frontend status strings
+                let statusClass = 'dash_stable';
+                if (p.riskLevel === 'HIGH' || p.riskLevel === 'CRITICAL') {
+                    statusClass = 'dash_at_risk';
+                }
+
+                if (p.alerts && p.alerts.length > 0) {
+                    p.alerts.forEach(a => allAlerts.push({ ...a, patientName: p.patientName }));
+                }
+
+                return {
+                    id: p.patientId,
+                    name: p.patientName,
+                    status: statusClass,
+                    adherence: `${Math.round(p.adherencePercentage || 0)}%`,
+                    lastSeen: 'Recently',
+                    avatar: initials
+                };
+            });
+            setPatients(mapped);
+            setAlerts(allAlerts.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0, 10));
+        } catch (err) {
+            console.error('Failed to fetch patients dashboard:', err);
+            addNotification('Failed to load patient overview', 'error');
+        }
+    };
+
+    useEffect(() => {
+        fetchPatients();
+    }, [user?.id]);
 
     const fields = [
         { name: 'name', labelKey: 'auth_name_label', placeholder: 'e.g. John Doe', required: true },
@@ -44,14 +80,16 @@ export default function DoctorDashboard() {
             lastSeen: 'Just now',
             avatar: initials || 'P'
         };
+        // This is still local since we don't have an endpoint to just "add" a patient in the dashboard.
+        // A real system would POST to a patient registration API.
         setPatients([...patients, newPatient]);
         addNotification(`${t('notif_added')} (${data.name})`, 'success');
     };
 
     const quickStats = [
         { label: 'dash_total_patients', value: patients.length, icon: '👥' },
-        { label: 'dash_professional_rating', value: '4.9', sub: 'Based on 128 reviews', icon: '⭐' },
-        { label: 'dash_consultations', value: '12', icon: '📅' },
+        { label: 'dash_stable', value: patients.filter(p => p.status === 'dash_stable').length, icon: '✅' },
+        { label: 'dash_at_risk', value: patients.filter(p => p.status === 'dash_at_risk').length, icon: '⚠️' },
     ];
 
     const handleRemovePatient = (e, id) => {
@@ -173,49 +211,38 @@ export default function DoctorDashboard() {
                     </div>
                 </div>
 
-                {/* Feedback Hub */}
+                {/* Clinical Alerts */}
                 <div className="space-y-8">
                     <div className="flex items-center justify-between px-2">
-                        <h2 className="font-black theme-text text-xl uppercase tracking-tight">{t('dash_feedback_hub')}</h2>
+                        <h2 className="font-black theme-text text-xl uppercase tracking-tight">Clinical Alerts</h2>
                     </div>
 
                     <div className="border theme-border hover:border-teal-500 rounded-[3rem] overflow-hidden transition-all shadow-sm hover:shadow-2xl">
-                        <div className="p-10 border-b theme-border theme-bg/50">
-                            <div className="flex items-baseline gap-2">
-                                <span className="text-6xl font-black theme-text">4.9</span>
-                                <span className="text-base font-black theme-text-sub opacity-40 uppercase tracking-widest">/ 5.0</span>
-                            </div>
-                            <div className="flex gap-1.5 mt-6">
-                                {[1, 2, 3, 4, 5].map(i => (
-                                    <span key={i} className="text-yellow-400 text-2xl drop-shadow-sm">★</span>
-                                ))}
-                            </div>
-                            <p className="text-[10px] theme-text-sub font-black uppercase tracking-[0.2em] mt-8 opacity-70">98% Positive Adherence Outcomes</p>
-                        </div>
-
-                        <div className="p-4 space-y-2">
-                            {[
-                                { authorKey: 'pat_sarah', author: 'Sarah Miller', role: 'Caregiver', comment: 'Excellent coordination on medication reports.', date: '2d ago' },
-                                { authorKey: 'pat_john', author: 'John Doe', role: 'Patient', comment: 'The AI feedback has been life-changing.', date: '1w ago' }
-                            ].map((review, i) => (
-                                <div key={i} className="p-6 hover:theme-bg rounded-[1.5rem] transition-all group">
+                        <div className="p-6 space-y-4">
+                            {alerts.map((alert, i) => (
+                                <div key={i} className="p-5 border theme-border rounded-[1.5rem] hover:theme-bg transition-all group">
                                     <div className="flex items-center justify-between mb-3">
                                         <div className="flex items-center gap-3">
-                                            <span className="text-xs font-black theme-text group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
-                                                {review.authorKey ? t(review.authorKey) : review.author}
+                                            <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded-md tracking-widest border theme-border ${
+                                                alert.severity === 'CRITICAL' ? 'bg-red-500/10 text-red-500 border-red-500/20' : 
+                                                alert.severity === 'WARNING' ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20' : 
+                                                'bg-teal-500/10 text-teal-600 border-teal-500/20'
+                                            }`}>
+                                                {alert.severity}
                                             </span>
-                                            <span className="text-[8px] font-black theme-text-sub uppercase px-2 py-0.5 rounded-md tracking-widest border theme-border">{t(`auth_role_${review.role.toLowerCase()}`)}</span>
                                         </div>
-                                        <span className="text-[9px] theme-text-sub font-bold opacity-50">{review.date}</span>
+                                        <span className="text-[9px] theme-text-sub font-bold opacity-50">
+                                            {alert.timestamp ? new Date(alert.timestamp).toLocaleDateString() : 'Recent'}
+                                        </span>
                                     </div>
-                                    <p className="text-xs theme-text leading-relaxed font-medium italic opacity-80">"{review.comment}"</p>
+                                    <p className="text-xs font-black theme-text group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">{alert.patientName}</p>
+                                    <p className="text-[10px] theme-text leading-relaxed font-medium mt-1 opacity-80">{alert.message}</p>
                                 </div>
                             ))}
+                            {alerts.length === 0 && (
+                                <p className="text-sm theme-text-sub text-center p-8 opacity-70">No active alerts across network.</p>
+                            )}
                         </div>
-
-                        <button onClick={() => addNotification('Loading full clinical feedback archives...', 'info')} className="w-full py-6 text-[10px] font-black theme-text-sub hover:text-teal-600 dark:hover:text-teal-400 border-t theme-border theme-bg/30 transition-all uppercase tracking-[0.2em] hover:bg-teal-50/20 dark:hover:bg-teal-900/10">
-                            {t('dash_read_archives')}
-                        </button>
                     </div>
                 </div>
             </div>

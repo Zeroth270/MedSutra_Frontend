@@ -12,14 +12,14 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const { login } = useAuth();
   const { addNotification } = useNotification();
-  const [form, setForm] = useState({ email: '', password: '', role: 'Patient' });
+  const [form, setForm] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const userData = await authService.login(form.email, form.password, form.role);
+      const userData = await authService.login(form.email, form.password);
       login(userData);
       addNotification(`Welcome back, ${userData.name}`, 'success');
       navigate(ROUTES.DASHBOARD);
@@ -73,25 +73,6 @@ export default function LoginPage() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label className="block text-[10px] font-black uppercase tracking-[0.2em] theme-text-sub mb-4 px-1">{t('auth_select_role')}</label>
-              <div className="grid grid-cols-3 gap-3">
-                {['Patient', 'Caregiver', 'Doctor'].map(role => (
-                  <button
-                    key={role}
-                    type="button"
-                    onClick={() => setForm({ ...form, role })}
-                    className={`py-3.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border shadow-sm active:scale-95 ${form.role === role
-                      ? 'bg-gray-900 dark:bg-teal-600 border-gray-900 dark:border-teal-500 text-white shadow-xl'
-                      : 'theme-surface theme-border theme-text-sub hover:border-gray-400 dark:hover:border-teal-900/50'
-                      }`}
-                  >
-                    {t(`auth_role_${role.toLowerCase()}`)}
-                  </button>
-                ))}
-              </div>
-            </div>
-
             <div className="space-y-6">
               <div className="group">
                 <label className="block text-[10px] font-black uppercase tracking-[0.2em] theme-text-sub mb-2 px-1 group-focus-within:text-teal-600 transition-colors">{t('auth_email_label')}</label>
